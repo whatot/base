@@ -1,0 +1,5 @@
+/test
+*.pyc
+*.o
+.*.swp
+/ma-c/.git
