@@ -1,0 +1,39 @@
+(1)通用
+
+---内存低地址---
+Code(代码)
+Data(数据)
+Heap(堆)(向高地址延伸)
+
+......
+
+Stack(栈)(向低地址延伸)
+---内存高地址---
+
+
+(2)UNIX
+
+---内存低地址---
+Text(文本)
+Data(数据)
+BSS
+Heap(堆)(向高地址延伸)
+
+......
+
+Stack(栈)(向低地址延伸)
+---内存高地址---
+
+
+(3)Win32
+
+---内存低地址---
+Reserved by OS(操作系统保留)
+Stack(栈)
+Heap(堆)
+Code(代码)
+Constants(常量)
+Static Constants(静态常量)
+Uninitialized variables(未初始化的变量)
+---内存高地址---
+

@@ -1,0 +1,372 @@
+2.1字符串基本特征
+
+C风格的字符串由一个连续的字符序列组成，并以一个空字符(null)作为结束.
+一个指向字符串的指针实际上就是指向该字符串的起始字符.
+字符串长度是指空字符之前的字节数.
+字符串的值则是它包含的按序列排列的字符序列.
+宽字符串(wide string)类似...
+
+malloc(strlen(str))一般都是错误的,应该是malloc(strlen(str)+1)
+
+
+2.2常见的字符串操作错误
+
+四种:分别为无界字符串复制(unbounded string copy)
+	差一错误(off-by-one error)
+	空结尾错误(null termination error)
+	字符串截断(string truncation)
+
+
+2.2.1无界字符串复制(unbounded string copy)
+
+实例:(无界字符串复制与连接)
++-------------------------------------------------------------------+
+int main(int argc, char argv[]) {
+	char name[2048];
+	strcpy(name, argv[1]);
+	strcat(name, " = ");
+	strcat(name, argv[2]); //全都会越界写
+	......
+}
++-------------------------------------------------------------------+
+
+修正方法:(利用strlen测试长度，然后动态分配内存)
++-------------------------------------------------------------------+
+int main(int argc, char *argv[]) {
+	char *buff = (char *)malloc(strlen(argv[1])+1);
+	if (buff != NULL) {
+		strcpy(buff, argv[1]);
+		printf("argv[1] = %s.\n", buff);
+	}
+	else {
+		/* 处理无法获取内存的恢复性代码*/
+	}
+	return 0;
+}
++-------------------------------------------------------------------+
+
+实例:(C++,从cin中提取字符到字符数组中)
++-------------------------------------------------------------------+
+#include <iostream>
+
+int main(void) {
+	char buff[12];
+
+	//cin.width(12); //修正方法
+	cin >> buf; //用户输入超过11个字符，就会导致越界写
+	cout << "echo: " << buf << endl;
+}
++-------------------------------------------------------------------+
+
+
+2.2.2差一错误(off-by-one error)
+
+错误实例:(一般能通过编译，运行不会报错)
++-------------------------------------------------------------------+
+int main(int argc, char *argv[]) {
+	char source[10];
+	strcpy(source, "0123456789"); //复制了11个字符到source[10],包括一个结尾的空字符
+	char *dest = (char *)malloc(strlen(source)); //长度没有考虑结尾的空字符
+	int i = 1; //数组索引值应从0开始
+	for (; i <= 11; i++) { //为<=11,则比期望的多迭代一次
+		dest[i] = source[i];
+	}
+	dest[i] = '\0'; //也会越界写
+	printf("dest = %s", dest);
+}
++-------------------------------------------------------------------+
+
+
+2.2.3空结尾错误(null termination error)
+
+错误实例:(空结尾覆盖)
++-------------------------------------------------------------------+
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char *argv[]) {
+	char a[16];
+	char b[16];
+	char c[32];
+
+	strcpy(a, "0123456789abcdef");
+	strcpy(b, "0123456789abcdef");
+	strcpy(c, a);
+	strcpy(c, b);
+	printf("a = %s\n", a);
+	printf("b = %s\n", b);
+	printf("c = %s\n", c);
+	return 0;
+}
++-------------------------------------------------------------------+
+
+
+2.2.4字符串截断(string truncation)
+	2.2.1错误实例2的修复版就产生了字符串截断
+
+puts() 是向stdin所指向的输入流中写入一个字符串并且以换行符('\n')结尾.
+
+
+
+2.3预防
+
+静态预防策略,假设固定缓冲区大小,超出即丢弃,即strncpy()和strncat()以及OpenBSD的strlcpy()和strlcat().因为静态方法必然会丢弃多余的数据,因此必然存在实际程序数据丢失的可能性.这就导致必须对得到的字符串进行有效性验证.
+
+动态预防策略,即动态分配内存,有追加内存的需求时,会动态地调整其大小.其优点在于伸缩性好,不会丢弃多余的数据.最大的缺点在于,如果不对输入进行限制,会耗尽一台机器的内存,因而这种方式会被拒绝服务攻击DoS所利用.
+
+
+2.3.1输入验证
+缓冲区溢出可以通常是由无界字符串或者内存复制造成的.缓冲区溢出可以通过确保输入的数据不超过其存储的最小缓冲区大小进行预防.
+
+输入验证实例:
++----------------------------------------------------------------+
+int myfunction(const char *arg) {
+	char buff[100];
+	if (strlen(arg) >= sizeof(buff)) {
+		abort();
+	}
+}
++----------------------------------------------------------------+
+
+任何跨越安全边界转送到程序接口的数据都需要验证.这些数据的例子包括:argv,环境变量,套接字,管道,文件,信号,共享内存以及硬件设备等.
+输入验证虽然对所有类型的缓冲区利用都有效,但这需要开发者对可能引起缓冲区溢出的所有外部输出进行正确地识别和验证.由于这种方式易于出错,因此通常将其和其他策略谨慎地组合使用(例如,替换可以的函数).
+
+
+2.3.2 fgets()和gets_s()
+永远不要使用gets()
++----------------------------------------------------------------+
+#define BUFFSIZE 8
+
+int main(int argc, char *argv[]) {
+	char buff[BUFFSIZE];
+
+	//对gets()的非安全使用
+	gets(buff);
+	printf("gets: %s.\n", buff);
+
+	if (fgets(buff, BUFFSIZE, stdin) == NULL) {
+		printf("read error.\n");
+		abort();
+	}
+	printf("fgets: %s.\n", buff);
+
+	if (gets_s(buff, BUFFSIZE) == NULL) { //只在VS下存在
+		printf("invalid input.\n");
+		abort();
+	}
+	printf("gets_s: %s", buff);
+
+	return 0;
+}
++----------------------------------------------------------------+
+
+与gets()不同,fgets()函数会保留换行符.因此如果输入被截断了,那么输入缓冲区将不会包含一个换行符.
+fgets()函数从流中最多读入比指定数量少1的字符数到一个数组.如果遇到换行符或者是文件结束标志,则不会继续读取.在最后一个字符读入数组后,一个空字符随即被写入缓冲区的结尾处.
+
+gets_s()函数只在VS下存在:
+
+gets_s()函数仅从stdin中读入数据.如果参数(BUFFSIZE)大于内部RSIZE_MAX或者等于0,或者目标指针数组(buff)为空,将会产生一个错误条件,函数不会有任何输入动作,目标字符数组不会被更改.否则,该函数最多读入比指定数目少1的数量的字符,并且在最后一个字符读入数组后马上在其后加上null字符.
+成功返回一个指向目标数组的指针,错误则返回NULL指针.
+gets_s()函数只有在读取了完整的一行数据后才算操作成功(即读入一个换行符时).如果没有读入一个完整行,则函数会返回NULL,将缓冲区设为空字符串,并且清空输入流使其指向下一个换行符.
+
+如果指定输入字符数量超过了目标缓冲区的长度,fgets()和gets_s()还是可能发生缓冲区溢出问题.
+
+
+2.3.3 memcpy_s(),memmove_s()增加一个尺寸参数
+
+2.3.4 strcpy(),strcat()增加输入验证
+strcpy()将源字符串中的字符复制到目标字符数组,直到遇到空结束符并且包括结尾的空字符.
+
+2.3.5 strcpy_s(),strcat_s()增加一个参数指定缓冲区的最大长度
+
+2.3.6 strncpy(),strncat(),C标准库,静态分配,并会舍弃无法放入目标缓冲区的数据
+strncpy(dest, source, dest_size - 1);
+dest[dest_size - 1] = '\0';
+
+最后的参数是剩余的长度
+strncat(dest, source, dest_size-strlen(dest)-1);
+
+问题:这两个函数都没有提供一个状态值表示结果字符串什么时候被截断了.都是返回目标缓冲区的指针.
+
+如果源字符串至少与目标缓冲区一样长,则strncpy()不会在目标字符串结尾加上null终结字符.这导致在strncpy()被调用后,目标字符串必须被手工设为null结尾.
+
+strncpy()性能问题,当源字符串被复制完之后,它会将目标字符串填满null字符.
+
+2.3.7 strncpy_s(),strncat_s()
+
+2.3.8 strlen()
+strlen()函数接受一个指向字符数组的指针,并返回结尾null结束符之前的字符数量.
+但如果字符数组没有正确地以null结束,strlen()函数就可能返回一个极大的错误数值,并造成漏洞.
+解决方案之一是在将字符串传递给strlen()之前在其结尾插入一个null结束符,这就能保证字符串是以null结尾的.
+解决方案之二使用strnlen()函数,再接受一个最大尺寸参数.如果字符串比指定的最大长度还要长,则返回指定的最大长度而不是字符串的实际长度.
+size_t strnlen(const char *s, size_t maxlen);
+
+2.3.9 microsoft Strsafe.h
+
+2.3.10 strlcpy(),strlcat()
+$man strlcpy
+
+#include <bsd/string.h>
+size_t strlcpy(char *dst, const char *src, size_t size);
+size_t strlcat(char *dst, const char *src, size_t size);
+
+strlcpy()函数从src复制一个以null结尾的字符串到dst(结果为以null结尾)(至多复制size-1个字符).
+strlcat()函数在dst的末尾附加上以null结尾的src字符串(目标缓冲区内的字符数目最多不超过size个)(延伸最多(size - strlen(dst) - 1)个字符)(结果为以null结尾).
+
+strlcat()和strlcpy()都不会用null填充目标字符串.
+
+strlcpy()和strlcat()返回他们试图创建的字符串的总长.
+For strlcpy() that means the length of src.
+For strlcat() that means the initial length of dst plus the length of src.
+
+要检测截断,就得验证返回值是否小于size参数,如果字符串被截断,就可以获得存储整个字符串所需的实际字节数,然后重新分配内存并重新进行复制操作.
+	n = strlcpy(dest, source, sizeof(dest));
+	if (n >= sizeof(dest)){
+		...}
+
+
+2.3.11 C++ std::string
+
+std::string是std::basic_string模板类针对char类型的实例化,它采用动态方式按需为字符串分配所需的内存,这意味着在所有情况下size() <= capacity().
+
++-----------------------------------------------------------------+
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main(void) {
+	string str;
+
+	cin >> str;
+	cout <<"str 1: " << str << endl;
+}
++-----------------------------------------------------------------+
+
+std::string对象转换为C风格的字符串:
+使用string::c_str(),就会得到一个正确的以null结尾的C风格字符串.
+使用string::data(),这个函数直接将数据写入一个数组(返回一个指向数组的指针),得到一个不以null结尾的缓冲区.
+这两种方式的唯一区别在于c_str()会加上一个额外的null字符.
+
+
+2.3.12 SafeStr (by Messier和Viega)
+动态分配,可以在需要时自动调整字符串的大小(,通过重新分配内存并移动字符串内容来做到这一点).
+
+2.3.13 Vstr字符串库
+使用readv()/writev()进行输入输出
+
+与大多数字符串库不同,Vstr不具有可通过字符指针直接存取的字符串内部表示.Vstr的内部表示有多个节点组成,每一个节点包含一部分字符串数据.
+这种数据表示模型意味着当字符串长度增长时,其内存使用量线性增长.添加,替换或移动位于字符串任何位置的数据都可以被优化成复杂度为O(1)的算法.
+
+使用Vstr的"Hello World"程序
++-----------------------------------------------------------------+
+#define VSTR_COMPILE_INCLUDE 1
+#include <vstr.h>
+#include <errno.h>
+#include <err.h>
+#include <unistd.h>
+
+int main(void) {
+	Vstr_base *s1 = NULL;
+
+	if (!vstr_init())
+		err(EXIT_FAILURE, "init";
+	if (!(s1 = vstr_dup_cstr_buf(NULL, "Hello World\n")))
+		err(EXIT_FAILURE, "Create string");
+	While (s1->len)
+		if(!vstr_sc_write_fd(s1, 1, s1->len,STDOUT_FILENO,NULL)){
+			if ((errno != EAGAIN) && (errno != EINTR))
+				err(EXIT_FAILURE, "Write");
+		}
+	vstr_free_base(s1);
+	vstr_exit();
+	exit(EXIT_SUCCESS);
+}
++-----------------------------------------------------------------+
+
+
+2.4 字符串流
+按需分配内存的写入机制
+
+#include <stdio.h>
+FILE *fmemopen(void *buf, size_t size, const char *mode);
+FILE *open_memstream(char **ptr, size_t *sizeloc);
+
+#include <wchar.h>
+FILE *open_wmemstream(wchar_t **ptr, size_t *sizeloc);
+
++-----------------------------------------------------------------+
+#include <stdio.h>
+
+int main(void) {
+	char *bp;
+	size_t size;
+	FILE *stream;
+
+	//fmemopen()函数打开一个流,允许你读取或写入一个指定的缓存区.
+	//open_memstream()函数则打开一个流用于向缓存区写入数据.
+	stream = open_memstream(&bp, &size);
+	fprintf(stream, "hello");
+	fflush(stream); //刷新流,更新了buf和size,size表示缓冲区总计大小
+	printf("buf = '%s', size = %d\n", bp, size);
+	fprintf(stream, ", world");
+	fclose(stream); //关闭流,也更新了buf和size
+	printf("buf = '%s', size = %d\n", bp, size);
+
+	return 0;
+}
++-----------------------------------------------------------------+
+output:
+$ gcc -Wall -g -o t_stream t_stream.c
+$ ./t_stream
+buf = 'hello', size = 5
+buf = 'hello, world', size = 12
++-----------------------------------------------------------------+
+
+当流被fclose()关闭或被fflush()刷新时,ptr和sizeloc所指向的位置分别更新为指向缓冲区的指针及缓冲区的大小.
+如果(对流)执行了一个额外的输出,需要再一次刷新流以存储新值，然后才能再次使用它.
+一个null字符会被写入缓冲区的末尾,但sizeloc存储的大小值并不会考虑这个null字符.
+
+
+2.5检测与恢复
+一般要求对运行时环境做出一定的改变,以便可以在缓冲区溢出发生时对其进行检测,从而可以从错误中恢复或安全的失效.
+
+2.5.1编译器生成的运行时检测
+VC++,RTC
+栈指针校验,来检测栈指针的破坏情况.
+局部数组越界检测
+
+2.5.2不可运行栈
+
+2.5.3 Stackgap-分配栈内存时加入随即大小的空隙,使攻击者更难定位栈上的返回地址(针对仅消耗一页实存(real memory)的情景).
+
+为了实现Stackgap,linux内核所需做出的修改
++---------------------------------------------------------------+
+sgap = STACKGAPLEN;
+if (stackgap_ramdom != 0)
+	sgap += (arc4random()*ALIGNBYTES) &(stackgap_ramdom-1)'
+/*检查参数和环境变量能否放入新栈*/
+len = ((argc + envc + 2 + pack.ep_emul->e_arglen) *
+	sizeof(char *) +sizeof(long) + dp + sgap +
+	sizeof(struct ps_strings)) - argp;
++---------------------------------------------------------------+
+
+2.5.4运行时边界检查器
+CRED,C Range Error Detector,C范围错误侦测器(by Ruwase and Lam)
+
+2.5.5 canaries
+canaries用于保护栈上的返回地址免遭连续的写操作(例,strlcpy()所造成的结果)
+
+2.5.6 栈粉碎保护器(ProPolice)
+GCC的栈粉碎保护器(Stack Smashing Protector, SSP,也称为ProPolice),SSP是GCC的一个扩展,可以保护C应用免遭大多数常见形式的栈缓冲区溢出利用,它是作为GCC的中间语言翻译器的形式实现的.SSP提供了缓冲区溢出检测和变量重排技术来防止对指针的破坏.
+特别的是,SSP重排局部变量,将缓冲区放到指针后面,并且将函数参数的指针复制到局部缓冲区变量之前的区域,从而防止了对指针的破坏.
+
+GCC选项
+-fstack-protector和-fno-stack-protector选项可以打开或关闭栈粉碎保护.
+-fstack-protector-all和-fno-stack-protector-all选项可以打开或关闭对每一个函数的保护,而不仅仅局限于对具有字符数组的函数的保护.
+
+SSP的原理是引入一个哨位变量,以阻止对参数,返回地址和前面的帧指针的改变.
+
+2.5.7 Libsafe和Libverify(from Avaya Labs Research)
+Libsafe可以拦截容易产生缓冲区溢出的C库函数并且对其参数做边界检测,确保帧指针和返回地址不会被其拦截的函数修改.
+Libverify这实现了与StackGuard类似的返回地址校验的逻辑,但它不需要对源代码进行重编译.
+

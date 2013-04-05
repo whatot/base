@@ -1,0 +1,197 @@
+3.指针诡计(Pointer subterfuge)是通过修改指针值的利用的统称.
+指针是一个包含某对象地址的变量,其所指对象可以是函数,数组元素或其他数据结构.
+函数指针(function pointer) 数据指针(data pointer)
+
+
+3.1 data段与BSS段
+
+data段包含了所有已初始化的全局变量和常数.
+BSS (Block Started by Symbol), BSS段包含了所有未初始化的全局变量.
+
+将已初始化和未初始化变量分开是为了让汇编器不用将未初始化的内容(BSS段)写入目标文件.
+
+数据声明和进程内存组织:
++------------------------------------------------------------------+
+static int GLOBAL_INIT = 1; /*data段,全局*/
+static int global_uninit; /*BSS段,全局*/
+
+void main(int argc, char *argv[]) { /*栈上,局部*/
+	int local_init = 1; /*栈上,局部*/
+	int local_uninit; /*栈上,局部*/
+	static int local_static_init = 1; /*data段,局部*/
+	static int local_static_uninit; /*BSS段,局部*/
+
+	/*buff_ptr的存储区位于栈上,局部*/
+	/*分配的内存位于堆上,局部*/
+	int *buff_ptr = (int *)malloc(32);
+}
++------------------------------------------------------------------+
+
+
+3.2 GOT(全局偏移表)
+
+任何ELF的二进制文件的进程空间中,都包含一个称为GOT (global offset table, 全局偏移表)的区(section).GOT保持有绝对地址(即是固定的),从而使得地址可用,并不会影响位置独立性和程序代码的可共享性.该表的实际内容和形式取决于处理器的型号.
+
+查询GOT
+$ objdump --dynamic-reloc abccopy
+
+程序使用的每一个库函数在GOT中拥有一个入口项,GOT中包含实际函数的地址.这使得很容易在进程内存中对库函数进行重定位.程序首次使用一个函数之前,该入口项包含有运行时链接器(RTL, runtime linker)的地址.如果该函数被函数调用,则程序的控制权被转移到RTL,然后函数的实际地址被确定且被插入GOT中.接下来就可以通过GOT中的入口项直接调用函数,而跟RTL就无关了.
+
+(可以通过覆写GOT中某个函数的入口项,一旦函数被执行,就获取了程序的控制权)
+
+
+3.3 GNU C中的构造函数与析构函数
+(利用__attribute__关键字后跟一个包含于双括号的属性修饰符来声明函数的属性)
+
++-----------------------------------------------------------------+
+#include <stdio.h>
+#include <stdlib.h>
+
+static void create(void)
+	__attribute__ ((constructor)); //声明构造函数,main()之前执行
+static void destroy(void)
+	__attribute__ ((destructor)); //声明析构函数,main()之后执行
+
+int main(int argc, char *argv[]) {
+	printf("create: %p.\n",create);
+	printf("destroy: %p.\n",destroy);
+	exit(EXIT_SUCCESS);
+}
+void create(void) {
+	printf("create called.\n");
+}
+void destroy(void) {
+	printf("destroy called.\n");
+}
++----------------------------------------------------------------+
+
+构造函数和析构函数分别存储于生成的ELF可执行映像的.ctors和.dtors区.这两区具有如下的布局形式:
+	0xffffffff { 函数地址 } 0x00000000
+.ctors和.dtors区映射到进程地址空间后,默认属性为可写.
+查询.dtors区中的内容
+$ objdump -s -j .btors dtor
+
+(可以通过覆写.dtors和.ctors段来提取程序控制权)
+
+
+3.4虚指针
+
+虚函数就是用virtual关键字声明的类成员函数.该函数可以被派生类中的同名函数所覆写.一个指向派生类对象的指针可以被赋给基类指针,并且通过该指针来调用函数.
+如果没有虚函数,则调用的是基类的函数,因为它和指针的静态类型相关联.
+当使用虚函数时,调用的则是派生类的函数,因为该函数和对象的动态类型相关联.
+
++-----------------------------------------------------------------+
+#include <stdio.h>
+#include <iostream>
+using namespace std;
+
+class a {
+	public:
+		void f(void) {
+			cout << "base f" << endl;
+		};
+	
+		virtual void g(void) { //虚函数
+			cout << "base g" << endl;
+		};
+};
+
+class b: public a {
+	public:
+		void f(void) {
+			cout << "derived f" << endl;
+		};
+
+		void g(void) {
+			cout << "derived g" << endl;
+		};
+};
+
+int main(int argc, char *argv[]) {
+	a *my_b = new b();
+	my_b->f(); //调用a类(基类)的f()
+	my_b->g(); //调用b类(派生类)的g()
+	return 0;
+}
++----------------------------------------------------------------+
+
+大多数C++编译器使用虚函数表(virtual function table, VTBL)实现虚函数.VTBL是一个函数指针数组,用于在运行时派发虚函数调用.
+在每一个对象的头部,包含了一个指向VTBL的虚指针(virtual pointer, VPTR).VTBL包含有指向虚函数的每一个实现的指针.
+
+下面是VTBL的运行时表示:
+	b object	b vtable	g()
+my_b----->[ VPTR ]------>[    ]------->[    ]
+
+(覆写VTBL中的函数指针或者改变VPTR使其指向任意的VTBL都是可能的,可以通过任意内存写或者利用缓冲区溢出直接写入对象.VPTR粉碎(VPTR smashing))
+
+
+3.5 atexit()和on_exit()函数
+atexit()可以注册无参函数,并在程序正常结束后调用该函数.
++----------------------------------------------------------------+
+#include <stdio.h>
+
+char *glob;
+void test(void) {
+	printf("%s", glob);
+}
+
+int main(void) {
+	atexit(test);
+	glob = "Exiting.\n";
+}
++---------------------------------------------------------------+
+
+atexit()通过往一个退出时被调用的数组中添加指定的函数完成工作.当exit()被调用时,数组中的每一个函数都以"后进先出"(LIFO)的顺序被调用.由于atexit()和exit()都要使用该数组,因此它被分配为一个全局性的符号(BSD中是__atexit,linux中是__exit_funcs,试验不对).
+
+
+3.6 longjmp()函数
+C99定义了setjmp()宏,longjmp()函数,以及jmp_buf类型.
+setjmp()宏为稍后将会调用的longjmp()函数保存其调用环境.
+longjmp()则恢复最后一次setjmp()宏保存的调用环境.
++-----------------------------------------------------------------+
+#include <setjmp.h>
+
+jmp_buf buf;
+void g(int n);
+void h(int n);
+int n = 6;
+
+void f(void) {
+	setjmp(buf);
+	g(n);
+}
+void g(int n) {
+	h(n);
+}
+void h(int n) {
+	longjmp(buf, 2);
+}
++-----------------------------------------------------------------+
+
+jmp_buf
++-----------------------------------------------------------------+
+/usr/include/i386-linux-gnu/bits/setjmp.h
+typedef int __jmp_buf[6];
+
+longjmp(env, i) //linux中对应汇编指令
+
+movl i, %eax /* return i */
+movl env.__jmp_buf[JB_BP], %ebp
+movl env.__jmp_buf[JB_BP], %esp
+jmp (env.__jmp_buf[JB_PC])
++----------------------------------------------------------------+
+(可以通过覆写jmp_buf中的PC指针达到获取程序控制权的目的)
+
+
+
+3.7缓解指针诡计-消除"允许内存被不正确地覆写"的漏洞
+
+3.7.1 W^X
+降低有漏洞的进程的权限.
+"W xor X"即一段内存区域要么可写要么可执行,不可两者兼备.
+
+3.7.2 Canaries
+仅对那些欲通过溢出栈缓冲区来覆写栈指针或者其他受保护区域的漏洞利用有效.
+Canaries并不能保护对变量,数据指针或者函数指针的修改.
+Canaries不能阻止包括栈段在内的任何位置发生缓冲区溢出.
+

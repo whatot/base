@@ -1,0 +1,118 @@
+4.动态内存管理
+
+Doug Lea的malloc分配器
+microsoft的RtlHeap
+
+4.1基本知识
+
+堆中的内存是由动态内存分配器(dynamic memory allocator)或内存管理器(memory maager)管理.
+C语言中,内存的分配是通过calloc(),malloc(),realloc()函数实现的,内存的释放是通过free()函数实现的.C++中,内存通过new操作符分配,通过delete操作符释放.
+
+#include <stdlib.h>
+void *malloc(size_t size);
+void free(void *ptr);
+void *calloc(size_t nmemb, size_t size);
+void *realloc(void *ptr, size_t size);
+
+malloc()所分配的内存未被初始化.
+free()重复调用会产生未定义行为.如果ptr为NULL,无操作.
+calloc()为数组分配内存,共有nmemb个元素,每个大小为size,返回的指针指向指向的数组.数组中的内容全部被初始化为0.
+realloc()将ptr所指向的内存块的大小改为size个字节.新旧大小的最小值所包含的内容不变,新分配的内容没被初始化.如果ptr为NULL,等价于malloc(size);如果size=0,则等价于free(ptr).如果ptr不为BULL,则其必须是早先调用malloc(),calloc()或realloc()所返回的结果.
+
+calloc(),malloc()的返回值是一个指向已分配内存的指针,该指针已被适当地对齐,使其可以指向任何类型.如果分配请求失败,则返回NULL.
+
+
+4.2常见的动态内存管理错误
+
+与内存管理有关的常见缺陷包括:初始化错误;检查返回值失败;对已分配内存进行写操作;多次释放同一块内存;不匹配的内存管理函数;混淆对标量和数组的使用;对内存分配函数的不正确使用.
+
+4.2.1初始化-错误地认为malloc()会对内存进行清零初始化.
+
+错误实例:读取未初始化的内存
++----------------------------------------------------------------+
+/* return y = Ax */
+int *matvec(int **A, int *x, int n) {
+	int *y = malloc(n * sizeof(int));
+	int i,j;
+
+	for (i = 0; i < n; i++)
+		for (j = 0; j < n; j++)
+			y[i] += A[i][j] * x[j];
+			//此处假设y[i]的值会被初始化为0
+	return y;
+}
++----------------------------------------------------------------+
+
+4.2.2检查返回值失败
+
+4.2.3引用已释放的内存
+
+错误实例,释放链表的元素
+for (p=head; p != NULL; p = p->next)
+	free(p);
+
+正确方式
+for (p = head; p != MULL; p = q) {
+	q = p->next;
+	free(p);
+}
+
+4.2.4多次释放同一块内存
+
+4.2.5不匹配的内存管理函数
+new分配的存储区,则必须使用delete进行释放.
+malloc()分配存储区,则必须使用free()进行释放.
+违反对应不能保证代码一直正确地工作.
+
+4.2.6未正确区分标量和数组(C++)
+new和delete操作符用于标量的分配与释放:
+	Widget *w new = Widget(arg);
+	delete w;
+new []和delete []操作符用于数组的分配和释放:
+	w = new Widget[n];
+	delete [] w;
+
+4.2.7对分配函数的不当使用
+malloc(0),C运行时库既可以返回NULL指针,也可以将行为表现得与返回一个非零大小的值相同,除了返回的指针不能用于存取对象外.最安全的方式且最具可移植性的方案就是避免这种零长度的内存分配.
+alloca(),在调用者的栈帧(stack frame)内分配内存.被分配的内存在调用alloca()的函数返回时自动释放.alloca()函数返回的指针指向所分配的内存空间的起始处.内联函数形式实现.
+不鼓励使用alloca().
+
+
+4.3 Doug Lea的内存分配器
+
+unlink()
+fontlink()
+
+4.4RtlHeap
+
+4.5缓解策略
+
+4.5.1空指针
+完成free()的调用后,将指针置为NULL．
+之后任何企图解引用指针的操作都会导致致命的错误,并且内存可以释放多次而不会导致糟糕的后果.
+
+4.5.2一致的内存管理约定
+(1)使用同样的模式分配和释放内存.在C++中,在构造函数中进行所以的内存分配,在析构函数中进行所有的内存释放.在C中,定义具有相同功能的create()和destory()函数.
+(2)在同一个模块中,在同一个抽象层次中,分配和释放内存.
+(3)让分配和释放配对.
+
+4.5.3堆完整性检测
+4.5.4phkmalloc
+4.5.5随机化
+4.5.6哨位页
+4.5.8运行时分析工具
+(4.5.8.1)Purify和PurifyPlus--它可以检测出程序对已释放内存的读写以及对非堆或未分配内存的释放,并且可以检查对数组的越界写操作.
+(4.5.8.2)dmalloc库-调试内存分配库
+(4.5.8.3)Electric Fence-检测缓冲区溢出或对为分配内存的引用-使用保护页
+(4.5.8.4)GNU Checker-会在运行时发现内存错误,并且在程序读取未初始化变量或内存区域,或存取一个未分配的内存区域时,对用户发出警告.
+(4.5.8.5)Valgrind
+(4.5.8.6)Parasoft Insure++
+(4.5.8.7)微软的Application Verifier
+
+
+阅读材料:
+Paul Wilson -- [Wilson 95]
+Doug Lea -- <A Memory Allocator> -- [Lea 00]
+[Smahing 05] -- Poul-Henning Kamp的malloc()实现(phkmalloc)的内部细节
+John Wilander - Mariam Kamkar -- [Wilander 03] -- [Wilander 02]
+Ruwase - Lam --CRED(C Range Error Detector)-- [Ruwase 04]
