@@ -1,0 +1,263 @@
+
+if [ -f this_file ]; then
+	if [ -f that_file ]; then
+		if [ -f the_other_file ]; then
+			echo "All files present, and correct"
+		fi
+	fi
+fi
+
+上下替代
+
+if [ -f this_file ]; then
+	foo="True"
+elif [ -f that_file ]; then
+	foo="True"
+elif [ -f the_other_file ]; then
+	foo="True"
+else
+	foo="False"
+fi
+if [ "$foo" = "True" ]; then
+	echo "one of the files exists"
+fi
+
+
+还可以使用AND
+
+if [ -f this_file ] && [ -f that_file ] && [ -f the_other_file ] ; then
+	echo "in if"
+else
+	echo "in else"
+fi
+
+
+statement blocks
+
+get_confirm && {
+	grep -v "$cdcatnum" $tracks_file > $temp_file
+	cat $temp_file > $tracks_file
+	echo
+	add_record_tracks
+}
+
+foo=10
+x=foo
+y='$'$x
+echo $y
+#output $foo
+
+foo=10
+x=foo
+eval y='$'$x
+echo $y
+#output 10
+
+
+exec wall "Thank for all the fish"
+
+
+exit code
+0	success
+1-125	error code
+126	file was not excutable
+127	command was not found
+128+	a signal occurred
+
+
+下面两句等价，将expr计算的结果赋给x
+x=`expr $x + 1`
+x=$(expr $x + 1)
+
+
+printf "format string" parameter1 parameter2
+\a		Alert(ring the bell or beep)
+\b		backspace character
+\f		form feed character
+\n		newline character
+\r		carriage return
+\t		tab character
+\v		vertical tab character
+\oop		the single character with octal value ooo
+
+
+man 3 printf
+d		output a decimal number
+c		output a character
+s		output a string
+%		output the % character
+
+
+return 默认是最后一个命令的exit code
+
+
+shift 将$2变成$1, $3变成$2,...
+
+
+find [path] [options] [tests] [actions]
+
+option			meaning
+-depth
+-follow			follow symbolic links
+-maxdepths N		search at most N levels of directory when searching
+-mount (or -xdev)	don't search directories on other file systems
+
+test			meaning
+-atime N		N天前被访问的accessed
+-mtime N		N天前被修改的modified
+-name pattern		pattern必须被引号包围
+-newer otherfile
+-type C/d/f
+-user username
+
+!	-not	invert the test
+-a	-and	both tests must be true
+-o	-or
+
+\( -newer X -o -name "_*" \)
+比文件X新，或名字以_开头
+
+$find . -newer while2 -print
+$find . -newer while2 -type f -print
+$find . \( -newer "_*" -or -newer while2 \) -type f -print
+
+action			meaning
+-exec command
+-ok command
+-print
+-ls			ls -dils
+
+$find . -newer while2 -type f -exec ls -l {} \;
+
+
+
+grep [options] PATTERN [FILES]
+
+option		meaning
+-c		不输出匹配的行，只输出有多少行匹配
+-E		turn on extended expressions
+-h		每行前加入对应文件名
+-i		ignore case
+-l		只列出有匹配行的文件名，不输出实际匹配的行
+-v		反转，列出不匹配的行
+
+character	meaning
+^		行开头
+$		行结尾
+.		any single character
+[ ]		任选一
+
+匹配次数限定符(默认为贪婪模式，尽可能多地匹配)
+
+使被修饰的表达式可多次重复匹配的修饰符。
+可使被修饰的表达式重复固定次数，也可以限定一定的重复匹配的次数范围。
+
+在限定符之后的表达式能够匹配成功的情况下，不定次数的限定符总是尽可能的多匹配。如果之后的表达式匹配失败，限定符可适当“让出”能够匹配的字符，以使整个表达式匹配成功。这种模式就叫“贪婪模式”。
+{n}		表达式固定重复n次，比如："\w{2}" 相当于 "\w\w"
+{m, n}		表达式尽可能重复n次，至少重复m次："ba{1,3}"可以匹配 "ba"或"baa"或"baaa"
+{m, }		表达式尽可能的多匹配，至少重复m次："\w\d{2,}"可以匹配 "a12","x456"...
+?		表达式尽可能匹配1次，也可以不匹配，相当于 {0, 1}
++		表达式尽可能的多匹配，至少匹配1次，相当于 {1, }
+*		表达式尽可能的多匹配，最少可以不匹配，相当于 {0, }
+
+“勉强模式”限定符：
+在限定符之后添加问号(?)，则使限定符成为“勉强模式”。勉强模式的限定符，总是尽可能少的匹配。如果之后的表达式匹配失败，勉强模式也可以尽可能少的再匹配一些，以使整个表达式匹配成功。
+{m, n}?		表达式尽量只匹配m次，最多重复n次。
+{m, }?		表达式尽量只匹配m次，最多可以匹配任意次。
+??		表达式尽量不匹配，最多匹配1次，相当于 {0, 1}?
++?		表达式尽量只匹配1次，最多可匹配任意次，相当于 {1, }?
+*?		表达式尽量不匹配，最多可匹配任意次，相当于 {0, }?
+
+
+“占有模式”限定符：
+在限定符之后添加加号(+)，则使限定符成为“占有模式”。占有模式的限定符，总是尽可能多的匹配。与“贪婪模式”不同的是，即使之后的表达式匹配失败，“占有模式”也不会“让出”自己能够匹配的字符。
+{m, n}+		表达式尽可能重复n次，至少重复m次。
+{m, }+		表达式尽可能的多匹配，至少重复m次。
+?+		表达式尽可能匹配1次，也可以不匹配，相当于 {0, 1}+
+++		表达式尽可能的多匹配，至少匹配1次，相当于 {1, }+
+*+		表达式尽可能的多匹配，最少可以不匹配，相当于 {0, }+
+
+
+match pattern		meaning
+[:alnum:]		alphanumeric character
+[:alpha:]		letters
+[:ascii:]		ASCII characters
+[:blank:]		space or tab
+[:cntrl:]		ASCII control characters
+[:digit:]		digit
+[:graph:]		noncontrol, nonspace characters
+[:lower:]		lowercase letters
+[:print:]		printable letters
+[:punct:]		punctuation characters
+[:space:]		whitespace character, include vertical tab
+[:upper:]		uppercase letters
+[:xdigit:]		hexadecimal digit
+
+
+
+parameter expansion		description
+${param:-default}		如果param是NULL，设定一个默认值
+${#param}			give the lenth of param
+${param%word}			shell像文件名扩展中那样扩展WORD，并从PARAMETER扩展后的值末尾删除最短的匹配模式
+${param%%word}			从末尾删除最长的匹配模式
+${param#word}			从开头删除最短的匹配模式
+${param##word}			从开头删除最长的匹配模式
+
+
+
+for image in *.gif
+do
+	cjpeg $image > ${image%%gif}jpg
+done
+
+
+command line option	set option	description
+sh -n <script>		set -o noexec	只检查语法错误，不运行
+			set -n
+sh -v <script>		set -o verbose	运行前显示命令
+			set -v
+sh -x <script>		set -o xtrace	运行后显示命令
+			set -x
+			set -o nounset	当有未定义变量被使用时输出错误信息
+			set -u
+
+
+dialog --msgbox "Hello world" 9 18
+
+type		option used to		meaning
+		create type
+check boxes	--checklist		多选框
+infob boxes	--infobox		立即返回的框，没有clear screen
+input boxes	--inputbox		输入框
+memu boxes	--menu			单选框
+message boxes	--msgbox		有OK按钮的消息框
+radio selection boxes --radiolist	单选框
+text boxes	--textbox		display a file in a scrolling box
+Yes/No boxes	--yesno
+
+additional parameters
+dialog type		parameters
+--checklist		text height width list-height[tag text status]...
+--infobox		text height width
+--inputbox		text height width [initial string]
+--menu			text height width memu-height [tag item]...
+--msgbox		text height width
+--radiolist		text height width list-height [tag text status]...
+--textbox		filename height width
+--yesno			text height width
+
+$dialog --title "check me" --checklist "pick numbers" 15 25 3 1 "one" "off" 2 "two" "on" 3 "three" "off"
+
+获取输入 $?
+
+
+open
+read
+write
+close
+ioctl
+
+0:standard input
+1:standard output
+2:standard error
+
