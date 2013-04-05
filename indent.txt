@@ -1,0 +1,162 @@
+格式化 C语言源码——命令indent (2012-06-04 21:04) 一键转载
+标签:  转载  分类： linux
+原文地址：格式化 C语言源码——命令indent 作者：ztguang
+
+http://blog.chinaunix.net/u2/75045/showart_2052986.html
+
+indent是linux下一个能力极强的代码整理软件，使用他，可以轻松的写出代码风格十分精良的代码。但是indent的参数太多，使用起来不是很容易，怎么办呢？
+
+查看 /usr/src/linux-headers-<版本>/scripts/Lindent文件，可以看到一行代码:
+
+indent -npro -kr -i8 -ts8 -sob -l280 -ss -ncs -cp1 *.c *.h
+
+这一行就是linux内核使用indent整理代码的格式，使用这条命令就可以实现风格十分良好的C或C++代码，其中-l280是每一行最多280个字母，超出会拆行，如果不喜欢可以使用更长的行字数
+
+indent 常用的参数设置
+以前的用法：indent -kr -cli4 -i4 -nut <filename>
+改进的用法：indent -kr -cli4 -nut -bl4 -bli0 <filename>
+注释：
+-kr, Use Kernighan & Ritchie coding style.
+-cli4, specifies the number of spaces that case labels should be indented to the right of the containing switch statement.
+-nut, 不使用空格。
+-bl4, 大括号内的缩进，这里为4个空格。
+-bli0, “if”语句后大括号的缩进，一般设为“0”。
+indent工具参数
+indent是一个常用的Linux的C代码格式化工具,但是参数太多,很难记忆,目前发现一组参数,可以格式化为我常用的代码格式。
+
+-bad -bap -bbb -bbo -nbc -bl -bli0 -bls -c33 -cd33 -ncdb -ncdw -nce -cli0 -cp33 -cs -d0 -nbfda -nfc1 -nfca -hnl -ip5 -l75 -lp -pcs -nprs -saf -sai -saw -nsc -nsob -nss -i4 -ts4 -ut
+保存在~/.indent.pro，就是默认的indent参数了。
+
+3.5. 用 indent 进行代码格式化
+一个范例，胜过前言万语。用indent格式化代码，再从格式化前后的格式变化，来学习格式化规范。
+可以用不同的参数调用 indent，
+
+Download : ftp.gnu.org/gnu/indent/indent-2.2.7.tar.gz
+
+3.5.2. Indent参数规范
+我们参照GNU，Kernighan & Ritchie，Berkeley风格，制定了自己风格：
+
+1.indent命令参数：
+-bad -bap -bbb -bbo -nbc -bl -bli0 -bls -c33 -cd33 -ncdb -ncdw -nce -cli0 -cp33 -cs -d0 -nbfda -di2 -nfc1 -nfca -hnl -ip5 -l75 -lp -pcs -nprs -psl -saf -sai -saw -nsc -nsob -nss -i4 -ts4 -ut
+
+2.indent配置文件
+如上参数可写入用户目录下的文件：".indent.pro"，作为运行indent的确省参数。
+
+3.indent配置说明
+
+
+使用的indent参数
+值
+含义
+
+--blank-lines-after-declarations
+bad
+变量声明后加空行
+--blank-lines-after-procedures
+bap
+函数结束后加空行
+--blank-lines-before-block-comments
+bbb
+块注释前加空行
+--break-before-boolean-operator
+bbo
+较长的行，在逻辑运算符前分行
+--blank-lines-after-commas
+nbc
+变量声明中，逗号分隔的变量不分行
+--braces-after-if-line
+bl
+"if"和"{"分做两行
+--brace-indent 0
+bli0
+"{"不继续缩进
+--braces-after-struct-decl-line
+bls
+定义结构，"struct"和"{"分行
+--comment-indentationn
+c33
+语句后注释开始于行33
+--declaration-comment-columnn
+cd33
+变量声明后注释开始于行33
+--comment-delimiters-on-blank-lines
+ncdb
+不将单行注释变为块注释
+--cuddle-do-while
+ncdw
+"do --- while"的"while"和其前面的"}"另起一行
+--cuddle-else
+nce
+"else"和其前面的"}"另起一行
+--case-indentation 0
+cli0
+switch中的case语句所进0个空格
+--else-endif-columnn
+cp33
+#else, #endif后面的注释开始于行33
+--space-after-cast
+cs
+在类型转换后面加空格
+--line-comments-indentation n
+d0
+单行注释（不从1列开始的），不向左缩进
+--break-function-decl-args
+nbfda
+关闭：函数的参数一个一行
+--declaration-indentationn
+di2
+变量声明，变量开始于2行，即不必对齐
+--format-first-column-comments
+nfc1
+不格式化起于第一行的注释
+--format-all-comments
+nfca
+不开启全部格式化注释的开关
+--honour-newlines
+hnl
+Prefer to break long lines at the position of newlines in the input.
+--indent-leveln
+i4
+设置缩进多少字符，如果为tab的整数倍，用tab来缩进，否则用空格填充。
+--parameter-indentationn
+ip5
+旧风格的函数定义中参数说明缩进5个空格
+--line-length 75
+l75
+非注释行最长75
+--continue-at-parentheses
+lp
+续行从上一行出现的括号开始
+--space-after-procedure-calls
+pcs
+函数和"("之间插入一个空格
+--space-after-parentheses
+nprs
+在"（"后"）"前不插入空格
+--procnames-start-lines
+psl
+将函数名和返回类型放在两行定义
+--space-after-for
+saf
+for后面有空格
+--space-after-if
+sai
+if后面有空格
+--space-after-while
+saw
+while后面有空格
+--start-left-side-of-comments
+nsc
+不在生成的块注释中加*
+--swallow-optional-blank-lines
+nsob
+不去掉可添加的空行
+--space-special-semicolon
+nss
+一行的for或while语句，在";"前不加空。
+--tab-size
+ts4
+一个tab为4个空格（要能整除"-in"）
+--use-tabs
+ut
+使用tab来缩进
