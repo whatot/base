@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-g -Wall
 LDFLAGS=
 
-objects=simple_write simple_read copy_system copy_block copy_stdio printdir
+objects=argopt longopt
 
 .PHONY:all
 all:$(objects)
