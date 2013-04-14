@@ -64,7 +64,54 @@ def sim_pearson(prefs, p1, p2):
     return r
 
 
+# 从反映偏好的字典中返回最为匹配者
+# 返回结果的个数和相似度函数均为可选参数
+def topMatches(prefs, person, n=5, similarity=sim_pearson):
+    scores=[(similarity(prefs,person,other),other)
+            for other in prefs if other != person]
+
+    # 对列表进行排序，评价值最高者排在最前面
+    scores.sort();
+    scores.reverse()
+    return scores[0:n]
+
+
+# 利用所有他人评价值的加权平均，为他人提供建议
+def getRecommendations(prefs,person,similarity=sim_pearson):
+    totals={}
+    simSums={}
+    for other in prefs:
+        # 不要和自己做比较
+        if other==person: continue
+        sim=similarity(prefs,person,other)
+
+        # 忽略评价值为零或小于零的情况
+        if sim<=0: continue
+        for item in prefs[other]:
+
+            # 只对自己还未曾看过的影片进行评价
+            if item not in prefs[person] or prefs[person][item]==0:
+                # 相似度*评价度
+                totals.setdefault(item,0)
+                totals[item] += prefs[other][item]*sim
+                # 相似度之和
+                simSums.setdefault(item,0)
+                simSums[item] += sim
+
+    # 建立一个归一化的列表
+    rankings=[(total/simSums[item],item) for item,total in totals.items()]
+
+    # 返回经过排序的列表
+    rankings.sort()
+    rankings.reverse()
+    return rankings
+
+
+
 if __name__ == "__main__":
 
     print sim_distence(critics, 'Lisa Rose', 'Gene Seymour')
     print sim_pearson(critics, 'Lisa Rose', 'Gene Seymour')
+    print topMatches(critics, 'Toby', n=3)
+    print getRecommendations(critics, 'Toby')
+    print getRecommendations(critics, 'Toby', similarity=sim_distence)
