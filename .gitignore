@@ -2,4 +2,5 @@
 *.pyc
 *.o
 .*.swp
-/ma-c/.git
+*.zip
+*.tar.gz
