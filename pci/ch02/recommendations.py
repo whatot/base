@@ -107,6 +107,16 @@ def getRecommendations(prefs,person,similarity=sim_pearson):
     return rankings
 
 
+def transformPrefs(prefs):
+    result={}
+    for person in prefs:
+        for item in prefs[person]:
+            result.setdefault(item,{})
+
+            # 将物品与人员对调
+            result[item][person]=prefs[person][item]
+    return result
+
 
 if __name__ == "__main__":
 
@@ -115,3 +125,7 @@ if __name__ == "__main__":
     print topMatches(critics, 'Toby', n=3)
     print getRecommendations(critics, 'Toby')
     print getRecommendations(critics, 'Toby', similarity=sim_distence)
+    print
+    movies=transformPrefs(critics)
+    print topMatches(movies, 'Superman Returns')
+    print getRecommendations(movies, 'Just My Luck')

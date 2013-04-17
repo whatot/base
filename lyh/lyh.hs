@@ -52,6 +52,12 @@ cylinder r h =
 	let	sideArea = 2 * pi * r * h
 		topArea = pi * r ^ 2
 	in sideArea + 2 * topArea
+
+fac :: Integer -> Integer
+fac 0 = 1
+fac n | n > 0 = n * fac (n-1)
+
+
 --ghci> 4 * (let a = 9 in a + 1) + 2
 --42
 --ghci> [let square x = x * x in (square 5, square 3, square 2)]
