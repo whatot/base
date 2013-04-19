@@ -250,3 +250,237 @@ non_raw_pattern将\b识别为转义字符中的退格字符
 	In [20]: re_obj.match(search_string, pos=1, endpos=3)
 
 
+
+####处理文件
+
+**读取文件,创建文件对象**
+
+	In [1]: infile = open("foo.txt", "r")
+
+	In [2]: print infile.read()
+	this is a test file.
+	for file operations.
+
+	In [3]: ls
+	foo.txt  README.md  re_loop_compile.py  re_loop_nocompile.py
+
+open (文件名， 文件打开模式， 缓冲区大小)   
+模式 r(读取，default), w(写), a(附加模式), b(二进制)
+
+
+**写入文件,关闭文件,覆盖原内容**
+
+	In [4]: outputfile = open("foo.txt", "w")
+
+	In [5]: outputfile.write("This is \nSome\nRandom\nOutput Text\n")
+
+	In [7]: outputfile.close()
+
+	In [8]: !cat foo.txt
+	This is 
+	Some
+	Random
+	Output Text
+
+**使用try/finally写入并关闭文件**
+
+	In [9]: try:
+	...:     f = open('foo.txt', 'w')
+	...:     f.write('quick line here\n')
+	...: finally:
+	...:     f.close()
+	...:     
+
+	In [10]: !cat foo.txt
+	quick line here
+
+**使用with-as写入并自动关闭文件**
+
+	In [11]: with open('foo.txt', 'w') as f:
+	....:     f.write('this is a writeable file\n')
+	....:     
+
+	In [12]: !cat foo.txt
+	this is a writeable file
+
+	In [13]: f
+	Out[13]: <closed file 'foo.txt', mode 'w' at 0x95dec28>
+
+
+**读取文件read(),readline(),readlines()**
+
+	In [15]: f = open("foo.txt", "r")
+
+	In [16]: f.read()
+	Out[16]: 'this is a writeable file\n'
+
+	In [17]: f.readline()
+	Out[17]: ''
+
+	In [22]: f = open("foo.txt", "r")
+
+	In [23]: f.readline()
+	Out[23]: 'this is a writeable file\n'
+
+	In [25]: f.read(5)
+	Out[25]: 'this '
+
+
+**写文件write(),writelines()**
+
+	In [26]: f = open("foo.txt", "w")
+
+	In [27]: f.write("Test\nFile\n")
+
+	In [29]: f.close()
+
+	In [30]: g = open("foo.txt", "r")
+
+	In [31]: g.read()
+	Out[31]: 'Test\nFile\n'
+
+使用列表生成式
+
+	In [35]: f = open("foo.txt", "w")
+
+	In [36]: f.writelines("%s\n" % i for i in range(10))
+
+	In [37]: f.close()
+
+	In [38]: g = open("foo.txt", "r")
+
+	In [39]: g.read()
+	Out[39]: '0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n'
+
+使用迭代器(iterator) yield
+
+	In [40]: def myRange(r):
+	....:     i = 0
+	....:     while i < r:
+	....:         yield "%s\n" % i
+	....:         i += 1
+	....:         
+
+	In [41]: f = open("foo.txt", "w") 
+
+	In [42]: f.writelines(myRange(10))
+
+	In [43]: f.close()
+
+	In [44]: g= open("foo.txt", "r")
+
+	In [45]: g.read()
+	Out[45]: '0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n'
+
+
+####标准输入和输出
+
+**sys.stdin**
+
+	In [50]: import sys
+
+	In [51]: g
+	Out[51]: <open file 'foo.txt', mode 'r' at 0x96487b0>
+
+	In [52]: sys.stdin
+	Out[52]: <open file '<stdin>', mode 'r' at 0xb75b2020>
+
+	In [53]: type(sys.stdin) == type(f)
+	Out[53]: True
+
+**sys.stdout**
+
+	In [1]: import sys
+
+	In [2]: f = open('foo.txt', 'w')
+
+	In [3]: sys.stdout
+	Out[3]: <open file '<stdout>', mode 'w' at 0xb7500078>
+
+	In [4]: f
+	Out[4]: <open file 'foo.txt', mode 'w' at 0x99dcb20>
+
+	In [5]: type(sys.stdout) == type(f)
+	Out[5]: True
+
+
+**StringIO**
+
+	In [6]: from StringIO import StringIO
+
+	In [8]: file_like_string = StringIO("This is a\nmultiline string.\nreadline() shoule see\nmultiple lines of \ninput")
+
+	In [9]: file_like_string.readline()
+	Out[9]: 'This is a\n'
+
+	In [10]: file_like_string.readline()
+	Out[10]: 'multiline string.\n'
+
+	In [11]: file_like_string.readlines()
+	Out[11]: ['readline() shoule see\n', 'multiple lines of \n', 'input']
+
+	In [12]: dir(file_like_string)
+	Out[12]: 
+	['__doc__',
+	'__init__',
+	'__iter__',
+	'__module__',
+	'buf',
+	'buflist',
+	'close',
+	'closed',
+	'flush',
+	'getvalue',
+	'isatty',
+	'len',
+	'next',
+	'pos',
+	'read',
+	'readline',
+	'readlines',
+	'seek',
+	'softspace',
+	'tell',
+	'truncate',
+	'write',
+	'writelines']
+
+
+**file与StringIO的区别-方法与属性**
+
+	In [13]: f = open("foo.txt", 'r')
+
+	In [14]: from sets import Set
+
+	In [15]: sio_set = Set(dir(file_like_string))
+
+	In [16]: file_set = Set(dir(f))
+
+	In [17]: sio_set.difference(file_set)
+	Out[17]: Set(['__module__', 'buflist', 'pos', 'len', 'getvalue', 'buf'])
+
+	In [18]: file_set.difference(sio_set)
+	Out[18]: Set(['__enter__', 'encoding', '__str__', '__getattribute__', 'xreadlines', '__sizeof__', 'newlines', '__setattr__', 'errors', '__new__', 'readinto', '__format__', '__class__', 'mode', '__exit__', '__reduce__', '__reduce_ex__', 'fileno', 'name', '__delattr__', '__subclasshook__', '__repr__', '__hash__'])
+
+
+**urllib**
+
+	In [1]: import urllib
+
+	In [2]: url_file = urllib.urlopen("https://google.com.hk")
+
+	In [3]: url_docs = url_file.read()
+
+	In [4]: url_file.close()
+
+	In [5]: len(url_docs)
+	Out[5]: 10976
+
+	In [6]: url_docs[:80]
+	Out[6]: '<!doctype html><html itemscope="itemscope" itemtype="http://schema.org/WebPage">'
+
+	In [7]: url_docs[-80:]
+	Out[7]: 'n);google.timers.load.t.prt=e=(new Date).getTime();})();\n</script></body></html>'
+
+
+
