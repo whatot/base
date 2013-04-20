@@ -1,4 +1,5 @@
 /test
+/server
 *.pyc
 *.o
 .*.swp
