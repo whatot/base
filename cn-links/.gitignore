@@ -1,7 +1,3 @@
-/test
-/server
-/cn-links
-/ma_c
 *.pyc
 *.o
 .*.swp

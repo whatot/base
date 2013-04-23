@@ -47,6 +47,10 @@ cn-links
 
 ###Redis
 
+* [redis中文官方网站](http://redis.cn/)
+
+* [redis网络资料汇总](http://redis.cn/article.html)
+
 * [Redis核心解读系列](http://www.wzxue.com/redis%E6%A0%B8%E5%BF%83%E8%A7%A3%E8%AF%BB%E7%B3%BB%E5%88%97/)
 
 >**Redis核心解读系列包含内容**
@@ -124,3 +128,13 @@ cn-links
 * [Vim 编辑器 [Python俱乐部]](http://www.pythonclub.org/linux/vim/start)
 
 * 
+
+
+### jemalloc
+
+* [jemalloc index](http://canonware.com/jemalloc/index.html)
+
+* [jemalloc Downloading](http://canonware.com/jemalloc/download.html)
+>``git clone git://canonware.com/jemalloc.git``
+
+
