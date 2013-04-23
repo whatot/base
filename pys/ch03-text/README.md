@@ -486,3 +486,13 @@ open (文件名， 文件打开模式， 缓冲区大小)
 
 ####日志解析
 
+####ElementTree
+
+    In [1]: from xml.etree import ElementTree as ET
+
+    In [2]: tcusers = ET.parse('./mime.xml')
+
+    In [3]: tcusers
+    Out[3]: <xml.etree.ElementTree.ElementTree at 0x8a9e02c>
+
+
