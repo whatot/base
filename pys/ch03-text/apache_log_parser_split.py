@@ -16,7 +16,7 @@ def dictify_logline(line):
     in are remote host and bytes sent, but we are putting status in
     there just for goog measure.
     '''
-    split_line = line.splt()
+    split_line = line.split()
     return {'remote_host': split_line[0],
             'status': split_line[8],
             'bytes_sent': split_line[9],
