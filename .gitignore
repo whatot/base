@@ -2,6 +2,7 @@
 /server
 /cn-links
 /ma_c
+/zoj
 *.pyc
 *.o
 .*.swp
