@@ -1,12 +1,26 @@
-objects=$(wildcard *.c)
+CC=gcc
+CXX=gcc
+
+CFLAGS += --static
+CLFAGS += -Wall -ansi -fno-asm -O2 -g
+LDFLAGS += -lm
+
+SOURCE = $(wildcard *.c)
+#OBJS = $(patsubst %.c,%.o,$(SOURCE))
+TARGET = $(patsubst %.c,%.bin,$(SOURCE))
 
 .PHONY: all clean
 
-all:$(objects)
-	gcc $^ -o $^.bin -ansi -fno-asm -O2 -Wall -lm --static
+all:$(TARGET)
+
+%.bin:%.c
+	$(CXX) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $< -o $@
+
+#all:$(objects)
+#	gcc $^ -o $^.bin -ansi -fno-asm -O2 -Wall -lm --static
 
 clean:
-	rm -f *.bin
+	rm -f *.bin *.o
 
 # $(wildcard *.c source/*.c)
 # wildcard把目录./和./source/下的所有后缀是c的文件全部展开
