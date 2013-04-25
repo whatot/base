@@ -257,7 +257,7 @@ Soup会使用heuristics修复可能的结构问题。
 
   * 有些标签可以内嵌 (<BLOCKQUOTE>) ，有些不行 (<P>). 
   * table和list标签有一个自然的内嵌顺序。例如，<TD> 标签内为 <TR> 标签，而不会相反。 
-  * <SCRIPT> 标签的内容不会被剖析为HTML。 
+  * SCRIPT 标签的内容不会被剖析为HTML。 
   * <META> 标签可以知道文档的编码类型。 
 
 这是运行例子:
