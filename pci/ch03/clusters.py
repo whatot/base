@@ -14,3 +14,12 @@ def readfile(filename):
         #剩余部分就是该行对应的数据
         data.append([float(x) for x in p[1:]])
     return rownames,colnames,data
+
+
+class bicluster:
+    def __init__(self,vec,left=None,right=None,distance=0.0,id=None):
+        self.left=left
+        self.right-right
+        self.vec=vec
+        self.id=id
+        self.distance=distance
