@@ -1,5 +1,5 @@
-# -*- coding:utf-8 -*-
 #!/usr/bin/python2
+# -*- coding:utf-8 -*-
 
 import smtplib
 mail_server = 'localhost'

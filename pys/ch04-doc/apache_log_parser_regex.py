@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 """
 USAGE:
 apache_log_parser_split.py some_log_file

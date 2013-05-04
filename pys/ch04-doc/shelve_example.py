@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python2
+# -*- coding:utf-8 -*-
 
 import shelve
 import apache_log_parser_regex
