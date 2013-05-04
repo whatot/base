@@ -1,5 +1,27 @@
 #!/usr/bin/python2
 # -*- coding:utf-8 -*-
+'''check web server using HTTP request
+Usage and example:
+$ python2 check_web_server.py -a google.com.hk -p 80 -r apache
+options: {'resource': 'apache', 'port': 80, 'address': 'google.com.hk'},
+args: []
+HTTP request:
+|||GET /apache HTTP/1.1
+HOST: google.com.hk
+
+|||
+Attempting to connect to google.com.hk on port 80
+Connectd to google.com.hk on port 80
+Received 100 bytes of HTTP reponse
+|||HTTP/1.1 301 Moved Permanently
+Location: http://www.google.com.hk/apache
+Content-Type: text/html; |||
+Closing the connection
+First line of the HTTP response: HTTP/1.1 301 Moved Permanently
+Version: HTTP/1.1, Status: 301, Message: Moved Permanently
+Success - status was 301
+check_webserver returned True
+'''
 
 import socket
 import re
