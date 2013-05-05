@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding:utf-8 -*-
 
-import email
+#import email
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -22,9 +22,9 @@ m["To"] = to_addr
 m["From"] = from_addr
 m["Subject"] = subject_header
 (ctype, encoding) = mimetypes.guess_type(attachment)
-print ctype, encoding
+print(ctype, encoding)
 maintype, subtype = ctype.split('/', 1)
-print maintype, subtype
+print(maintype, subtype)
 
 m.attach(MIMEText(body))
 fp = open(attachment, 'rb')
@@ -39,4 +39,3 @@ s = smtplib.SMTP("localhost")
 s.set_debuglevel(1)
 s.sendmail(from_addr, to_addr, m.as_string())
 s.quit()
-

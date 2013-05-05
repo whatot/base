@@ -2,6 +2,7 @@
 
 import re
 
+
 def run_re():
     pattern = 'pDq'
     re_obj = re.compile(pattern)
@@ -19,5 +20,5 @@ def run_re():
 
 if __name__ == "__main__":
     lines, match_count = run_re()
-    print 'LINES::', lines
-    print 'MATCHES::', match_count
+    print('LINES::', lines)
+    print('MATCHES::', match_count)

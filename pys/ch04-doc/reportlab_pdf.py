@@ -7,19 +7,20 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 
 import reportlab.pdfbase.ttfonts
-reportlab.pdfbase.pdfmetrics.registerFont(reportlab.pdfbase.ttfonts.TTFont('wqyzh', '/usr/share/fonts/wenquanyi/wqy-zenhei/wqy-zenhei.ttc'))
-import reportlab.lib.fonts
+reportlab.pdfbase.pdfmetrics.registerFont(reportlab.pdfbase.ttfonts.TTFont('wqyzh', 'wqy-zenhei.ttc'))
+#import reportlab.lib.fonts
 
 
 def disk_report():
     p = subprocess.Popen("df -h", shell=True, stdout=subprocess.PIPE)
     return p.stdout.readlines()
 
-def create_pdf(input,output="disk_report.pdf"):
+
+def create_pdf(input, output="disk_report.pdf"):
     now = datetime.datetime.today()
     date = now.strftime("%h %d %Y %H:%M:%S")
     c = canvas.Canvas(output)
-    c.setFont("wqyzh",12)
+    c.setFont("wqyzh", 12)
     textobject = c.beginText()
     textobject.setTextOrigin(inch, 11*inch)
     textobject.textLines('''

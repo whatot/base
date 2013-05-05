@@ -3,6 +3,7 @@
 import unittest
 import apache_log_parser_regex
 
+
 class TestApacheLogParse(unittest.TestCase):
 
     def setUp(self):

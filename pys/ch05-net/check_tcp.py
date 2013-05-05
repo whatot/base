@@ -12,8 +12,8 @@ check_server returned True
 '''
 
 import socket
-import re
 import sys
+
 
 def check_server(address, port):
     #create a TCP socket
@@ -32,13 +32,12 @@ if __name__ == '__main__':
     parser = OptionParser()
 
     parser.add_option("-a", "--address", dest="address", default='localhost',
-            help="ADDRESS for server", metavar="ADDRESS")
+                      help="ADDRESS for server", metavar="ADDRESS")
     parser.add_option("-p", "--port", dest="port", type="int", default=80,
-            help="PORT for server", metavar="PORT")
+                      help="PORT for server", metavar="PORT")
 
-(options, args) = parser.parse_args()
-print('options: %s, args: %s' % (options, args))
-check = check_server(options.address, options.port)
-print('check_server returned %s' % check)
-sys.exit(not check)
-
+    (options, args) = parser.parse_args()
+    print('options: %s, args: %s' % (options, args))
+    check = check_server(options.address, options.port)
+    print('check_server returned %s' % check)
+    sys.exit(not check)

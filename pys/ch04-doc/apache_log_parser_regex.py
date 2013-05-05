@@ -26,8 +26,10 @@ log_line_re = re.compile(r'''(?P<remote_host>\S+) #IP ADDRESS
                             \s* #whitespace
                             ''', re.VERBOSE)
 
+
 def dictify_logline(line):
-    '''return a dictionry of the pertinent pieces of an apache combined log file
+    '''return a dictionry of the pertinent pieces of
+    an apache combined log file
 
     Currently, the only fields we are interested in are remote host and
     bytes sent, but we are putting status in there just for good measure.
@@ -42,7 +44,8 @@ def dictify_logline(line):
         return {'remote_host': None,
                 'status': None,
                 'bytes_sent': "0",
-        }
+                }
+
 
 def generate_log_report(logfile):
     '''return a dictionry of format remote_host=>[list of bytes sent]
@@ -54,7 +57,7 @@ def generate_log_report(logfile):
     report_dict = {}
     for line in logfile:
         line_dict = dictify_logline(line)
-        print line_dict
+        print(line_dict)
         try:
             bytes_sent = int(line_dict['bytes_sent'])
         except ValueError:
@@ -66,15 +69,15 @@ def generate_log_report(logfile):
 
 if __name__ == "__main__":
     if not len(sys.argv) > 1:
-        print __doc__
+        print(__doc__)
         sys.exit(1)
     infile_name = sys.argv[1]
     try:
         infile = open(infile_name, 'r')
     except IOError:
-        print "You must specify a valid file to parse"
-        print __doc__
+        print("You must specify a valid file to parse")
+        print(__doc__)
         sys.exit(1)
     log_report = generate_log_report(infile)
-    print log_report
+    print(log_report)
     infile.close()

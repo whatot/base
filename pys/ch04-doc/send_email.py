@@ -13,8 +13,7 @@ subject_header = 'Subject: nothing intersting'
 
 body = 'This is a not-very-interesting email.'
 
-email_message = '%s\n%s\n%s\n\n%s' % (from_addr, to_addr, subject_header,
-        body)
+email_message = '%s\n%s\n%s\n\n%s' % (from_addr, to_addr, subject_header, body)
 
 s = smtplib.SMTP(mail_server, mail_server_port)
 
