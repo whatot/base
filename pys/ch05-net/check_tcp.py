@@ -1,6 +1,8 @@
 #!/usr/bin/python2
 # -*- coding:utf-8 -*-
-'''check TCP to an address on some port
+'''
+check_tcp.py : check TCP to an address on some port
+
 USAGE:
 $ python2 check_tcp.py -a google.com.hk -p 80
 or

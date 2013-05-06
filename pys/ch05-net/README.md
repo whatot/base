@@ -6,3 +6,10 @@
 	>* send()
 	>* recv()
 	>* close()
+
+* httplib
+* ftplib
+* urllib
+* urllib2
+
+
