@@ -1,25 +1,26 @@
 #!/usr/bin/python2
 
+
 def readfile(filename):
-    lines=[line for line in file(filename)]
+    lines = [line for line in filename]
 
     #第一列是列标题
-    colnames=lines[0].strip().split('\t')[1:]
-    rownames=[]
-    data=[]
+    colnames = lines[0].strip().split('\t')[1:]
+    rownames = []
+    data = []
     for line in lines[1:]:
-        p=line.strip().split('\t')
+        p = line.strip().split('\t')
         #每行的第一列是行名
         rownames.append(p[0])
         #剩余部分就是该行对应的数据
         data.append([float(x) for x in p[1:]])
-    return rownames,colnames,data
+    return rownames, colnames, data
 
 
 class bicluster:
-    def __init__(self,vec,left=None,right=None,distance=0.0,id=None):
-        self.left=left
-        self.right-right
-        self.vec=vec
-        self.id=id
-        self.distance=distance
+    def __init__(self, vec, left=None, right=None, distance=0.0, id=None):
+        self.left = left
+        self.right = right
+        self.vec = vec
+        self.id = id
+        self.distance = distance
