@@ -1,5 +1,7 @@
 ## ch05 network
 
+###网络客户端
+
 * socket
 	>* socket()
 	>* connect()
@@ -12,4 +14,10 @@
 * urllib
 * urllib2
 
+
+###远程过程调用
+
+* XML-RPC
+* Pyro ?
+* SSH
 
