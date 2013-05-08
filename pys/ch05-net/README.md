@@ -30,3 +30,10 @@
 
 
 ### Scapy
+
+> $sudo scapy
+
+> >>>res,unans = traceroute(["www.microsoft.com","www.cisco.com","www.yahoo.com","www.wanadoo.fr","www.pacsec.com"],dport=[80,443],maxttl=20,retry=-2)
+
+> >>>res.graph(target=">./graph.svg")
+> >>>res.graph(type="ps", target="| lp")
