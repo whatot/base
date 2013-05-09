@@ -6,6 +6,7 @@ to draw a picture we need python2-imaging PIL
 '''
 
 from math import sqrt
+from PIL import Image, ImageDraw
 
 
 def readfile(filename):
@@ -122,7 +123,73 @@ def printclust(clust, labels=None, n=0):
         printclust(clust.right, labels=labels, n=n+1)
 
 
+def getheight(clust):
+    # 这是一个叶节点吗？若是，则高度为1
+    if clust.left is None and clust.right is None:
+        return 1
+
+    # 否则，高度为每一个分支的高度之和
+    return getheight(clust.left) + getheight(clust.right)
+
+
+def getdepth(clust):
+    # 一个叶节点的距离是0.0
+    if clust.left is None and clust.right is None:
+        return 0
+
+    # 一个枝节点的距离等于左右两侧分支中距离较大者，
+    # 加上该枝节点自身的距离
+    return max(getdepth(clust.left), getdepth(clust.right)) + clust.distance
+
+
+def drawnode(draw, clust, x, y, scaling, labels):
+    if clust.id < 0:
+        h1 = getheight(clust.left) * 20
+        h2 = getheight(clust.right) * 20
+        top = y - (h1 + h2) / 2
+        bottom = y + (h1 + h2) / 2
+
+        # 线的长度
+        ll = clust.distance * scaling
+        # 聚类到其子节点的垂直线
+        draw.line((x, top + h1/2, x, bottom - h2/2), fill=(255, 0, 0))
+
+        # 连接到左侧节点的水平线
+        draw.line((x, top + h1/2, x + ll, top + h1/2), fill=(255, 0, 0))
+
+        # 连接到右侧节点的水平线
+        draw.line((x, bottom - h2/2, x + ll, bottom - h2/2), fill=(255, 0, 0))
+
+        # 调用函数绘制左右节点
+        drawnode(draw, clust.left, x + ll, top + h1/2, scaling, labels)
+        drawnode(draw, clust.right, x + ll, bottom - h2/2, scaling, labels)
+    else:
+        # 如果这是一个叶节点，则绘制节点的标签
+        draw.text((x + 5, y - 7), labels[clust.id], (0, 0, 0))
+
+
+def drawdendrogram(clust, labels, jpeg='clusters.jpg'):
+    # 高度和宽度
+    h = getheight(clust) * 20
+    w = 1200
+    depth = getdepth(clust)
+
+    # 由于宽度是固定的，因此我们须要对距离值作相应的调整
+    scaling = float(w - 150)/depth
+
+    # 新建一个白色背景的图片
+    img = Image.new('RGB', (w, h), (255, 255, 255))
+    draw = ImageDraw.Draw(img)
+
+    draw.line((0, h/2, 10, h/2), fill=(255, 0, 0))
+
+    # 画第一个节点
+    drawnode(draw, clust, 10, (h/2), scaling, labels)
+    img.save(jpeg, 'JPEG')
+
+
 if __name__ == '__main__':
     blognames, words, data = readfile('./blogdata-ori.txt')
     clust = hcluster(data)
     printclust(clust, labels=blognames)
+    drawdendrogram(clust, blognames, jpeg='blogclust.jpg')
