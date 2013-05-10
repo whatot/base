@@ -12,3 +12,12 @@
 >* 聚类
 * 非负矩阵因式分解(non-negative matrix facrization)
 * 自组织映射(self-organizing maps)
+
+
+## error 记录
+
+* for t in range[100]:
+TypeError: 'builtin_function_or_method' object has no attribute '__getitem__'
+
+change to
+ for t in range(100)
