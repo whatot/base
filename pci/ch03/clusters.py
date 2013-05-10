@@ -62,7 +62,7 @@ def hcluster(rows, distance=pearson):
     currentclustid = -1
 
     # 最开始的聚类就是数据集中的行
-    clust = [bicluster(rows[i], id=1) for i in range(len(rows))]
+    clust = [bicluster(rows[i], id=i) for i in range(len(rows))]
 
     while len(clust) > 1:
         lowestpair = (0, 1)
@@ -84,8 +84,8 @@ def hcluster(rows, distance=pearson):
                     lowestpair = (i, j)
 
         # 计算两个聚类的平均值
-        mergevec = [(clust[lowestpair[0]].vec[1]
-                     + clust[lowestpair[1]].vec[2])/2.0
+        mergevec = [(clust[lowestpair[0]].vec[i]
+                     + clust[lowestpair[1]].vec[i])/2.0
                     for i in range(len(clust[0].vec))]
 
         # 建立新的聚类
@@ -188,8 +188,20 @@ def drawdendrogram(clust, labels, jpeg='clusters.jpg'):
     img.save(jpeg, 'JPEG')
 
 
+def rotatematrix(data):
+    newdata = []
+    for i in range(len(data[0])):
+        newrow = [data[j][i] for j in range(len(data))]
+        newdata.append(newrow)
+    return newdata
+
+
 if __name__ == '__main__':
     blognames, words, data = readfile('./blogdata-ori.txt')
     clust = hcluster(data)
-    printclust(clust, labels=blognames)
+    # printclust(clust, labels=blognames)
     drawdendrogram(clust, blognames, jpeg='blogclust.jpg')
+
+    rdata = rotatematrix(data)
+    wordclust = hcluster(rdata)
+    drawdendrogram(wordclust, labels=words, jpeg='wordclust.jpg')
