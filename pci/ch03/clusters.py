@@ -52,6 +52,24 @@ def pearson(v1, v2):
     return 1.0 - num/den
 
 
+def tanimoto(v1, v2):
+    '''返回一个介于 1.0 和 0.0 之间的值
+    1.0代表不存在同时喜欢两件物品的人
+    0.0代表所有人都同时喜欢两个向量中的物品
+    '''
+    c1, c2, shr = 0, 0, 0
+
+    for i in range(len(v1)):
+        if v1[i] != 0:
+            c1 += 1  # 出现在 v1 中
+        if v2[i] != 0:
+            c2 += 1  # 出现在 v2 中
+        if v1[i] != 0 and v2[i] != 0:
+            shr += 1  # 在两个变量中都出现
+
+    return 1.0 - (float(shr) / (c1 + c2 - shr))
+
+
 class bicluster:
     def __init__(self, vec, left=None, right=None, distance=0.0, id=None):
         self.left = left
@@ -264,3 +282,7 @@ if __name__ == '__main__':
     print([blognames[r] for r in kclust[0]])
     print('======kclust[1]======')
     print([blognames[r] for r in kclust[1]])
+
+    # 利用tanimoto聚类
+    tclust = hcluster(data, distance=tanimoto)
+    drawdendrogram(tclust, blognames, jpeg='tclust.jpg')
