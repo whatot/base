@@ -138,6 +138,50 @@ class crawler:
         self.dbcommit()
 
 
+class searcher:
+    def __init__(self, dbname):
+        self.con = sqlite.connect(dbname)
+
+    def __del__(self):
+        self.con.close()
+
+    def getmatchrows(self, q):
+        # 构造查询的字符串
+        fieldlist = 'w0.urlid'
+        tablelist = ''
+        clauselist = ''
+        wordids = []
+
+        # 根据空格拆分单词
+        words = q.split(' ')
+        tablenumber = 0
+
+        for word in words:
+            # 获取单词的id
+            wordrow = self.con.execute("select rowid from wordlist where"
+                                       "word = '%s'" % word).fetchone()
+            if wordrow is not None:
+                wordid = wordrow[0]
+                wordids.append(wordid)
+                if tablenumber > 0:
+                    tablelist += ','
+                    clauselist += ' and '
+                    clauselist += ('w%d.urlid = w%d.urlid and '
+                                   % (tablenumber - 1, tablenumber))
+                fieldlist += ', w%d.location' % tablenumber
+                tablelist += 'wordlocation w%d' % tablenumber
+                clauselist += 'w%d.wordid = %d' % (tablenumber, wordid)
+                tablenumber += 1
+
+        # 根据各个组分，建立查询
+        fullquery = 'select %s from %s where %s' % (fieldlist, tablelist,
+                                                    clauselist)
+        cur = self.con.execute(fullquery)
+        rows = [row for row in cur]
+
+        return rows, wordids
+
+
 if __name__ == '__main__':
     # pagelist = ['http://kiwitobes.com/wiki/Perl.html']
     pagelist = ['http://kiwitobes.com/wiki/'
