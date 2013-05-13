@@ -3,6 +3,7 @@
 
 
 import urllib2
+import re
 from bs4 import BeautifulSoup
 from urlparse import urljoin
 from pysqlite2 import dbapi2 as sqlite
@@ -25,11 +26,38 @@ class crawler:
 
     # 辅助函数，用于获取条目的id，并且如果条目不存在，就将其加入数据库中
     def getentryid(self, table, field, value, createnew=True):
-        return None
+        cur = self.con.execute("select rowid from %s where %s = '%s'"
+                               % (table, field, value))
+        res = cur.fetchone()
+        if res is None:
+            cur = self.con.execute("insert into %s (%s) values ('%s')"
+                                   % (table, field, value))
+            return cur.lastrowid
+        else:
+            return res[0]
 
     # 为每个网页建立索引
     def addtoindex(self, url, soup):
-        print('Indexing %s' % url)
+        if self.isindexed(url):
+            return
+        print('Indexing ' + url)
+
+        # 获取每个单词
+        text = self.gettextonly(soup)
+        words = self.separatewords(text)
+
+        # 得到url的id
+        urlid = self.getentryid('urllist', 'url', url)
+
+        # 将每个单词与该url关联
+        for i in range(len(words)):
+            word = words[i]
+            if word in ignorewords:
+                continue
+            wordid = self.getentryid('wordlist', 'word', word)
+            self.con.execute("insert into \
+                              wordlocation(urlid, wordid, location) \
+                              values(%d, %d, %d)" % (urlid, wordid, i))
 
     # 从一个HTML网页中提取文字（不带标签）
     def gettextonly(self, soup):
@@ -46,10 +74,19 @@ class crawler:
 
     # 根据任何非空白字符进行分词处理
     def separatewords(self, text):
-        return None
+        splitter = re.compile('\\W*')
+        return [s.lower() for s in splitter.split(text) if s != '']
 
     # 如果url已经建立过索引，则返回true
     def isindexed(self, url):
+        u = self.con.execute("select rowid from urllist where url = '%s'"
+                             % url).fetchone()
+        if u is not None:
+            # 检查它是否已经被检查过了
+            v = self.con.execute("select * from wordlocation where urlid = %d"
+                                 % u[0]).fetchone()
+            if v is not None:
+                return True
         return False
 
     # 添加一个关联两个网页的链接
@@ -103,8 +140,10 @@ class crawler:
 
 if __name__ == '__main__':
     # pagelist = ['http://kiwitobes.com/wiki/Perl.html']
-    pagelist = ['http://doc.chinaunix.net/']
+    pagelist = ['http://kiwitobes.com/wiki/'
+                'Categorical_list_of_programming_languages.html']
+    # pagelist = ['http://doc.chinaunix.net/']
     crawler = crawler('searchindex.db')
-    # crawler.createindextables()
-    # crawler.crawl(pagelist)
+    crawler.createindextables()
+    crawler.crawl(pagelist)
     # print(pagelist)
