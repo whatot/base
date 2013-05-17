@@ -177,7 +177,7 @@ class searcher:
         # 根据各个组分，建立查询
         fullquery = 'select %s from %s where %s' % (fieldlist, tablelist,
                                                     clauselist)
-        print(fullquery)
+        # print(fullquery)
         cur = self.con.execute(fullquery)
         rows = [row for row in cur]
 
@@ -186,7 +186,12 @@ class searcher:
     def getscoredlist(self, rows, wordids):
         totalscores = dict([(row[0], 0) for row in rows])
 
-        weights = [(1.0, self.frequencyscore(rows))]
+        # weights = [(1.0, self.locationscore(rows))]
+        # weights = [(1.0, self.frequencyscore(rows))]
+        weights = [(0.3, self.frequencyscore(rows)),
+                   (0.2, self.locationscore(rows)),
+                   (0.2, self.distancesore(rows)),
+                   (0.3, self.inboundlinkscore(rows))]
 
         for (weight, scores) in weights:
             for url in totalscores:
@@ -224,6 +229,36 @@ class searcher:
                 maxscore = vsmall
             return dict([(u, float(c)/maxscore) for (u, c) in scores.items()])
 
+    def locationscore(self, rows):
+        locations = dict([(row[0], 1000000) for row in rows])
+        for row in rows:
+            loc = sum(row[1:])
+            if loc < locations[row[0]]:
+                locations[row[0]] = loc
+        return self.normalizescores(locations, smallIsBetter=1)
+
+    def distancesore(self, rows):
+        # 如果仅有一个单词，则得分都一样
+        if len(rows[0]) <= 2:
+            return dict([(row[0], 1.0) for row in rows])
+
+        # 初始化字典，并填入一个很大的数
+        mindistance = dict([(row[0], 1000000) for row in rows])
+
+        for row in rows:
+            dist = sum([abs(row[i] - row[i-1]) for i in range(2, len(row))])
+            if dist < mindistance[row[0]]:
+                mindistance[row[0]] = dist
+        return self.normalizescores(mindistance, smallIsBetter=1)
+
+    def inboundlinkscore(self, rows):
+        uniqueurls = set([row[0] for row in rows])
+        inboundlinkcount =\
+            dict([(u, self.con.execute(
+                'select count(*) from link where toid = %d' % u)
+                .fetchone()[0]) for u in uniqueurls])
+        return self.normalizescores(inboundlinkcount)
+
 
 if __name__ == '__main__':
     # pagelist = ['http://kiwitobes.com/wiki/Perl.html']
@@ -235,5 +270,5 @@ if __name__ == '__main__':
     # crawler.crawl(pagelist)
     # print(pagelist)
     e = searcher('searchindex-ori.db')
-    print(e.getmatchrows('functional programing'))
-    e.query('functional programing')
+    # print(e.getmatchrows('functional programing'))
+    e.query('functional language')
