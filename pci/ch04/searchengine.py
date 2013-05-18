@@ -137,6 +137,38 @@ class crawler:
         self.con.execute('create index urlfromidx on link(fromid)')
         self.dbcommit()
 
+    def calculatapagerank(self, iterations=20):
+        # 清除当前的 PageRank 表
+        self.con.execute('drop table if exists pagerank')
+        self.con.execute('create table pagerank(urlid primary key, score)')
+
+        # 初始化每一个 url, 令其 PageRank 值为 1.0
+        self.con.execute('insert into pagerank select rowid, 1.0 from urllist')
+        self.dbcommit()
+
+        for i in range(iterations):
+            print("iterations %d" % (i))
+            for (urlid, ) in self.con.execute('select rowid from urllist'):
+                pr = 0.15
+
+                # 循环遍历指向当前网页的所有其他网页
+                for (linker, ) in self.con.execute('select distinct fromid '
+                                                   'from link where toid = %d'
+                                                   % urlid):
+                    # 得到链接源对应网页的 PageRank 值
+                    linkingpr =\
+                        self.con.execute('select score from pagerank where '
+                                         'urlid = %d' % linker).fetchone()[0]
+
+                    # 根据链接源，求得总的链接数
+                    linkingcount =\
+                        self.con.execute('select count(*) from link where '
+                                         'fromid = %d' % linker).fetchone()[0]
+                    pr += 0.85 * (linkingpr / linkingcount)
+                self.con.execute('update pagerank set score = %f where '
+                                 'urlid = %d' % (pr, urlid))
+            self.dbcommit()
+
 
 class searcher:
     def __init__(self, dbname):
@@ -188,10 +220,13 @@ class searcher:
 
         # weights = [(1.0, self.locationscore(rows))]
         # weights = [(1.0, self.frequencyscore(rows))]
-        weights = [(0.3, self.frequencyscore(rows)),
-                   (0.2, self.locationscore(rows)),
-                   (0.2, self.distancesore(rows)),
-                   (0.3, self.inboundlinkscore(rows))]
+        # weights = [(0.3, self.frequencyscore(rows)),
+                   # (0.2, self.locationscore(rows)),
+                   # (0.2, self.distancesore(rows)),
+                   # (0.3, self.inboundlinkscore(rows))]
+        weights = [(0.3, self.locationscore(rows)),
+                   (0.3, self.frequencyscore(rows)),
+                   (0.3, self.pagerankscore(rows))]
 
         for (weight, scores) in weights:
             for url in totalscores:
@@ -259,16 +294,35 @@ class searcher:
                 .fetchone()[0]) for u in uniqueurls])
         return self.normalizescores(inboundlinkcount)
 
+    def pagerankscore(self, rows):
+        pageranks = dict([(row[0],
+                           self.con.execute('select score from pagerank where '
+                                            'urlid = %d'
+                                            % row[0]).fetchone()[0])
+                          for row in rows])
+        maxrank = max(pageranks.values())
+        normalizescores = dict([(u, float(l) / maxrank)
+                                for (u, l) in pageranks.items()])
+        return normalizescores
+
 
 if __name__ == '__main__':
     # pagelist = ['http://kiwitobes.com/wiki/Perl.html']
     # pagelist = ['http://kiwitobes.com/wiki/'
                 # 'Categorical_list_of_programming_languages.html']
     # pagelist = ['http://doc.chinaunix.net/']
-    # crawler = crawler('searchindex.db')
+    # crawler = crawler('searchindex-ori.db')
     # crawler.createindextables()
     # crawler.crawl(pagelist)
     # print(pagelist)
+
+    # 创建pagerank表
+    # crawler.calculatapagerank()
+    # 验证calculatapagerank()是否成功
+    # cur = crawler.con.execute('select * from pagerank order by score desc')
+    # for i in range(3):
+        # print(cur.next())
+
     e = searcher('searchindex-ori.db')
     # print(e.getmatchrows('functional programing'))
     e.query('functional language')
