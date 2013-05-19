@@ -7,7 +7,9 @@
 *.o
 .*.swp
 *.zip
+*.rar
 *.tar.gz
+*.tar.bz2
 *.bin
 *.jpg
 *.db
