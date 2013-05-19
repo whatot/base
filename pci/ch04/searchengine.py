@@ -325,6 +325,8 @@ class searcher:
 
 
 if __name__ == '__main__':
+    # # searchindex.db can be download from
+    # # http://kiwitobes.com/db/searchindex.db
     # pagelist = ['http://kiwitobes.com/wiki/Perl.html']
     # pagelist = ['http://kiwitobes.com/wiki/'
                 # 'Categorical_list_of_programming_languages.html']
