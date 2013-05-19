@@ -13,6 +13,9 @@ class searchnet:
         self.con.close()
 
     def maketables(self):
+        self.con.execute('drop table if exists hiddennode')
+        self.con.execute('drop table if exists wordhidden')
+        self.con.execute('drop table if exists hiddenurl')
         self.con.execute('create table hiddennode(create_key)')
         self.con.execute('create table wordhidden(fromid, toid, strength)')
         self.con.execute('create table hiddenurl(fromid, toid, strength)')
@@ -67,14 +70,17 @@ class searchnet:
                 self.setstrength(hiddenid, urlid, 1, 0.1)
             self.con.commit()
 
+    def buildtableandtest(self):
+        self.maketables()
+        wWorld, wRiver, wBank = 101, 102, 103
+        uWorldBank, uRiver, uEarch = 201, 202, 203
+        self.generatehiddennode([wWorld, wBank], [uWorldBank, uRiver, uEarch])
+        for c in self.con.execute('select * from wordhidden'):
+            print(c)
+        for c in self.con.execute('select * from hiddenurl'):
+            print(c)
+
 
 if __name__ == '__main__':
     mynet = searchnet('nn.db')
-    mynet.maketables()
-    wWorld, wRiver, wBank = 101, 102, 103
-    uWorldBank, uRiver, uEarch = 201, 202, 203
-    mynet.generatehiddennode([wWorld, wBank], [uWorldBank, uRiver, uEarch])
-    for c in mynet.con.execute('select * from wordhidden'):
-        print(c)
-    for c in mynet.con.execute('select * from hiddenurl'):
-        print(c)
+    mynet.buildtableandtest()
