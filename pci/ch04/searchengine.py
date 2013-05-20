@@ -76,8 +76,11 @@ class crawler:
 
     # 根据任何非空白字符进行分词处理
     def separatewords(self, text):
-        splitter = re.compile('\\W*')
-        return [s.lower() for s in splitter.split(text) if s != '']
+        # splitter = re.compile('\\W*')
+        splitter = re.compile('\\s*')
+        nomatch = re.compile('\\W+|[0-9]+')
+        return [s.lower() for s in splitter.split(text)
+                if not nomatch.match(s)]
 
     # 如果url已经建立过索引，则返回true
     def isindexed(self, url):
