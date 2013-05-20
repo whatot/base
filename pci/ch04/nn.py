@@ -5,6 +5,10 @@ from math import tanh
 from pysqlite2 import dbapi2 as sqlite
 
 
+def dtanh(y):
+    return 1.0 - y * y
+
+
 class searchnet:
     def __init__(self, dbname):
         self.con = sqlite.connect(dbname)
@@ -70,6 +74,60 @@ class searchnet:
                 self.setstrength(hiddenid, urlid, 1, 0.1)
             self.con.commit()
 
+    def getallhiddenids(self, wordids, urlids):
+        l1 = {}
+        for wordid in wordids:
+            cur = self.con.execute('select toid from wordhidden where '
+                                   'fromid = %d' % wordid)
+            for row in cur:
+                l1[row[0]] = 1
+        for urlid in urlids:
+            cur = self.con.execute('select fromid from hiddenurl where '
+                                   'toid = %d' % urlid)
+            for row in cur:
+                l1[row[0]] = 1
+        return l1.keys()
+
+    def setupnetwork(self, wordids, urlids):
+        # 值列表
+        self.wordids = wordids
+        self.hiddenids = self.getallhiddenids(wordids, urlids)
+        self.urlids = urlids
+
+        # 节点输出
+        self.ai = [1.0] * len(self.wordids)
+        self.ah = [1.0] * len(self.hiddenids)
+        self.ao = [1.0] * len(self.urlids)
+
+        # 建立权重矩阵
+        self.wi = [[self.getstrength(wordid, hiddenid, 0)
+                    for hiddenid in self.hiddenids]
+                   for wordid in self.wordids]
+        self.wo = [[self.getstrength(hiddenid, urlid, 1)
+                    for urlid in self.urlids]
+                   for hiddenid in self.hiddenids]
+
+    def feedforword(self):
+        # 查询单词是仅有的输入
+        for i in range(len(self.wordids)):
+            self.ai[i] = 1.0
+
+        # 隐藏层节点的活跃程度
+        for j in range(len(self.hiddenids)):
+            sum = 0.0
+            for i in range(len(self.wordids)):
+                sum = sum + self.ai[i] * self.wi[i][j]
+            self.ah[j] = tanh(sum)
+
+        # 输出层节点的活跃程度
+        for k in range(len(self.urlids)):
+            sum = 0.0
+            for j in range(len(self.hiddenids)):
+                sum = sum + self.ah[j] * self.wo[j][k]
+            self.ao[k] = tanh(sum)
+
+        return self.ao[:]
+
     def buildtableandtest(self):
         self.maketables()
         wWorld, wRiver, wBank = 101, 102, 103
@@ -80,7 +138,13 @@ class searchnet:
         for c in self.con.execute('select * from hiddenurl'):
             print(c)
 
+    def getresult(self, wordids, urlids):
+        self.setupnetwork(wordids, urlids)
+        return self.feedforword()
 
 if __name__ == '__main__':
+    wWorld, wRiver, wBank = 101, 102, 103
+    uWorldBank, uRiver, uEarch = 201, 202, 203
     mynet = searchnet('nn.db')
-    mynet.buildtableandtest()
+    # mynet.buildtableandtest()
+    print(mynet.getresult([wWorld, wBank], [uWorldBank, uRiver, uEarch]))
