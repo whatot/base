@@ -128,6 +128,56 @@ class searchnet:
 
         return self.ao[:]
 
+    def backPropagate(self, targets, N=0.5):
+        # 计算输出层的误差
+        output_deltas = [0.0] * len(self.urlids)
+        for k in range(len(self.urlids)):
+            error = targets[k] - self.ao[k]
+            output_deltas[k] = dtanh(self.ao[k]) + error
+
+        # 计算隐藏层的误差
+        hidden_deltas = [0.0] * len(self.hiddenids)
+        for j in range(len(self.hiddenids)):
+            error = 0.0
+            for k in range(len(self.urlids)):
+                error = error + output_deltas[k] * self.wo[j][k]
+            hidden_deltas[j] = dtanh(self.ah[j]) * error
+
+        # 更新输出权重
+        for j in range(len(self.hiddenids)):
+            for k in range(len(self.urlids)):
+                change = output_deltas[k] * self.ah[j]
+                self.wo[j][k] = self.wo[j][k] + N * change
+
+        # 更新输入权重
+        for i in range(len(self.wordids)):
+            for j in range(len(self.hiddenids)):
+                change = hidden_deltas[j] * self.ai[i]
+                self.wi[i][j] = self.wi[i][j] + N * change
+
+    def trainquery(self, wordids, urlids, selectedurl):
+        # 如有必要，生成一个隐藏节点
+        self.generatehiddennode(wordids, urlids)
+
+        self.setupnetwork(wordids, urlids)
+        self.feedforword()
+        targets = [0.0] * len(urlids)
+        targets[urlids.index(selectedurl)] = 1.0
+        self.backPropagate(targets)
+        self.updatedatabase()
+
+    def updatedatabase(self):
+        # 将值存入数据库中
+        for i in range(len(self.wordids)):
+            for j in range(len(self.hiddenids)):
+                self.setstrength(self.wordids[i], self.hiddenids[j], 0,
+                                 self.wi[i][j])
+        for j in range(len(self.hiddenids)):
+            for k in range(len(self.urlids)):
+                self.setstrength(self.hiddenids[j], self.urlids[k], 1,
+                                 self.wo[j][k])
+        self.con.commit()
+
     def buildtableandtest(self):
         self.maketables()
         wWorld, wRiver, wBank = 101, 102, 103
@@ -142,9 +192,26 @@ class searchnet:
         self.setupnetwork(wordids, urlids)
         return self.feedforword()
 
+    def nntrain(self):
+        self.trainquery([wWorld, wBank], [uWorldBank, uRiver, uEarch],
+                        uWorldBank)
+        print(self.getresult([wWorld, wBank], [uWorldBank, uRiver, uEarch]))
+
+    def nntrainmore(self):
+        for i in range(30):
+            self.trainquery([wWorld, wBank], allurls, uWorldBank)
+            self.trainquery([wRiver, wBank], allurls, uRiver)
+            self.trainquery([wWorld], allurls, uEarch)
+        print(self.getresult([wWorld, wBank], allurls))
+        print(self.getresult([wRiver, wBank], allurls))
+        print(self.getresult([wBank], allurls))
+
 if __name__ == '__main__':
     wWorld, wRiver, wBank = 101, 102, 103
     uWorldBank, uRiver, uEarch = 201, 202, 203
+    allurls = [uWorldBank, uRiver, uEarch]
     mynet = searchnet('nn.db')
-    # mynet.buildtableandtest()
+    mynet.buildtableandtest()
     print(mynet.getresult([wWorld, wBank], [uWorldBank, uRiver, uEarch]))
+    # mynet.nntrain()
+    mynet.nntrainmore()

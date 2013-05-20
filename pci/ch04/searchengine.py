@@ -7,8 +7,10 @@ import re
 from bs4 import BeautifulSoup
 from urlparse import urljoin
 from pysqlite2 import dbapi2 as sqlite
+import nn
 
 
+mynet = nn.searchnet('nn.db')
 # 被忽略单词列表
 ignorewords = set(['the', 'of', 'to', 'and', 'a', 'in', 'is', 'it'])
 
@@ -247,6 +249,9 @@ class searcher:
         for (score, urlid) in rankedscores[0:10]:
             print('%f\t%s' % (score, self.geturlname(urlid)))
 
+        # 结果可以传入nn.py 中的searchnet的trainquery方法中
+        return wordids, [r[1] for r in rankedscores[0:10]]
+
     def frequencyscore(self, rows):
         counts = dict([(row[0], 0) for row in rows])
         for row in rows:
@@ -322,6 +327,13 @@ class searcher:
         normalizescores = dict([(u, float(l) / maxscore)
                                 for (u, l) in linkscores.items()])
         return normalizescores
+
+    def nnscore(self, rows, wordids):
+        # for nn.py 获得一个由唯一的URL ID构成的有序列表
+        urlids = [urlid for urlid in set([row[0] for row in rows])]
+        nnres = mynet.getresult(wordids, urlids)
+        scores = dict([(urlids[i], nnres[i]) for i in range(len(urlids))])
+        return self.normalizescores(scores)
 
 
 if __name__ == '__main__':
