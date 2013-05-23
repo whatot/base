@@ -43,14 +43,49 @@ def printschedule(r):
                                                       ret[0], ret[1], ret[2]))
 
 
-def test_printschedule():
-    s = [1, 4, 3, 2, 7, 3, 6, 3, 2, 4, 5, 3]
-    printschedule(s)
+def schedulecost(sol):
+    totalprice = 0
+    latestarrival = 0
+    earliestdep = 24 * 60
+
+    for d in range(len(sol) / 2):
+        # 得到往程航班和返程航班
+        origin = people[d][1]
+        outbound = flights[(origin, destination)][int(sol[2 * d])]
+        returnf = flights[(destination, origin)][int(sol[2 * d + 1])]
+
+        # 总价格等于所有往程航班和返程航班价格之和
+        totalprice += outbound[2]
+        totalprice += returnf[2]
+
+        # 记录最晚到达时间和最早离开时间
+        if latestarrival < getminutes(outbound[1]):
+            latestarrival = getminutes(outbound[1])
+        if earliestdep > getminutes(returnf[0]):
+            earliestdep = getminutes(returnf[0])
+
+    # 每个人必须在机场等待直到最后一个人到达为止
+    # 他们也必须在相同时间到达， 并等候他们的返程航班
+    totalwait = 0
+    for d in range(len(sol) / 2):
+        origin = people[d][1]
+        outbound = flights[(origin, destination)][int(sol[2 * d])]
+        returnf = flights[(destination, origin)][int(sol[2 * d + 1])]
+        totalwait += latestarrival - getminutes(outbound[1])
+        totalwait += getminutes(returnf[0]) - earliestdep
+
+    # 汽车租用费用， $50
+    if latestarrival < earliestdep:
+        totalprice += 50
+
+    return totalprice + totalwait
 
 
 def main():
     loadflights()
-    test_printschedule()
+    s = [1, 4, 3, 2, 7, 3, 6, 3, 2, 4, 5, 3]
+    printschedule(s)
+    print(schedulecost(s))
 
 
 if __name__ == '__main__':
