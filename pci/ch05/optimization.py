@@ -163,6 +163,7 @@ class scheduleoptization:
 
     def geneticoptimize(self, domain, costf, popsize=50, step=1, mutprob=0.2,
                         elite=0.2, maxiter=100):
+
         # 可选参数：
         #   popsize         种群大小
         #   mutprob         种群的新成员是由变异而非交叉得来的概率
@@ -219,6 +220,27 @@ class scheduleoptization:
         return scores[0][1]
 
 
+def testalgorithms():
+    schopti = scheduleoptization()
+    algorithm = [schopti.randomoptimize,
+                 schopti.hillclimb,
+                 schopti.annealingoptimize,
+                 schopti.geneticoptimize,
+                 ]
+
+    print("which one do you want to test:\n\t")
+    for i in range(len(algorithm)):
+        print(i+1, algorithm[i])
+    letter = input('\nInput your choice: 1/2/3/4 :')
+    if letter in [1, 2, 3, 4]:
+        print(letter)
+
+    domain = [(0, 9)] * (len(schopti.people) * 2)
+    s = algorithm[letter - 1](domain, schopti.schedulecost)
+    schopti.printschedule(s)
+    print(schopti.schedulecost(s))
+
+
 def testschedule(scheduleoptization):
     schopti = scheduleoptization()
     s = [1, 4, 3, 2, 7, 3, 6, 3, 2, 4, 5, 3]
@@ -226,37 +248,6 @@ def testschedule(scheduleoptization):
     print(schopti.schedulecost(s))
 
 
-def testrandomoptimize():
-    schopti = scheduleoptization()
-    domain = [(0, 9)] * (len(schopti.people) * 2)
-    s = schopti.randomoptimize(domain, schopti.schedulecost)
-    schopti.printschedule(s)
-    print(schopti.schedulecost(s))
-
-
-def testhillclimb():
-    schopti = scheduleoptization()
-    domain = [(0, 9)] * (len(schopti.people) * 2)
-    s = schopti.hillclimb(domain, schopti.schedulecost)
-    print(schopti.schedulecost(s))
-    schopti.printschedule(s)
-
-
-def testannealingoptimize():
-    schopti = scheduleoptization()
-    domain = [(0, 9)] * (len(schopti.people) * 2)
-    s = schopti.annealingoptimize(domain, schopti.schedulecost)
-    print(schopti.schedulecost(s))
-    schopti.printschedule(s)
-
-
-def testgeneticoptimize():
-    schopti = scheduleoptization()
-    domain = [(0, 9)] * (len(schopti.people) * 2)
-    s = schopti.geneticoptimize(domain, schopti.schedulecost)
-    print(schopti.schedulecost(s))
-    schopti.printschedule(s)
-
-
 if __name__ == '__main__':
-    testgeneticoptimize()
+    # testschedule()
+    testalgorithms()
