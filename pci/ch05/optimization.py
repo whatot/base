@@ -195,7 +195,7 @@ class scheduleoptization:
 
         # 主循环
         for i in range(maxiter):
-            scores = [(costf(v), v) for v in pop]
+            scores = [(costf(v), v) for v in pop if v is not None]
             scores.sort()
             ranked = [v for (s, v) in scores]
 
