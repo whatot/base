@@ -24,8 +24,8 @@ links = [('Augustus', 'Willy'),
 
 domain = [(10, 370)] * (len(people) * 2)
 
-sol = [120, 200, 250, 125, 100, 320, 220, 130,
-       210, 240, 250, 310, 118, 129, 223, 334]
+sol = [20, 30, 40, 50, 60, 70, 80, 90,
+       100, 110, 120, 130, 140, 150, 160, 170]
 
 
 def crosscount(v):
@@ -62,7 +62,7 @@ def crosscount(v):
             (x1, y1), (x2, y2) = loc[people[i]], loc[people[j]]
 
             # 计算两结点的间距
-            dist = math.sqrt(math.pow(x1-x1, 2) + math.pow(y1-y2, 2))
+            dist = math.sqrt(math.pow(x1-x2, 2) + math.pow(y1-y2, 2))
             # 对间距小于 50 个像素的结点进行判别
             if dist < 50:
                 total += (1.0 - (dist/50.0))
