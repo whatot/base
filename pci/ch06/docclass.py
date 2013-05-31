@@ -73,13 +73,69 @@ class classifier:
         # 增加针对该分类的计数值
         self.incc(cat)
 
+    def fprob(self, f, cat):
+        if self.catcount(cat) == 0:
+            return 0
+        # 特征在分类中出现的总次数，除以分类中包含内容项的总数
+        return self.fcount(f, cat) / self.catcount(cat)
 
-def main():
+    def weightedprob(self, f, cat, prf, weight=1.0, ap=0.5):
+        # 计算当前的概率值
+        basicprob = prf(f, cat)
+
+        # 统计特征在所有分类中出现的次数
+        totals = sum([self.fcount(f, c) for c in self.categories()])
+
+        # 计算加权平均
+        bp = ((weight*ap) + (totals*basicprob)) / (weight+totals)
+        return bp
+
+
+class naivebayes(classifier):
+    def docprob(self, item, cat):
+        features = self.getfeatures(item)
+
+        # 将所有特征的概率相乘
+        p = 1
+        for f in features:
+            p *= self.weightedprob(f, cat, self.fprob)
+        return p
+
+
+# 1.0
+# 1.0
+def testSimple():
     cl = classifier(getwords)
     cl.train('the quick brown for jumps over the lazy dog', 'good')
     cl.train('make quick money in the online casino', 'bad')
     print(cl.fcount('quick', 'good'))
     print(cl.fcount('quick', 'bad'))
 
+
+# 0.666666666667
+def testFprob():
+    cl = classifier(getwords)
+    simpletrain(cl)
+    print(cl.fprob('quick', 'good'))
+
+
+# 0.25
+# 0.166666666667
+def testWeightedprob():
+    cl = classifier(getwords)
+    simpletrain(cl)
+    print(cl.weightedprob('money', 'good', cl.fprob))
+    simpletrain(cl)
+    print(cl.weightedprob('money', 'good', cl.fprob))
+
+
+def simpletrain(cl):
+    cl.train('Nobody owns the water.', 'good')
+    cl.train('the quick rabbit jumps fences', 'good')
+    cl.train('buy pharmaceuticals now', 'bad')
+    cl.train('make quick money at the online casino', 'bad')
+    cl.train('the quick brown fox jumps', 'good')
+
+
 if __name__ == '__main__':
-    main()
+    testWeightedprob()
