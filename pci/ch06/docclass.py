@@ -101,6 +101,13 @@ class naivebayes(classifier):
             p *= self.weightedprob(f, cat, self.fprob)
         return p
 
+    # Pr(Category | Document) =
+    #           Pr(Document | Category) x Pr(Category)/Pr(Document)
+    def prob(self, item, cat):
+        catprob = self.catcount(cat) / self.totalcount()
+        docprob = self.docprob(item, cat)
+        return docprob * catprob
+
 
 # 1.0
 # 1.0
@@ -129,6 +136,15 @@ def testWeightedprob():
     print(cl.weightedprob('money', 'good', cl.fprob))
 
 
+# 0.15625
+# 0.05
+def testnaivebayes():
+    cl = naivebayes(getwords)
+    simpletrain(cl)
+    print(cl.prob('quick rabbit', 'good'))
+    print(cl.prob('quick rabbit', 'bad'))
+
+
 def simpletrain(cl):
     cl.train('Nobody owns the water.', 'good')
     cl.train('the quick rabbit jumps fences', 'good')
@@ -138,4 +154,4 @@ def simpletrain(cl):
 
 
 if __name__ == '__main__':
-    testWeightedprob()
+    testnaivebayes()
