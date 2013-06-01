@@ -143,6 +143,25 @@ class naivebayes(classifier):
 # 属于所有分类的频率 freqsum = Pr(features | Category)
 # cprob = clf / (clf + nclf)
 class fisherclassifier(classifier):
+    def __init__(self, getfeatures, filename=None):
+        # 统计特征/分类组合的数量
+        self.fc = {}
+        # 统计每个分类中的文档数量
+        self.cc = {}
+        self.getfeatures = getfeatures
+        # 最小阀值，归类倍数，默认值为 1.0
+        self.thresholds = {}
+        # 保存临界值，默认值为 0
+        self.minimums = {}
+
+    def setminimums(self, cat, min):
+        self.minimums[cat] = min
+
+    def getminimums(self, cat):
+        if cat not in self.minimums:
+            return 0
+        return self.minimums[cat]
+
     def cprob(self, f, cat):
         # 特征在该分类中出现的概率
         clf = self.fprob(f, cat)
@@ -177,6 +196,18 @@ class fisherclassifier(classifier):
             term *= m / i
             sum += term
         return min(sum, 1.0)
+
+    def classify(self, item, default=None):
+        # 遍历并寻找最佳结果
+        best = default
+        max = 0.0
+        for c in self.categories():
+            p = self.fisherprob(item, c)
+            # 确保其超过下限值
+            if p > self.getminimums(c) and p > max:
+                best = c
+                max = p
+        return best
 
 
 # 1.0
@@ -237,6 +268,21 @@ def testfisherclassifier_fishercprob():
 
 # good
 # bad
+# good
+# good
+def testfisherclassifier_classify():
+    cl = fisherclassifier(getwords)
+    simpletrain(cl)
+    print(cl.classify('quick rabbit'))
+    print(cl.classify('quick money'))
+    cl.setminimums('bad', 0.8)
+    print(cl.classify('quick money'))
+    cl.setminimums('good', 0.4)
+    print(cl.classify('quick money'))
+
+
+# good
+# bad
 # unknown
 # bad
 def testClassify():
@@ -260,4 +306,4 @@ def simpletrain(cl):
 
 
 if __name__ == '__main__':
-    testfisherclassifier_fishercprob()
+    testfisherclassifier_classify()
