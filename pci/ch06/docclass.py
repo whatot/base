@@ -32,6 +32,16 @@ class classifier:
         # 统计每个分类中的文档数量
         self.cc = {}
         self.getfeatures = getfeatures
+        # 最小阀值，归类倍数
+        self.thresholds = {}
+
+    def setthreshold(self, cat, t):
+        self.thresholds[cat] = t
+
+    def getthreshold(self, cat):
+        if cat not in self.thresholds:
+            return 1.0
+        return self.thresholds[cat]
 
     # 增加对特征/分类组合的计数值
     def incf(self, f, cat):
@@ -90,6 +100,24 @@ class classifier:
         bp = ((weight*ap) + (totals*basicprob)) / (weight+totals)
         return bp
 
+    def classify(self, item, default=None):
+        probs = {}
+        # 寻找概率最大的分类
+        max = 0.0
+        for cat in self.categories():
+            probs[cat] = self.prob(item, cat)
+            if probs[cat] > max:
+                max = probs[cat]
+                best = cat
+        # 确保概率值超出 域值*次大概率值
+        # 可能属于的，但没有超过的归于default类
+        for cat in probs:
+            if cat == best:
+                continue
+            if probs[cat]*self.getthreshold(best) > probs[best]:
+                return default
+        return best
+
 
 class naivebayes(classifier):
     def docprob(self, item, cat):
@@ -145,6 +173,22 @@ def testnaivebayes():
     print(cl.prob('quick rabbit', 'bad'))
 
 
+# good
+# bad
+# unknown
+# bad
+def testClassify():
+    cl = naivebayes(getwords)
+    simpletrain(cl)
+    print(cl.classify('quick rabbit', default='unknown'))
+    print(cl.classify('quick money', default='unknown'))
+    cl.setthreshold('bad', 3.0)
+    print(cl.classify('quick money', default='unknown'))
+    for i in range(10):
+        simpletrain(cl)
+    print(cl.classify('quick money', default='unknown'))
+
+
 def simpletrain(cl):
     cl.train('Nobody owns the water.', 'good')
     cl.train('the quick rabbit jumps fences', 'good')
@@ -154,4 +198,4 @@ def simpletrain(cl):
 
 
 if __name__ == '__main__':
-    testnaivebayes()
+    testClassify()
