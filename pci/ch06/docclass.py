@@ -10,7 +10,7 @@
 '''
 
 import re
-# import math
+import math
 
 
 def getwords(doc):
@@ -137,6 +137,48 @@ class naivebayes(classifier):
         return docprob * catprob
 
 
+# Pr(Category | features)
+# = (具有指定特征的属于某分类的文档数)/(具有指定特征的文档总数)
+# 属于某分类的频率 clf = Pr(features | Category)
+# 属于所有分类的频率 freqsum = Pr(features | Category)
+# cprob = clf / (clf + nclf)
+class fisherclassifier(classifier):
+    def cprob(self, f, cat):
+        # 特征在该分类中出现的概率
+        clf = self.fprob(f, cat)
+        if clf == 0:
+            return 0
+
+        # 特征在所有分类中出现的频率
+        freqsum = sum([self.fprob(f, c) for c in self.categories()])
+
+        # 概率等于特征在该分类中出现的概率除以总体概率
+        p = clf / (freqsum)
+
+        return p
+
+    def fisherprob(self, item, cat):
+        # 将所有概率值相乘
+        p = 1
+        features = self.getfeatures(item)
+        for f in features:
+            p *= (self.weightedprob(f, cat, self.cprob))
+
+        # 取自然对数，并乘以 -2
+        fscore = (-2) * math.log(p)
+
+        # 利用倒置对数卡方函数求得概率
+        return self.invchi2(fscore, len(features)*2)
+
+    def invchi2(self, chi, df):
+        m = chi / 2.0
+        sum = term = math.exp(-m)
+        for i in range(1, df//2):
+            term *= m / i
+            sum += term
+        return min(sum, 1.0)
+
+
 # 1.0
 # 1.0
 def testSimple():
@@ -173,6 +215,26 @@ def testnaivebayes():
     print(cl.prob('quick rabbit', 'bad'))
 
 
+# 0.571428571429
+# 1.0
+def testfisherclassifier_cprob():
+    cl = fisherclassifier(getwords)
+    simpletrain(cl)
+    print(cl.cprob('quick', 'good'))
+    print(cl.cprob('money', 'bad'))
+
+
+# 0.571428571429
+# 0.78013986589
+# 0.356335962833
+def testfisherclassifier_fishercprob():
+    cl = fisherclassifier(getwords)
+    simpletrain(cl)
+    print(cl.cprob('quick', 'good'))
+    print(cl.fisherprob('quick rabbit', 'good'))
+    print(cl.fisherprob('quick rabbit', 'bad'))
+
+
 # good
 # bad
 # unknown
@@ -198,4 +260,4 @@ def simpletrain(cl):
 
 
 if __name__ == '__main__':
-    testClassify()
+    testfisherclassifier_fishercprob()
