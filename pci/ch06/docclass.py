@@ -11,6 +11,7 @@
 
 import re
 import math
+from sqlite3 import dbapi2 as sqlite
 
 
 def getwords(doc):
@@ -35,6 +36,13 @@ class classifier:
         # 最小阀值，归类倍数
         self.thresholds = {}
 
+    def setdb(self, dbfile):
+        self.con = sqlite.connect(dbfile)
+        self.con.execute('create table if not exists '
+                         'fc(features, category, count)')
+        self.con.execute('create table if not exists '
+                         'cc(category, count)')
+
     def setthreshold(self, cat, t):
         self.thresholds[cat] = t
 
@@ -45,34 +53,51 @@ class classifier:
 
     # 增加对特征/分类组合的计数值
     def incf(self, f, cat):
-        self.fc.setdefault(f, {})
-        self.fc[f].setdefault(cat, 0)
-        self.fc[f][cat] += 1
-
-    # 增加对某一分类的计数值
-    def incc(self, cat):
-        self.cc.setdefault(cat, 0)
-        self.cc[cat] += 1
+        count = self.fcount(f, cat)
+        if count == 0:
+            self.con.execute("insert into fc values ('%s','%s',1)" % (f, cat))
+        else:
+            self.con.execute("update fc set count = %d where features = '%s' "
+                             "and category = '%s'" % (count+1, f, cat))
 
     # 某一特征出现于某一分类中的次数
     def fcount(self, f, cat):
-        if f in self.fc and cat in self.fc[f]:
-            return float(self.fc[f][cat])
-        return 0.0
+        res = self.con.execute('select count from fc where features = "%s" '
+                               'and category = "%s"' % (f, cat)).fetchone()
+        if res is None:
+            return 0
+        else:
+            return float(res[0])
+
+    # 增加对某一分类的计数值
+    def incc(self, cat):
+        count = self.catcount(cat)
+        if count == 0:
+            self.con.execute("insert into cc values ('%s', 1)" % (cat))
+        else:
+            self.con.execute("update cc set count = %d where category = '%s'"
+                             % (count+1, cat))
 
     # 属于某一分类的内容项数量
     def catcount(self, cat):
-        if cat in self.cc:
-            return float(self.cc[cat])
-        return 0
+        res = self.con.execute('select count from cc where category = "%s"'
+                               % (cat)).fetchone()
+        if res is None:
+            return 0
+        else:
+            return float(res[0])
 
     # 所有内容项的数量
     def totalcount(self):
-        return sum(self.cc.values())
+        res = self.con.execute('select sum(count) from cc').fetchone()
+        if res is None:
+            return 0
+        return res[0]
 
     # 所有分类的列表
     def categories(self):
-        return self.cc.keys()
+        cur = self.con.execute('select category from cc')
+        return [d[0] for d in cur]
 
     def train(self, item, cat):
         features = self.getfeatures(item)
@@ -82,6 +107,7 @@ class classifier:
 
         # 增加针对该分类的计数值
         self.incc(cat)
+        self.con.commit()
 
     def fprob(self, f, cat):
         if self.catcount(cat) == 0:
@@ -297,6 +323,15 @@ def testClassify():
     print(cl.classify('quick money', default='unknown'))
 
 
+def test_db():
+    cl = fisherclassifier(getwords)
+    cl.setdb('test1.db')
+    simpletrain(cl)
+    cl2 = naivebayes(getwords)
+    cl2.setdb('test1.db')
+    print(cl2.classify('quick money'))
+
+
 def simpletrain(cl):
     cl.train('Nobody owns the water.', 'good')
     cl.train('the quick rabbit jumps fences', 'good')
@@ -306,4 +341,4 @@ def simpletrain(cl):
 
 
 if __name__ == '__main__':
-    testfisherclassifier_classify()
+    test_db()
