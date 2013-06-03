@@ -20,13 +20,13 @@ def feedread(feed, classifier):
         print(entry['summary'].encode('utf-8'))
 
         # 将所有文本组合在一起，为分类器构建一个内容项
-        fulltext = '%s\n%s\n%s' % (entry['title'], entry['publisher'],
-                                   entry['summary'])
+        # fulltext = '%s\n%s\n%s' % (entry['title'], entry['publisher'],
+                                   # entry['summary'])
         # 将当前分类的最佳猜测结果打印输出
-        print('Guess:     ' + str(classifier.classify(fulltext)))
+        print('Guess:     ' + str(classifier.classify(entry)))
         # 请求用户给出正确分类，并据此进行训练
         cl = input('Enter category: ')
-        classifier.train(fulltext, cl)
+        classifier.train(entry, cl)
 
 
 def entryfeatures(entry):
@@ -66,6 +66,7 @@ def entryfeatures(entry):
     return f
 
 if __name__ == '__main__':
-    cl = docclass.fisherclassifier(docclass.getwords)
+    # cl = docclass.fisherclassifier(docclass.getwords)
+    cl = docclass.fisherclassifier(entryfeatures)
     cl.setdb('python_feed.db')
     feedread('python_feed.xml', cl)
