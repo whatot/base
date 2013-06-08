@@ -7,3 +7,6 @@
 [submodule "learn-kernel"]
 	path = learn-kernel
 	url = https://github.com/whatot/learn-kernel.git
+[submodule "zoj"]
+	path = zoj
+	url = https://github.com/whatot/zoj.git
