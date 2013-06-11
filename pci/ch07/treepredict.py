@@ -47,10 +47,59 @@ class decisionnode:
         set2 = [row for row in rows if not split_function(row)]
         return (set1, set2)
 
+    # 随机放置的数据项出现于错误分类中的概率
+    def giniimpurify(self, rows):
+        total = len(rows)
+        counts = uniquecounts(rows)
+        imp = 0
+        for k1 in counts:
+            p1 = float(counts[k1]) / total
+            for k2 in counts:
+                if k1 == k2:
+                    continue
+                p2 = float(counts[k2]) / total
+                imp += p1 * p2
+        return imp
+
+    # 熵是遍历所有可能的结果之后所得到的 p(x) * log(p(x)) 之和
+    # p(i) = frequency(outcome) = count(outcome) / count(total rows)
+    # Entropy = 针对所有结果的 p(i) * log(p(i)) 之和
+    def entropy(self, rows):
+        from math import log
+        log2 = lambda x: log(x) / log(2)
+        results = uniquecounts(rows)
+        # 此处开始计算熵的值
+        ent = 0.0
+        for r in results.keys():
+            p = float(results[r]) / len(rows)
+            ent = ent - p*log2(p)
+        return ent
+
 
 def test_divideset():
     tp = decisionnode()
     print(tp.divideset(my_data, 2, 'yes'))
 
+
+# tp.giniimpurify(my_data)
+# 0.671875
+# tp.entropy(my_data)
+# 1.74899922306
+# tp.entropy(set1)
+# 1.75
+# tp.giniimpurify(set1)
+# 0.65625
+def test_gini_entropy():
+    tp = decisionnode()
+    print('tp.giniimpurify(my_data)')
+    print(tp.giniimpurify(my_data))
+    print('tp.entropy(my_data)')
+    print(tp.entropy(my_data))
+    set1, set2 = tp.divideset(my_data, 2, 'yes')
+    print('tp.entropy(set1)')
+    print(tp.entropy(set1))
+    print('tp.giniimpurify(set1)')
+    print(tp.giniimpurify(set1))
+
 if __name__ == '__main__':
-    test_divideset()
+    test_gini_entropy()
