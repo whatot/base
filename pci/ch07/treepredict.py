@@ -1,5 +1,6 @@
 #!/usr/bin/python2
 # -*- coding:utf-8 -*-
+from PIL import Image, ImageDraw
 
 # wget http://kiwitobes.com/tree/decision_tree_example.txt
 with open('decision_tree_example.txt', 'r') as tree:
@@ -130,6 +131,54 @@ def printtree(tree, indent=' '):
         printtree(tree.fb, indent + '  ')
 
 
+def getwidth(tree):
+    if tree.tb is None and tree.fb is None:
+        return 1
+    return getwidth(tree.tb) + getwidth(tree.fb)
+
+
+def getdepth(tree):
+    if tree.tb is None and tree.fb is None:
+        return 0
+    return max(getdepth(tree.tb), getdepth(tree.fb)) + 1
+
+
+def drawtree(tree, jpeg='tree.jpg'):
+    w = getwidth(tree) * 100
+    h = getdepth(tree) * 100 + 120
+
+    img = Image.new('RGB', (w, h), (255, 255, 255))
+    draw = ImageDraw.Draw(img)
+
+    drawnode(draw, tree, w/2, 20)
+    img.save(jpeg, 'JPEG')
+
+
+def drawnode(draw, tree, x, y):
+    if tree.results is None:
+        # 得到每个分支的宽度
+        w1 = getwidth(tree.fb) * 100
+        w2 = getdepth(tree.tb) * 100
+
+        # 确定此节点所要占据的总空间
+        left = x - (w1 + w2) / 2
+        right = x + (w1 + w2) / 2
+
+        # 绘制判断条件字符串
+        draw.text((x-20, y-10), str(tree.col)+':'+str(tree.value), (0, 0, 0))
+
+        # 绘制到分支的连线
+        draw.line((x, y, left+w1/2, y+100), fill=(255, 0, 0))
+        draw.line((x, y, right-w2/2, y+100), fill=(255, 0, 0))
+
+        # 绘制分支的节点
+        drawnode(draw, tree.fb, left+w1/2, y+100)
+        drawnode(draw, tree.tb, right-w2/2, y+100)
+    else:
+        txt = ' \n'.join(['%s:%d' % v for v in tree.results.items()])
+        draw.text((x-20, y), txt, (0, 0, 0))
+
+
 def test_divideset():
     tp = decisionnode()
     print(tp.divideset(my_data, 2, 'yes'))
@@ -156,29 +205,40 @@ def test_gini_entropy():
     print(tp.giniimpurify(set1))
 
 
-# $python --
-# 0:google?
- # T-> 3:18?
-   # T-> 2:yes?
-     # T-> {'Basic\n': 1}
-     # F-> {'None\n': 1}
-   # F-> {'Premium\n': 3}
- # F-> 3:19?
-   # T-> 0:kiwitobes?
-     # T-> 1:UK?
-       # T-> {'None\n': 1}
-       # F-> {'Basic': 1}
-     # F-> {'None\n': 1}
-   # F-> 0:slashdot?
-     # T-> {'None\n': 2}
-     # F-> 2:yes?
-       # T-> {'Basic\n': 3}
-       # F-> 1:UK?
-         # T-> {'Basic\n': 1}
-         # F-> {'None\n': 2}
+'''
+$python2 --
+0:google?
+ T-> 3:18?
+   T-> 2:yes?
+     T-> {'Basic\n': 1}
+     F-> {'None\n': 1}
+   F-> {'Premium\n': 3}
+ F-> 3:19?
+   T-> 0:kiwitobes?
+     T-> 1:UK?
+       T-> {'None\n': 1}
+       F-> {'Basic': 1}
+     F-> {'None\n': 1}
+   F-> 0:slashdot?
+     T-> {'None\n': 2}
+     F-> 2:yes?
+       T-> {'Basic\n': 3}
+       F-> 1:UK?
+         T-> {'Basic\n': 1}
+         F-> {'None\n': 2}
+'''
+
+
 def testprinttree():
     tree = buildtree(my_data)
     printtree(tree)
 
+
+def testdrawtree():
+    tree = buildtree(my_data)
+    drawtree(tree, jpeg='treeview.jpg')
+
+
 if __name__ == '__main__':
     testprinttree()
+    testdrawtree()
