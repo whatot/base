@@ -198,6 +198,31 @@ def classify(observation, tree):
         return classify(observation, branch)
 
 
+# 剪枝
+def prune(tree, mingain):
+    # 如果分支不是叶节点，则对其进行剪枝操作
+    if tree.tb.results is None:
+        prune(tree.tb, mingain)
+    if tree.fb.results is None:
+        prune(tree.fb, mingain)
+
+    # 如果两个子分支都是叶节点，则判断它们是否须要合并
+    if tree.tb.results is not None and tree.fb.results is not None:
+        # 构造合并后的数据集
+        tb, fb = [], []
+        for v, c in tree.tb.results.items():
+            tb += [[v]] * c
+        for v, c in tree.fb.results.items():
+            fb += [[v]] * c
+
+        # 检查熵的减少情况
+        delta = entropy(tb+fb) - (entropy(tb) + entropy(fb))/2
+        if delta < mingain:
+            # 合并分支
+            tree.tb, tree.fb = None, None
+            tree.results = uniquecounts(tb+fb)
+
+
 def test_divideset():
     tp = decisionnode()
     print(tp.divideset(my_data, 2, 'yes'))
@@ -225,6 +250,7 @@ def test_gini_entropy():
 
 
 '''
+testprinttree()
 $python2 --
 0:google?
  T-> 3:18?
@@ -263,7 +289,32 @@ def testclassify():
     print(classify(['(direct)', 'USA', 'yes', 5], tree))
 
 
+'''
+testprune()第二次printtree()输出
+0:google?
+ T-> 3:18?
+   T-> 2:yes?
+     T-> {'Basic\n': 1}
+     F-> {'None\n': 1}
+   F-> {'Premium\n': 3}
+ F-> 3:19?
+   T-> 0:kiwitobes?
+     T-> 1:UK?
+       T-> {'None\n': 1}
+       F-> {'Basic': 1}
+     F-> {'None\n': 1}
+   F-> {'Basic\n': 4, 'None\n': 4}
+'''
+
+
+def testprune():
+    tree = buildtree(my_data)
+    prune(tree, 0.1)
+    printtree(tree)
+    print('')
+    prune(tree, 1)
+    printtree(tree)
+
+
 if __name__ == '__main__':
-    testprinttree()
-    # testdrawtree()
-    testclassify()
+    testprune()
