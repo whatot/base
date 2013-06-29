@@ -179,6 +179,25 @@ def drawnode(draw, tree, x, y):
         draw.text((x-20, y), txt, (0, 0, 0))
 
 
+def classify(observation, tree):
+    if tree.results is not None:
+        return tree.results
+    else:
+        v = observation[tree.col]
+        branch = None
+        if isinstance(v, int) or isinstance(v, float):
+            if v >= tree.value:
+                branch = tree.tb
+            else:
+                branch = tree.fb
+        else:
+            if v == tree.value:
+                branch = tree.tb
+            else:
+                branch = tree.fb
+        return classify(observation, branch)
+
+
 def test_divideset():
     tp = decisionnode()
     print(tp.divideset(my_data, 2, 'yes'))
@@ -239,6 +258,12 @@ def testdrawtree():
     drawtree(tree, jpeg='treeview.jpg')
 
 
+def testclassify():
+    tree = buildtree(my_data)
+    print(classify(['(direct)', 'USA', 'yes', 5], tree))
+
+
 if __name__ == '__main__':
     testprinttree()
-    testdrawtree()
+    # testdrawtree()
+    testclassify()
