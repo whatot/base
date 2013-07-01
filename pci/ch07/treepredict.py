@@ -223,6 +223,41 @@ def prune(tree, mingain):
             tree.results = uniquecounts(tb+fb)
 
 
+# 处理缺值属性，预测未知值
+def mdclassify(observation, tree):
+    if tree.results is not None:
+        return tree.results
+    else:
+        v = observation[tree.col]
+        if v is None:
+            tr = mdclassify(observation, tree.tb)
+            fr = mdclassify(observation, tree.fb)
+            tcount = sum(tr.values())
+            fcount = sum(fr.values())
+            tw = float(tcount) / (tcount+fcount)
+            fw = float(fcount) / (tcount+fcount)
+            result = {}
+            for k, v in tr.items():
+                result[k] = v * tw
+            for k, v in fr.items():
+                if k not in result:
+                    result[k] = 0
+                result[k] += v * fw
+            return result
+        else:
+            if isinstance(v, int) or isinstance(v, float):
+                if v >= tree.value:
+                    branch = tree.tb
+                else:
+                    branch = tree.fb
+            else:
+                if v == tree.value:
+                    branch = tree.tb
+                else:
+                    branch = tree.fb
+            return mdclassify(observation, branch)
+
+
 def test_divideset():
     tp = decisionnode()
     print(tp.divideset(my_data, 2, 'yes'))
@@ -316,5 +351,13 @@ def testprune():
     printtree(tree)
 
 
+# {'Basic\n': 0.25, 'Premium\n': 2.25}
+# {'Basic\n': 0.125, 'Premium\n': 2.25, 'None\n': 0.125}
+def testmdclassify():
+    tree = buildtree(my_data)
+    print(mdclassify(['google', None, 'yes', None], tree))
+    print(mdclassify(['google', 'France', None, None], tree))
+
+
 if __name__ == '__main__':
-    testprune()
+    testmdclassify()
