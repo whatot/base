@@ -1,8 +1,8 @@
 CC=gcc
 CXX=gcc
 
-CFLAGS += --static
-CLFAGS += -Wall -Wextra -ansi -fno-asm -O2 -g
+CFLAGS += #--static
+CLFAGS += -Wall -Wextra -ansi -fno-asm -O2 -g -fsanitize=address -fno-omit-frame-pointer
 LDFLAGS += -lm
 
 SOURCE = $(wildcard *.c)

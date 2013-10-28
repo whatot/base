@@ -47,7 +47,7 @@ void check(int64 n)
 	}
 }
 
-int main(int argc, char *argv[])
+int main()
 {
 	int64 i;
 
