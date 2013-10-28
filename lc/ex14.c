@@ -19,7 +19,10 @@
 #include <stdio.h>
 #include <ctype.h>
 
-//forward declarations
+extern int isblank(int c);
+
+
+/* forward declarations */
 int can_print_it(char ch);
 void print_letters(char arg[]);
 

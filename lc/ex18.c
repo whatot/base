@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex18.c
- *
- *    Description:
- *
- *        Version:  1.0
  *        Created:  2013年01月11日 21时12分36秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
@@ -47,7 +33,7 @@ int *bubble_sort(int *numbers, int count, compare_cb cmp)
 	int temp = 0;
 	int i = 0;
 	int j = 0;
-	int *target = malloc(count * sizeof(int));
+	int *target = (int *)malloc(count * sizeof(int));
 
 	if(!target) die("Memory error.");
 
@@ -112,7 +98,7 @@ int main(int argc, char *argv[])
 	int i = 0;
 	char **inputs = argv + 1;
 
-	int *numbers = malloc(count * sizeof(int));
+	int *numbers = (int *)malloc(count * sizeof(int));
 	if(!numbers) die("Memory error.");
 
 	for (i = 0; i < count; i++) {

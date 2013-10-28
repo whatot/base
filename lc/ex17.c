@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex17.c
- *
- *    Description:
- *
- *        Version:  1.0
  *        Created:  2013年01月11日 18时08分12秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
@@ -66,10 +52,10 @@ void Database_load(struct Connection *conn)
 
 struct Connection * Database_open(const char *Filename, char mode)
 {
-	struct Connection *conn = malloc(sizeof(struct Connection));
+	struct Connection *conn = (struct Connection *)malloc(sizeof(struct Connection));
 	if(!conn) die("Memory error");
 
-	conn->db = malloc(sizeof(struct Database));
+	conn->db = (struct Database*)malloc(sizeof(struct Database));
 	if(!conn->db) die("Memory error");
 
 	if(mode == 'c') {
@@ -113,7 +99,9 @@ void Database_create(struct Connection *conn)
 
 	for (i = 0; i <MAX_ROWS; i++) {
 		//make a prototype to initialize it
-		struct Address addr = {.id = i, .set = 0};
+		struct Address addr;
+		addr.id = i;
+		addr.set = 0;
 		//then just assign it
 		conn->db->rows[i] = addr;
 	}
@@ -147,7 +135,9 @@ void Database_get(struct Connection *conn, int id)
 
 void Database_delete(struct Connection *conn, int id)
 {
-	struct Address addr = {.id = id, .set = 0};
+	struct Address addr;
+	addr.id = id;
+	addr.set = 0;
 	conn->db->rows[id] = addr;
 }
 

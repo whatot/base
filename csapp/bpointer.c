@@ -33,7 +33,7 @@ void test_show_bytes(int val) {
 	show_pointer(pval);
 }
 
-int main(int argc, char *argv[]) {
+int main() {
 	int val = 0x87654321;
 	byte_pointer valp = (byte_pointer)&val;
 	
@@ -41,11 +41,13 @@ int main(int argc, char *argv[]) {
 	show_bytes(valp,2);
 	show_bytes(valp,3);
 
-//	test_show_bytes(val);
+	/* test_show_bytes(val); */
 	
 	const char *s = "abcdef";
 	show_bytes((byte_pointer) s, strlen(s));
 
-	printf("0x%x\n",0x87654321^0xFFFFFF00); //末位字节不变,其余取反
-	printf("0x%x\n",0x87654321|0x000000FF); //末位字节变全1,其余不变
+	printf("0x%x\n",0x87654321^0xFFFFFF00); /* 末位字节不变,其余取反 */
+	printf("0x%x\n",0x87654321|0x000000FF); /* 末位字节变全1,其余不变 */
+	
+	return 0;
 }

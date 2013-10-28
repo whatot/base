@@ -1,24 +1,10 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex7.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年01月09日 14时45分04秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
 
-int main(int argc, char *argv[])
+int main()
 {
 	int bugs = 100;
 	double bug_rate = 1.2;

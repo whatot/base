@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex19.c
- *
- *    Description:
- *
- *        Version:  1.0
  *        Created:  2013年01月13日 11时18分46秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
@@ -25,7 +11,7 @@
 
 int Monster_attack(void *self, int damage)
 {
-	Monster *monster = self;
+	Monster *monster = (Monster *)self;
 
 	printf("You attack %s!\n", monster->_(description));
 
@@ -42,7 +28,7 @@ int Monster_attack(void *self, int damage)
 
 int Monster_init(void *self)
 {
-	Monster *monster = self;
+	Monster *monster = (Monster *)self;
 	monster->hit_points = 10;
 	return 1;
 }
@@ -54,7 +40,7 @@ Object MonsterProto = {
 
 void *Room_move(void *self, Direction direction)
 {
-	Room *room = self;
+	Room *room = (Room *)self;
 	Room *next = NULL;
 
 	if(direction == NORTH && room->north) {
@@ -83,7 +69,7 @@ void *Room_move(void *self, Direction direction)
 
 int Room_attack(void *self, int damage)
 {
-	Room *room = self;
+	Room *room = (Room *)self;
 	Monster *monster = room->bad_guy;
 
 	if(monster) {
@@ -102,7 +88,7 @@ Object RoomProto = {
 
 void *Map_move(void *self, Direction direction)
 {
-	Map *map = self;
+	Map *map = (Map *)self;
 	Room *location = map->location;
 	Room *next = NULL;
 
@@ -117,7 +103,7 @@ void *Map_move(void *self, Direction direction)
 
 int Map_attack(void *self, int damage)
 {
-	Map *map = self;
+	Map *map = (Map *)self;
 	Room *location = map->location;
 
 	return location->_(attack)(location, damage);
@@ -125,7 +111,7 @@ int Map_attack(void *self, int damage)
 
 int Map_init(void *self)
 {
-	Map *map = self;
+	Map *map = (Map *)self;
 
 	// make some rooms for a small map
 	Room *hall = NEW(Room, "The freat Hall");
@@ -208,7 +194,7 @@ int process_input(Map *game)
 	return 1;
 }
 
-int main(int argc, char *argv[])
+int main()
 {
 	// simple way to setup the randomness
 	srand(time(NULL));

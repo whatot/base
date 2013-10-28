@@ -1,24 +1,10 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex9.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年01月09日 16时25分45秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
 
-int main(int argc, char *argv[])
+int main()
 {
 	int numbers[4] = {0};
 	char name[4] = {'a'};
@@ -71,8 +57,9 @@ int main(int argc, char *argv[])
 	//print the name like a string
 	printf("name: %s\n", name);
 
-	//another way to use name
-	char *another = "Zed";
+	// another way to use name
+	// char *another = "Zed";
+	char another[4] = "Zed";
 	printf("another: %s\n",another);
 
 	printf("another each: %c %c %c %c \n",

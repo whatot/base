@@ -1,19 +1,7 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex22_main.c
- *
  *    Description: "pass by value" vs "pass by reference"
- *
- *        Version:  1.0
+
  *        Created:  2013年01月20日 12时29分49秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include "ex22.h"
@@ -37,7 +25,7 @@ void scope_demo(int count)
 	log_info("count after assign: %d", count);
 }
 
-int main(int argc, char *argv[])
+int main()
 {
 	// test out THE_SIZE accessors
 	log_info("My name: %s, age: %d", MY_NAME, get_age());

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(int argc, char *argv[]) {
+int main() {
 	char a[16];
 	char b[16];
 	char c[32];

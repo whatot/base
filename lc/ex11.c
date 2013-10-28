@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex11.c
- *
- *    Description:
- *
- *        Version:  1.0
  *        Created:  2013年01月09日 23时45分01秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
@@ -29,7 +15,8 @@ int main(int argc, char *argv[])
 	}
 
 	// let's make our own array of strings
-	char *states[] = {
+	// char *states[] =
+	char states[4][20] = {
 		"California", "Oregon",
 		"Washington", "Texas"
 	};

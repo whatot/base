@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex25.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年01月31日 22时31分27秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
 /** WARNING: This code is fresh and potentially isn't correct yet. **/
@@ -27,10 +13,11 @@
 
 int read_string(char **out_string, int max_buffer)
 {
-	*out_string = calloc(1, max_buffer + 1);
+	char *result;
+	*out_string = (char *)calloc(1, max_buffer + 1);
 	check_mem(*out_string);
 
-	char *result = fgets(*out_string, max_buffer, stdin);
+	result = fgets(*out_string, max_buffer, stdin);
 	check(result != NULL, "Input error.");
 
 	return 0;
@@ -114,7 +101,7 @@ error:
 }
 
 
-int main(int argc, const char **argv) {
+int main() {
 	char *first_name = NULL;
 	char initial = ' ';
 	char *last_name = NULL;

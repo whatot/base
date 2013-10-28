@@ -1,8 +1,4 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex15.c
- *
  *    Description:
  *    type *ptr "一个叫做ptr的type型指针"
  *    *ptr "ptr 所指向地址对应的值"
@@ -11,21 +7,12 @@
  *    type *ptr = &thing "将名为ptr的type型指针设置到thing的地址"
  *    ptr++ "增进ptr的指向位置"
  *
- *
- *        Version:  1.0
  *        Created:  2013年01月10日 22时27分38秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
 
-int main(int argc, char *argv[])
+int main()
 {
 	//create two arrays we care about
 	int ages[] = {23, 43, 12, 89, 2};

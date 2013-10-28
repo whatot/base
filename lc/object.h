@@ -1,6 +1,8 @@
 #ifndef _object_h
 #define _object_h
 
+#include <sys/types.h>
+
 typedef enum {
 	NORTH, SOUTH, EAST, WEST
 } Direction;

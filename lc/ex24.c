@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex24.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年01月31日 20时11分37秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
@@ -39,10 +25,13 @@ typedef struct Person {
 } Person;
 
 
-int main(int argc, const char **argv){
-	Person you = {.age = 0};
+int main(){
+	Person you;
+	you.age = 0;
 	int i = 0;
 	char *in = NULL;
+	int eyes = -1;
+	int rc = 0;
 
 	printf("What's your first name?");
 	in = fgets(you.first_name, MAX_DATA-1, stdin);
@@ -53,7 +42,7 @@ int main(int argc, const char **argv){
 	check(in != NULL, "Failed to read last_name.");
 
 	printf("How old are you?");
-	int rc = fscanf(stdin, "%d", &you.age);
+	rc = fscanf(stdin, "%d", &you.age);
 	check(rc > 0, "You have to enter a nuber.");
 
 	printf("What color are your eyes:\n");
@@ -62,11 +51,10 @@ int main(int argc, const char **argv){
 	}
 	printf("> ");
 
-	int eyes = -1;
 	rc = fscanf(stdin, "%d", &eyes);
 	check(rc > 0, "You have to enter a number.");
 
-	you.eyes = eyes - 1;
+	you.eyes = (Eyecolor)(eyes - 1);
 	check(you.eyes <= OTHER_EYES && you.eyes >= 0, "Do it right, that's not an option.");
 
 	printf("How much do you make an hour? ");

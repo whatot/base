@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex16.c
- *
- *    Description:
- *
- *        Version:  1.0
  *        Created:  2013年01月11日 12时49分39秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
@@ -30,7 +16,7 @@ struct Person {
 
 struct Person *Person_create(char *name, int age, int height, int weight)
 {
-	struct Person *who = malloc(sizeof(struct Person));
+	struct Person *who = (struct Person *)malloc(sizeof(struct Person));
 	assert(who != NULL);
 
 	who->name = strdup(name);
@@ -57,14 +43,17 @@ void Person_print(struct Person *who)
 	printf("\tWeight: %d\n", who->weight);
 }
 
-int main(int argc, char *argv[])
+int main()
 {
 	// make two people structures
+	char joe_name[20] = "Joe Alex";
+	char frank_name[20] = "Frank Blank";
+
 	struct Person *joe = Person_create(
-			"Joe Alex", 32, 64, 140);
+			joe_name, 32, 64, 140);
 
 	struct Person *frank = Person_create(
-			"Frank Blank", 20, 72, 180);
+			frank_name, 20, 72, 180);
 
 	// print them out and where they are in memory
 	printf("Joe is at memory location %p:\n", joe);

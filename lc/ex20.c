@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  ex20.c
- *
- *    Description:
- *
- *        Version:  1.0
  *        Created:  2013年01月13日 18时28分07秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (),
- *   Organization:
- *
- * =====================================================================================
  */
 
 #include "dbg.h"
@@ -52,7 +38,7 @@ int test_check(char *file_name)
 	FILE *input = NULL;
 	char *block = NULL;
 
-	block = malloc(100);
+	block = (char*)malloc(100);
 	check_mem(block); // should work
 
 	input = fopen(file_name, "r");
@@ -70,7 +56,7 @@ error:
 
 int test_sentinel(int code)
 {
-	char *temp = malloc(100);
+	char *temp = (char *)malloc(100);
 	check_mem(temp);
 
 	switch(code) {
@@ -114,6 +100,7 @@ error:
 
 int main(int argc, char *argv[])
 {
+	char EX20_SRC[10] = "ex20.c";
 	check(argc == 2, "Need an argument.");
 
 	test_debug();
@@ -121,7 +108,7 @@ int main(int argc, char *argv[])
 	test_log_warn();
 	test_log_info();
 
-	check(test_check("ex20.c") == 0, "failed with ex20.c");
+	check(test_check(EX20_SRC) == 0, "failed with ex20.c");
 	check(test_check(argv[1]) == -1, "failed with argv");
 	check(test_sentinel(1) == 0, "test_sentinel failed");
 	check(test_sentinel(100) == -1, "test_sentinel failed");

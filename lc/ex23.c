@@ -89,7 +89,7 @@ int valid_copy(char *data, int count, char expects)
 }
 
 
-int main(int argc, char *argv[])
+int main()
 {
 	char from[1000] = {'a'};
 	char to[1000] = {'c'};
