@@ -1,22 +1,8 @@
 /*
- * =====================================================================================
- *
- *       Filename:  app.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年02月05日 17时08分02秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
-int main(int argc, const char **argv)
+int main()
 {
 	return f ();
 }

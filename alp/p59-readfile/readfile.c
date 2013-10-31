@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  readfile.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年02月05日 14时58分06秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
 #include <fcntl.h>
@@ -42,7 +28,7 @@ char* read_from_file (const char* filename, size_t length)
 	}
 	/* Read the data.  */
 	bytes_read = read (fd, buffer, length);
-	if (bytes_read != length) {
+	if ((size_t)bytes_read != length) {
 		/* read failed. Deallocate buffer and close fd before returning. */
 		free (buffer);
 		close (fd);

@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
-int main(int argc, const char *argv[])
+int main()
 {
 	char c;
 	int in, out;

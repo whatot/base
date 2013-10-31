@@ -1,25 +1,11 @@
 /*
- * =====================================================================================
- *
- *       Filename:  client.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年02月04日 13时21分52秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, const char **argv)
+int main()
 {
 	char* server_name = getenv ("SERVER_NAME");
 	if (server_name == NULL)

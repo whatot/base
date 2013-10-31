@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-int main(int argc, const char *argv[])
+int main()
 {
 	char buffer[128];
 	int nread;

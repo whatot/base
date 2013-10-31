@@ -5,6 +5,8 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
+extern int lstat(const char *restrict path, struct stat *restrict buf);
+
 void printdir(char *dir, int depth)
 {
 	DIR *dp;

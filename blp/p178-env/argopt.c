@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <unistd.h>
 
+extern int getopt(int argc, char * const argv[], const char *optstring);
+
+extern char *optarg;
+extern int optind, opterr, optopt;
+
 int main(int argc, char * argv[])
 {
 	int opt;

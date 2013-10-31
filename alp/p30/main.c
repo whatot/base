@@ -22,10 +22,11 @@
 
 int main(int argc, const char **argv)
 {
-	int i;
-
-	i = atoi (argv[1]);
-	printf ("The reciprocal of %d is %g\n", i, reciprocal (i));
+	if (argc == 2) {
+		int i;
+		i = atoi (argv[1]);
+		printf ("The reciprocal of %d is %g\n", i, reciprocal (i));
+	}
 
 	return 0;
 }

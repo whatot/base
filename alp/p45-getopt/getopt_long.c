@@ -1,19 +1,5 @@
 /*
- * =====================================================================================
- *
- *       Filename:  getopt_long.c
- *
- *    Description:  
- *
- *        Version:  1.0
  *        Created:  2013年02月04日 11时12分31秒
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  YOUR NAME (), 
- *   Organization:  
- *
- * =====================================================================================
  */
 
 #include <getopt.h>
@@ -24,7 +10,7 @@
 /* The name of this program. */
 const char* program_name;
 
-/* Prints usage information for this program to STREAM (typically 
+/* Prints usage information for this program to STREAM (typically
  * stdout or stderr), and exit the program with EXIT_CODE.
  * Does not return. */
 
@@ -66,7 +52,7 @@ int main(int argc, const char **argv)
 	program_name = argv[0];
 
 	do {
-		next_option = getopt_long (argc, argv, short_options,
+		next_option = getopt_long (argc, (char * const*)argv, short_options,
 			       long_options, NULL);
 		switch (next_option)
 		{
@@ -77,7 +63,7 @@ int main(int argc, const char **argv)
 				print_usage (stdout, 0);
 
 			case 'o':  /* -o or --output */
-				/* This option takes an argument, the name of 
+				/* This option takes an argument, the name of
 				 * the output file. */
 				output_filename = optarg;
 				break;
@@ -108,6 +94,11 @@ int main(int argc, const char **argv)
 		for(i = optind; i < argc; ++i) {
 			printf ("Argument: %s\n", argv[i]);
 		}
+	}
+
+	/* Only use output_filename */
+	if (output_filename) {
+		printf("The output filename:\t %s\n", output_filename);
 	}
 
 	/* The main program goes here. */
