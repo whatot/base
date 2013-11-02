@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -Wall -Wextra -Werror -pedantic -std=gnu99
-LDFLAGS=
+LDFLAGS= -ldl
 
 .PHONY: all test dist-clean clean GTAGS GTAGS-clean
 
