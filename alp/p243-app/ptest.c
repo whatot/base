@@ -230,8 +230,6 @@ static char current_suite[MAX_NAME];
 void pt_run()
 {
 
-	printf("    \n");
-
 	signal(SIGFPE, ptest_signal);
 	signal(SIGILL, ptest_signal);
 	signal(SIGSEGV, ptest_signal);

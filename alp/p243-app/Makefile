@@ -7,11 +7,11 @@ LDFLAGS= -ldl
 sources := $(wildcard ./*.c)
 objects := $(notdir $(sources:.c=.o))
 
-run_main_obj := 
+run_main_obj := main.c
 test_sources := $(wildcard ./*test*.c)
 test_main_obj := $(notdir $(test_sources:.c=.o))
-# test_main_obj contains all *test*.c
-# but run_main_obj only contains the server.c
+# test_main_obj contains all *test*.o
+# but run_main_obj only contains the server.o
 
 run_objects := $(filter-out $(test_main_obj),$(objects))
 all: $(run_objects)
