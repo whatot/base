@@ -4,31 +4,30 @@ LDFLAGS= -ldl
 
 .PHONY: all test dist-clean clean GTAGS GTAGS-clean
 
-sources := $(wildcard ./*.c)
-objects := $(notdir $(sources:.c=.o))
+COMMON_OBJECTS := server.o module.o common.o
+MAIN_OBJECTS := main.o $(COMMON_OBJECTS)
+MODULES_OBJECTS := diskfree.so issue.so time.so
+TEST_SOURCES := $(wildcard ./*test*.c)
+TEST_OBJECTS := $(notdir $(TEST_SOURCES:.c=.o)) $(COMMON_OBJECTS)
 
-run_main_obj := main.o
-test_sources := $(wildcard ./*test*.c)
-test_main_obj := $(notdir $(test_sources:.c=.o))
-# test_main_obj contains all *test*.o
-# but run_main_obj only contains the main.o
+all: server $(MODULES_OBJECTS)
 
-run_objects := $(filter-out $(test_main_obj),$(objects))
-all: $(run_objects)
+server: $(MAIN_OBJECTS)
 	$(CC) $^ $(CFLAGS) $(LDFLAGS) -o server.bin
 
-test_objects := $(filter-out $(run_main_obj),$(objects))
-test: $(test_objects)
+$(MODULES_OBJECTS): \
+%.so: %.c server.h
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ $<
+
+test: $(TEST_OBJECTS)
 	$(CC) $^ $(CFLAGS) $(LDFLAGS) -o test.bin
 	./test.bin
 
 %.bin: %.o
 	$(CC) $^ $(CFLAGS) $(LDFLAGS) -o $@
 
-dist-clean: clean GTAGS-clean
-
 clean:
-	-rm -f *.bin *.o
+	-rm -f *.bin *.o *.so
 
 GTAGS:
 	find . -type f -name '*.[ch]' > gtags.file
@@ -37,3 +36,5 @@ GTAGS:
 
 GTAGS-clean:
 	-rm -f gtags.file GPATH GRTAGS GTAGS
+
+dist-clean: clean GTAGS-clean
