@@ -6,7 +6,7 @@ LDFLAGS= -ldl
 
 COMMON_OBJECTS := server.o module.o common.o
 MAIN_OBJECTS := main.o $(COMMON_OBJECTS)
-MODULES_OBJECTS := diskfree.so issue.so time.so
+MODULES_OBJECTS := diskfree.so issue.so time.so processes.so
 TEST_SOURCES := $(wildcard ./*test*.c)
 TEST_OBJECTS := $(notdir $(TEST_SOURCES:.c=.o)) $(COMMON_OBJECTS)
 
