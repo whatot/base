@@ -262,4 +262,65 @@ void module_generate(int fd)
 	if (proc_listing == NULL) {
 		system_error("opendir");
 	}
+
+	/* Loop over directory entries in /proc */
+	while (1) {
+		struct dirent *proc_entry;
+		const char *name;
+		pid_t pid;
+		char *process_info;
+
+		/* Get the next entry in /proc. */
+		proc_entry = readdir(proc_listing);
+		if (proc_entry == NULL) {
+			/* We've hit the end of the listing. */
+			break;
+		}
+		/* If this entry is not composed purely of digits, it's not a
+		 * process directory, so skip it. */
+		name = proc_entry->d_name;
+		if (strspn(name, "0123456789") != strlen(name)) {
+			continue;
+		}
+		/* The name of the entry is the process ID. */
+		pid = (pid_t)atoi(name);
+		/* Generate HTML for a table row describing this process. */
+		process_info = format_process_info(pid);
+		if (process_info == NULL) {
+			/* Something went wrong. The process msy have vanished while
+			 * we were looking at it. Use a placeholser row instead. */
+			process_info = "<tr><td colspan=\"5\">ERROR</td></tr>";
+		}
+
+		/* Make sure the iovec array is long enough to hold this buffer
+		 * (plus one more because we'll add an extra element when we're done
+		 * listing processes). If not grow it to twice its curren size. */
+		if (vec_length == vec_size - 1) {
+			vec_size *= 2;
+			vec = xrealloc(vec, vec_size * sizeof (struct iovec));
+		}
+		/* Store this buffer as the next element of the array. */
+		vec[vec_length].iov_base = process_info;
+		vec[vec_length].iov_len = strlen(process_info);
+		++vec_length;
+	}
+
+	/* End the directory listing operation. */
+	closedir(proc_listing);
+
+	/* Add one last buffer with HTML that ends the page. */
+	vec[vec_length].iov_base = page_end;
+	vec[vec_length].iov_len = strlen(page_end);
+	++vec_length;
+
+	/* Output the entire page to the client file descriptor all at once. */
+	writev(fd, vec, vec_length);
+
+	/* Deallocate the buffers we created. The first and last are static
+	 * and should not be deallocated. */
+	for (i = 1; i < vec_length - 1; i++) {
+		free(vec[i].iov_base);
+	}
+	/* Deallocate the iovec array. */
+	free(vec);
 }
