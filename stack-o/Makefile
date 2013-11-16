@@ -1,9 +1,15 @@
-CC=gcc
-CXX=gcc
+CC := gcc
+CXX := g++
 
 CFLAGS += #--static
-CLFAGS += -Wall -Wextra -ansi -fno-asm -O2 -g -fsanitize=address -fno-omit-frame-pointer
+CLFAGS += -Wall -Wextra -ansi -fno-asm -O2 -g
 LDFLAGS += -lm
+GCCVERSIONGTEQ48 := $(shell expr `gcc -dumpversion ` \>= 4.8)
+
+# only gcc >= 4.8, llvm >= 3.1 support AddressSanitizer
+ifeq "$(GCCVERSIONGTEQ48)" "1"
+    CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+endif
 
 SOURCE = $(wildcard *.c)
 #OBJS = $(patsubst %.c,%.o,$(SOURCE))
@@ -14,7 +20,7 @@ TARGET = $(patsubst %.c,%.bin,$(SOURCE))
 all:$(TARGET)
 
 %.bin:%.c
-	$(CXX) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $< -o $@
 
 #all:$(objects)
 #	gcc $^ -o $^.bin -ansi -fno-asm -O2 -Wall -lm --static
