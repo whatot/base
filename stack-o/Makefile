@@ -11,9 +11,10 @@ ifeq "$(GCCVERSIONGTEQ48)" "1"
     CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 endif
 
-SOURCE = $(wildcard *.c)
-#OBJS = $(patsubst %.c,%.o,$(SOURCE))
-TARGET = $(patsubst %.c,%.bin,$(SOURCE))
+CSOURCE = $(wildcard *.c)
+CPPSOURCE = $(wildcard *.cc)
+#OBJS = $(patsubst %.c,%.o,$(CSOURCE))
+TARGET = $(patsubst %.c,%.bin,$(CSOURCE)) $(patsubst %.cc,%.bin,$(CPPSOURCE))
 
 .PHONY: all clean
 
@@ -21,6 +22,9 @@ all:$(TARGET)
 
 %.bin:%.c
 	$(CC) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $< -o $@
+
+%.bin:%.cc
+	$(CXX) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $< -o $@
 
 #all:$(objects)
 #	gcc $^ -o $^.bin -ansi -fno-asm -O2 -Wall -lm --static
