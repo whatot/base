@@ -76,21 +76,21 @@ def fab4(max):
 """
 yield的作用就是把一个函数变成一个generator对象，该对象具有next(方法)
 
- >>> f = fab(5) 
- >>> f.next() 
- 1 
- >>> f.next() 
- 1 
- >>> f.next() 
- 2 
- >>> f.next() 
- 3 
- >>> f.next() 
- 5 
- >>> f.next() 
- Traceback (most recent call last): 
-  File "<stdin>", line 1, in <module> 
- StopIteration 
+ >>> f = fab(5)
+ >>> f.next()
+ 1
+ >>> f.next()
+ 1
+ >>> f.next()
+ 2
+ >>> f.next()
+ 3
+ >>> f.next()
+ 5
+ >>> f.next()
+ Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ StopIteration
 
 
 当函数执行结束时，generator 自动抛出 StopIteration 异常，表示迭代完成。在 for 循环里，无需处理 StopIteration 异常，循环会正常结束。
@@ -106,52 +106,52 @@ yield 的好处是显而易见的，把一个函数改写为一个 generator 就
 
 清单 7. 使用 isgeneratorfunction 判断
 
- >>> from inspect import isgeneratorfunction 
- >>> isgeneratorfunction(fab) 
- True 
+ >>> from inspect import isgeneratorfunction
+ >>> isgeneratorfunction(fab)
+ True
 
 
 要注意区分 fab 和 fab(5)，fab 是一个 generator function，而 fab(5) 是调用 fab 返回的一个 generator，好比类的定义和类的实例的区别：
 
 清单 8. 类的定义和类的实例
 
-				
- >>> import types 
- >>> isinstance(fab, types.GeneratorType) 
- False 
- >>> isinstance(fab(5), types.GeneratorType) 
- True 
+
+ >>> import types
+ >>> isinstance(fab, types.GeneratorType)
+ False
+ >>> isinstance(fab(5), types.GeneratorType)
+ True
 
 
 fab 是无法迭代的，而 fab(5) 是可迭代的：
 
- >>> from collections import Iterable 
- >>> isinstance(fab, Iterable) 
- False 
- >>> isinstance(fab(5), Iterable) 
- True 
+ >>> from collections import Iterable
+ >>> isinstance(fab, Iterable)
+ False
+ >>> isinstance(fab(5), Iterable)
+ True
 
 
 每次调用 fab 函数都会生成一个新的 generator 实例，各实例互不影响：
 
- >>> f1 = fab(3) 
- >>> f2 = fab(5) 
- >>> print 'f1:', f1.next() 
- f1: 1 
- >>> print 'f2:', f2.next() 
- f2: 1 
- >>> print 'f1:', f1.next() 
- f1: 1 
- >>> print 'f2:', f2.next() 
- f2: 1 
- >>> print 'f1:', f1.next() 
- f1: 2 
- >>> print 'f2:', f2.next() 
- f2: 2 
- >>> print 'f2:', f2.next() 
- f2: 3 
- >>> print 'f2:', f2.next() 
- f2: 5 
+ >>> f1 = fab(3)
+ >>> f2 = fab(5)
+ >>> print 'f1:', f1.next()
+ f1: 1
+ >>> print 'f2:', f2.next()
+ f2: 1
+ >>> print 'f1:', f1.next()
+ f1: 1
+ >>> print 'f2:', f2.next()
+ f2: 1
+ >>> print 'f1:', f1.next()
+ f1: 2
+ >>> print 'f2:', f2.next()
+ f2: 2
+ >>> print 'f2:', f2.next()
+ f2: 3
+ >>> print 'f2:', f2.next()
+ f2: 5
 
 
 回页首
@@ -169,15 +169,15 @@ return 的作用
 清单 9. 另一个 yield 的例子
 """
 
-def read_file(fpath): 
-    BLOCK_SIZE = 1024 
-    with open(fpath, 'rb') as f: 
-        while True: 
-            block = f.read(BLOCK_SIZE) 
-            if block: 
-                yield block 
-            else: 
-                return 
+def read_file(fpath):
+    BLOCK_SIZE = 1024
+    with open(fpath, 'rb') as f:
+        while True:
+            block = f.read(BLOCK_SIZE)
+            if block:
+                yield block
+            else:
+                return
 
 """
 以上仅仅简单介绍了 yield 的基本概念和用法，yield 在 Python 3 中还有更强大的用法，我们会在后续文章中讨论。
