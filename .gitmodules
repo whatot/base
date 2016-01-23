@@ -1,12 +1,6 @@
 [submodule "ma_c"]
     path = ma_c
     url = https://github.com/whatot/ma_c.git
-[submodule "cn-links"]
-	path = cn-links
-	url = https://github.com/whatot/cn-links.git
 [submodule "learn-kernel"]
 	path = learn-kernel
 	url = https://github.com/whatot/learn-kernel.git
-[submodule "zoj"]
-	path = zoj
-	url = https://github.com/whatot/zoj.git
