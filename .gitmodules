@@ -1,6 +1,3 @@
 [submodule "ma_c"]
     path = ma_c
     url = https://github.com/whatot/ma_c.git
-[submodule "learn-kernel"]
-	path = learn-kernel
-	url = https://github.com/whatot/learn-kernel.git

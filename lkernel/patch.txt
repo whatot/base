@@ -1,0 +1,46 @@
+How to patch the linux kernel patch
+
+最先应该查看
+Documentation/applying-patches.txt
+
+http://blog.csdn.net/striver1205/article/details/7419119
+
+分类： Kernel 2012-04-01 14:11 199人阅读 评论(0) 收藏 举报
+patchlinuxlinux内核makefile嵌入式x86
+
+申明：本章是作者查阅几家bolg共同的出的结果。
+
+引荐：
+http://blog.sina.com.cn/s/blog_476d8cf30100lpym.html
+http://bbs.chinaunix.net/thread-1088259-1-1.html
+
+Kernel patch不是一定需要的，这要看你选择的是怎样的Linux内核，比如下载下来标准的Linux内核，想要编译linux系统在x86的PC机上运行，就根本不用什么板间支持的补丁了，因为标准Linux内核本身基于x86平台测试。而如果使用Embedix内核，开发板是PowerPC体系的，内核可能本身已经支持POwerpc，也不需要安装补丁了。但嵌入式系统往往工作在不同的特定目标板上，如arm，这就需要使linux内核扩展对目标体系的支持了。
+
+例子：
+
+为了应用一个从2.6.11到2.6.12的补丁,你最好按照下面来做(注意这些补丁不能应用于2.6.x.y的内核,
+而是应用在2.6.x的基础内核---如果你需要从2.6.x.y到2.6.x+1,那么你首先需要卸载掉2.6.x.y的补丁)
+下面是一些例子:
+
+#从2.6.11到2.6.12
+$ cd ~/linux-2.6.11                       # 切换到内核源代码目录
+$ patch -p1 < ../patch-2.6.12                  # 应用2.6.12补丁
+$ cd ..
+$ mv linux-2.6.11 linux-2.6.12                  # 重命名源代码目录
+# moving from 2.6.11.1 to 2.6.12
+$ cd ~/linux-2.6.11.1                      # 切换到内核源代码目录
+$ patch -p1 -R < ../patch-2.6.11.1 # 恢复出来2.6.11.1
+                                   # 源代码目录现在是2.6.11
+$ patch -p1 < ../patch-2.6.12                  # 应用新的2.6.12补丁
+ $ cd ..
+$ mv linux-2.6.11.1 linux-2.6.12                # 重命名源代码目录
+
+其中patch 中的-p选项：
+
+"-p 0"：表示使用完整路径名。
+
+"-p 1"：表示去除路径前面的斜杠。
+
+"-p 4"：表示去除路径前面的斜杠和前面的三个目录。
+
+但是这有个问题，就是当你要对目标机写模块时候产生版本不匹配的情况，小编苦恼了两天，没想到最后的解决方法确实简单的更改一下Makefile里的版本号即可，崩溃啊！

@@ -29,7 +29,7 @@ int main()
 		   pData->a, pData->b, pData->c, pData->d);
 	/* 位域可以使用指针 */
 
-	printf("sizeof(data) = %d \n", sizeof(data));	/* 4 bytes ，最常用的情况 */
+	printf("sizeof(data) = %ld \n", sizeof(data));	/* 4 bytes ，最常用的情况 */
 
 	struct testLen {
 		char a:5;
@@ -39,7 +39,7 @@ int main()
 		char e:5;
 	} len;
 
-	printf("sizeof(len) = %d \n", sizeof(len));	/* 5bytes 规则2 */
+	printf("sizeof(len) = %ld \n", sizeof(len));	/* 5bytes 规则2 */
 
 	struct testLen1 {
 		char a:5;
@@ -48,7 +48,7 @@ int main()
 		char c:2;
 		char e:7;
 	} len1;
-	printf("sizeof(len1) = %d \n", sizeof(len1));	/* 3bytes 规则1 */
+	printf("sizeof(len1) = %ld \n", sizeof(len1));	/* 3bytes 规则1 */
 
 	struct testLen2 {
 		char a:2;
@@ -57,7 +57,7 @@ int main()
 		long d:20;				/* 4bytes */
 		char e:4;
 	} len2;
-	printf("sizeof(len2) = %d \n", sizeof(len2));
+	printf("sizeof(len2) = %ld \n", sizeof(len2));
 	/* 12bytes 规则3,4,5，总长为4的整数倍，2+3 占1byte，b占1bye
 	 * 由于与long对其，2+3+7 占4字节，后面d与e进行了优化占一个4字节
 	 */
@@ -69,7 +69,7 @@ int main()
 		long d:30;
 		char e:4;
 	} len3;
-	printf("sizeof(len3) = %d \n", sizeof(len3));
+	printf("sizeof(len3) = %ld \n", sizeof(len3));
 	/* 12bytes 规则3，4，5，总长为4的整数倍，2+3 占1byte，b占1byte
 	 * 由于与long对其，2+3+7 占4字节，后面 d占一个4字节，
 	 * 为了保证与long对其, e独占一个4字节

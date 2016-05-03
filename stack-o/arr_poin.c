@@ -3,13 +3,13 @@
 #include <string.h>
 
 int main() {
-	char *c="abcdef";
-	char d[]="abcdef";
-	char e[]={'a','b','c','d','e','f'};
+	char *c = (char *)"abcdef";
+	char d[] = "abcdef";
+	char e[] = {'a','b','c','d','e','f'};
 
-	printf("sizeof(c):%d\tstrlen(c):%d\n", sizeof(c), strlen(c));
-	printf("sizeof(d):%d\tstrlen(d):%d\n", sizeof(d), strlen(d));
-	printf("sizeof(e):%d\tstrlen(e):%d\n", sizeof(e), strlen(e));
+	printf("sizeof(c):%ld\tstrlen(c):%ld\n", sizeof(c), strlen(c));
+	printf("sizeof(d):%ld\tstrlen(d):%ld\n", sizeof(d), strlen(d));
+	printf("sizeof(e):%ld\tstrlen(e):%ld\n", sizeof(e), strlen(e));
 
 	return 0;
 }

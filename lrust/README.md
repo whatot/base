@@ -1,0 +1,1 @@
+# code pratice for rust
