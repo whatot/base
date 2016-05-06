@@ -1,0 +1,5 @@
+*.swp
+*.sock
+*.pyc
+*.pyo
+node_modules/
