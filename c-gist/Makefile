@@ -2,7 +2,7 @@ CC := gcc
 CXX := g++
 
 CFLAGS += #--static
-CLFAGS += -Wall -Wextra -ansi -fno-asm -O2 -g
+CLFAGS += -Wall -Wextra -Werror -ansi -fno-asm -O2 -g
 LDFLAGS += -lm
 GCCVERSIONGTEQ48 := $(shell expr `gcc -dumpversion ` \>= 4.8)
 
@@ -16,7 +16,7 @@ CPPSOURCE = $(wildcard *.cc)
 #OBJS = $(patsubst %.c,%.o,$(CSOURCE))
 TARGET = $(patsubst %.c,%.bin,$(CSOURCE)) $(patsubst %.cc,%.bin,$(CPPSOURCE))
 
-.PHONY: all clean
+.PHONY: all clean check
 
 all:$(TARGET)
 
@@ -28,6 +28,9 @@ all:$(TARGET)
 
 #all:$(objects)
 #	gcc $^ -o $^.bin -ansi -fno-asm -O2 -Wall -lm --static
+
+check:
+	cppcheck --enable=all --std=c99 *.c
 
 clean:
 	rm -f *.bin *.o
