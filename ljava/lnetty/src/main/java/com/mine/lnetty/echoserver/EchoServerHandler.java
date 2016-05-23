@@ -1,4 +1,4 @@
-package com.mine.lnetty;
+package com.mine.lnetty.echoserver;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

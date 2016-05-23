@@ -1,4 +1,4 @@
-package com.mine.lnetty;
+package com.mine.lnetty.echoserver;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
