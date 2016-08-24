@@ -9,19 +9,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TestScanner {
 
     private static final int PROCESS_TASK_LIMIT = 1000;
+    private final Logger logger;
 
-    public static void main(String[] args) {
-        System.out.println("Working Directory = " + System.getProperty("user.dir"));
-        final String testFile = "test.data";
-        TestScanner.generateTestFile(testFile);
-        TestScanner.processAllTasks(testFile);
+    public TestScanner() {
+        logger = Logger.getLogger(TestScanner.class.getName());
+        logger.setLevel(Level.INFO);
+        logger.info("Working Directory = " + System.getProperty("user.dir"));
     }
 
-    private static void processAllTasks(String processFilePath) {
+    public static void main(String[] args) {
+        final String testFile = "test.data";
+        TestScanner testcase = new TestScanner();
+        testcase.generateTestFile(testFile);
+        testcase.processAllTasks(testFile);
+    }
+
+    private void processAllTasks(String processFilePath) {
         String line;
         List<String> keyList = new ArrayList<String>(PROCESS_TASK_LIMIT);
 
@@ -44,16 +53,16 @@ public class TestScanner {
         }
     }
 
-    private static void processTaskList(List<String> taskList) {
-        System.out.println("The processed taskList size:" + taskList.size());
+    private void processTaskList(List<String> taskList) {
+        logger.info("The processed taskList size:" + taskList.size());
         taskList.clear();
     }
 
-    private static void generateTestFile(String filePath) {
+    private void generateTestFile(String filePath) {
         final int Min = 2000;
         final int Max = 20000;
         final int cycle = Min + (int) (Math.random() * ((Max - Min) + 1));
-        System.out.println("The line of Test file:" + cycle);
+        logger.info("The line of Test file:" + cycle);
         BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(filePath));
