@@ -1,0 +1,33 @@
+# Object files
+*.d
+*.o
+*.ko
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+.*.pyc
+.*.swp
+.*.swo
+*.bin
+
+# gtags
+GPATH
+GRTAGS
+GTAGS
+gtags.files
+
+# unneed files
+*.log
