@@ -3,6 +3,8 @@ CXX := g++
 
 CFLAGS += #--static
 CLFAGS += -Wall -Wextra -Werror -ansi -fno-asm -O2 -g
+COPTS = -std=c99
+CXXOPTS = -std=c++11
 LDFLAGS += -lm
 GCCVERSIONGTEQ48 := $(shell expr `gcc -dumpversion ` \>= 4.8)
 
@@ -21,16 +23,19 @@ TARGET = $(patsubst %.c,%.bin,$(CSOURCE)) $(patsubst %.cc,%.bin,$(CPPSOURCE))
 all:$(TARGET)
 
 %.bin:%.c
-	$(CC) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $(COPTS) $< -o $@
 
 %.bin:%.cc
-	$(CXX) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $< -o $@
+	$(CXX) $(CFLAGS) $(CLFAGS) $(LDFLAGS) $(CXXOPTS) $< -o $@
 
 #all:$(objects)
 #	gcc $^ -o $^.bin -ansi -fno-asm -O2 -Wall -lm --static
 
 check:
 	cppcheck --enable=all --std=c99 *.c
+
+checkcc:
+	cppcheck --enable=all --std=c++11 *.cc
 
 clean:
 	rm -f *.bin *.o
