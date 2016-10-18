@@ -10,53 +10,53 @@
 
 typedef long long int64;
 typedef enum {
-	false = 0,
-	true = !false
+    false = 0,
+    true = !false
 } bool;
 
 int64 palindromify(int64 n, bool oddp)
 {
-	int64 a = n;
+    int64 a = n;
 
-	if (oddp) {
-		a /= 10;
-	}
-	while (n > 0) {
-		a = a * 10 + n % 10;
-		n /= 10;
-	}
-	return a;
+    if (oddp) {
+        a /= 10;
+    }
+    while (n > 0) {
+        a = a * 10 + n % 10;
+        n /= 10;
+    }
+    return a;
 }
 
 bool is_palindrome(int64 n)
 {
-	int64 a = 0;
-	int64 b = n;
-	while (n > 0) {
-		a = a * 10 + n % 10;
-		n /= 10;
-	}
-	return a == b;
+    int64 a = 0;
+    int64 b = n;
+    while (n > 0) {
+        a = a * 10 + n % 10;
+        n /= 10;
+    }
+    return a == b;
 }
 
 void check(int64 n)
 {
-	n *= n;
-	if (is_palindrome(n)) {
-		printf("%lld\n", n);
-	}
+    n *= n;
+    if (is_palindrome(n)) {
+        printf("%lld\n", n);
+    }
 }
 
 int main()
 {
-	int64 i;
+    int64 i;
 
-	for (i = 1ll; i < 10000ll; i++) {
-		check(palindromify(i, true));
-		if (i < 1000ll) {
-			check(palindromify(i, false));
-		}
-	}
+    for (i = 1ll; i < 10000ll; i++) {
+        check(palindromify(i, true));
+        if (i < 1000ll) {
+            check(palindromify(i, false));
+        }
+    }
 
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

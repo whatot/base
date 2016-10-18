@@ -3,21 +3,21 @@
 #include <string.h>
 
 int main() {
-	char *c = (char *)"abcdef";
-	char d[] = "abcdef";
-	char e[] = {'a','b','c','d','e','f'};
+    char *c = (char *)"abcdef";
+    char d[] = "abcdef";
+    char e[] = {'a','b','c','d','e','f'};
 
-	printf("sizeof(c):%ld\tstrlen(c):%ld\n", sizeof(c), strlen(c));
-	printf("sizeof(d):%ld\tstrlen(d):%ld\n", sizeof(d), strlen(d));
-	printf("sizeof(e):%ld\tstrlen(e):%ld\n", sizeof(e), strlen(e));
+    printf("sizeof(c):%ld\tstrlen(c):%ld\n", sizeof(c), strlen(c));
+    printf("sizeof(d):%ld\tstrlen(d):%ld\n", sizeof(d), strlen(d));
+    printf("sizeof(e):%ld\tstrlen(e):%ld\n", sizeof(e), strlen(e));
 
-	return 0;
+    return 0;
 }
 
 /*
-	sizeof(c):4	strlen(c):6
-	sizeof(d):7	strlen(d):6
-	sizeof(e):6	strlen(e):12
+    sizeof(c):4    strlen(c):6
+    sizeof(d):7    strlen(d):6
+    sizeof(e):6    strlen(e):12
  */
 
 /*

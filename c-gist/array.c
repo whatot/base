@@ -2,15 +2,15 @@
 
 int main()
 {
-	int i;
-	int arr[] = { 0, 3, 4, 28, 1198};
-	for(i = 0; i < 5; i++) {
-	    printf(" arr[i] %p\n" , (void *) (arr+i));
-	}
-	printf(" *******************\n");
-	printf(" %p\n",(void *) (&arr+1));
+    int i;
+    int arr[] = { 0, 3, 4, 28, 1198};
+    for(i = 0; i < 5; i++) {
+        printf(" arr[i] %p\n" , (void *) (arr+i));
+    }
+    printf(" *******************\n");
+    printf(" %p\n",(void *) (&arr+1));
 
-	return 1;
+    return 1;
 
 }
 
