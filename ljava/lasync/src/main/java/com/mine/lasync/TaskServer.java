@@ -21,7 +21,7 @@ public class TaskServer {
                 .setServerInfo("simple http server/1.1")
                 .setIOReactorConfig(ioReactorConfig)
                 .setListenerPort(11111)
-                .registerHandler("/", new RootHandler())
+                .registerHandler("/basic", new BasicHandler())
                 .create();
         httpServer.start();
         System.out.println("TaskServer is started");
@@ -34,7 +34,7 @@ public class TaskServer {
         });
     }
 
-    private static class RootHandler implements HttpAsyncRequestHandler {
+    private static class BasicHandler implements HttpAsyncRequestHandler {
 
         @Override
         public HttpAsyncRequestConsumer processRequest(HttpRequest request, HttpContext context)

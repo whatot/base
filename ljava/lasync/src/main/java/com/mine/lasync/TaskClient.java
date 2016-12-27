@@ -17,23 +17,20 @@ public class TaskClient {
     private static Random random = new Random();
 
     public static void main(String args[]) {
+        TaskClient.startTask(httpHost, 5000);
+    }
+
+    public static void startTask(HttpHost target, int times) {
         NSAsyncSingleton.instance().start();
-        for (int i = 0; i < 5000; i++) {
-            putSingleTask();
+        for (int i = 0; i < times; i++) {
+            putSingleTask(target);
         }
         System.out.println("all tasks have been added");
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < Math.sqrt(times) / 2; i++) {
             AsyncUtils.sleep(1000);
             printStat();
         }
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                NSAsyncSingleton.instance().close();
-            }
-        });
     }
 
     private static void printStat() {
@@ -42,10 +39,10 @@ public class TaskClient {
         System.out.println();
     }
 
-    private static void putSingleTask() {
-        final HttpRequest request = new BasicHttpRequest("GET", "/");
+    private static void putSingleTask(HttpHost target) {
+        final HttpRequest request = new BasicHttpRequest("GET", "/basic");
         request.setHeader("random", String.valueOf(random.nextInt()));
-        NSAsyncSingleton.instance().execute(httpHost, request, new FutureCallback<HttpResponse>() {
+        NSAsyncSingleton.instance().execute(target, request, new FutureCallback<HttpResponse>() {
             @Override
             public void completed(HttpResponse result) {
                 completed.incrementAndGet();

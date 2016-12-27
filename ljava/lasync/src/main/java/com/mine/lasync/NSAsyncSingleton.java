@@ -75,6 +75,13 @@ public class NSAsyncSingleton implements Closeable {
     public void start() {
         httpAsyncClient.start();
         staleMonitor.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                NSAsyncSingleton.instance().close();
+            }
+        });
     }
 
     public void close() {
