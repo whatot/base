@@ -8,6 +8,7 @@
 *.bin
 *.jpg
 *.db
+*.beam
 
 # for myself
 Module.symvers
