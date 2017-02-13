@@ -9,6 +9,7 @@
 *.jpg
 *.db
 *.beam
+.idea
 
 # gnu global files
 GPATH
