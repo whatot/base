@@ -27,3 +27,14 @@ sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ID
 ```
 sudo docker run -d --cpuset-cpus 1 --name flask-todo --restart=always whatot/flask-todo
 ```
+
+## docker-compose
+
+```
+sudo docker-compose up  # run in foreground
+sudo docker-compose up -d  # run in background
+sudo docker-compose ps
+sudo docker-compose run web env
+sudo docker-compose stop
+sudo docker-compose down --volumes  # also remove the data-volumes
+```

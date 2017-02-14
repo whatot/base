@@ -1,0 +1,12 @@
+version: '2'
+services:
+  web:
+    build: .
+    ports:
+      - "8201:8201"
+    volumes:
+      - .:/webapp
+  redis:
+    image: "redis:alpine"
+  postgres:
+    image: "postgres:alpine"
