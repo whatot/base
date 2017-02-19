@@ -4,7 +4,7 @@
 
 check the files inside a image
 ```
-sudo docker run -i --entrypoint /bin/bash -t image-name
+sudo docker run -i --rm --entrypoint /bin/bash -t image-name
 ```
 
 ```
