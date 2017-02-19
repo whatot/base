@@ -1,10 +1,35 @@
-# flask webservice example
+# flask webservice module
 
-## flask
+## post project
 
+### install deps
+
+in a python3 virtualenv
 ```
 pip install Flask
+pip install --no-cache-dir -r requirements.txt
 ```
+
+### init postgres
+
+set test config in config.py, then init db
+```
+sudo docker run -i --rm -p 5432:5432 --name postgres postgres:latest
+python create_db.py
+psql -h 127.0.0.1 -p 5432 -U postgres
+```
+
+### run with gunicorn
+
+default with `sync` worker, `-k gevent` set `gevent` async worker
+```
+gunicorn -w 4 -b :8201 post:app
+gunicorn -w 4 -k gevent -b :8201 post:app
+```
+
+## todo project
+
+### basic tests for todo by curl
 
 use curl check the basic flask todo server
 ```
@@ -14,27 +39,4 @@ curl -X PUT http://0.0.0.0:8201/todo/f69bbf8c-cdc6-4d24-b8b6-00b26aa347b7/finish
 curl -X DELETE http://0.0.0.0:8201/todo/f69bbf8c-cdc6-4d24-b8b6-00b26aa347b7
 ```
 
-## docker
 
-```
-sudo docker build --no-cache --rm -t whatot/flask-todo .
-sudo docker run -i --rm -p 8201:8201 --name flask-todo whatot/flask-todo
-sudo docker ps
-sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ID
-```
-
-`-d` means `detached mode`, more restriction for long-time running
-```
-sudo docker run -d --cpuset-cpus 1 --name flask-todo --restart=always whatot/flask-todo
-```
-
-## docker-compose
-
-```
-sudo docker-compose up  # run in foreground
-sudo docker-compose up -d  # run in background
-sudo docker-compose ps
-sudo docker-compose run web env
-sudo docker-compose stop
-sudo docker-compose down --volumes  # also remove the data-volumes
-```

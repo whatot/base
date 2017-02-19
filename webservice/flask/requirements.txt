@@ -1,1 +1,5 @@
-Flask>=0.12
+Flask==0.12
+SQLAlchemy==1.1.5
+gunicorn==19.6.0
+Flask-SQLAlchemy==2.1
+gevent==1.2.1
