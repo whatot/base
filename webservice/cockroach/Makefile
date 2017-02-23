@@ -5,7 +5,7 @@ clean:
 		cockroach1-data cockroach1-log \
 		cockroach2-data cockroach2-log \
 		cockroach3-data cockroach3-log \
-		cockroach4-data cockroach4-log \
+		cockroach4-data cockroach4-log
 
 distclean: clean
 	sudo docker-compose rm
