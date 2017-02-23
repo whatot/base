@@ -4,8 +4,8 @@ up:
 	sudo docker-compose up
 
 clean:
-	rm -rf web/__pycache__/
-	sudo rm -rf pgdata
+	sudo rm -rf pgdata/
+	sudo rm -rf nginx-log/
 
 distclean: clean
 	sudo docker-compose rm
