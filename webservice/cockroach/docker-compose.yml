@@ -1,0 +1,65 @@
+version: '2'
+
+# whatever specified in the "command" in docker-compose should get appended
+# to the entrypoint defined in the dockerfile provided entrypoint is defined
+# in exec form in the DockerFile.
+# If the EntryPoint is defined in shell form, then any CMD arguments will be ignored.
+
+services:
+  roach0:
+    image: cockroachdb/cockroach:beta-20170209
+    ports:
+      - "8080:8080"
+      - "26257:26257"
+    volumes:
+      - ./cockroach0-data:/data/
+      - ./cockroach0-log:/cockroach-log/
+    command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G
+
+  roach1:
+    image: cockroachdb/cockroach:beta-20170209
+    ports:
+      - "8080"
+      - "26257"
+    volumes:
+      - ./cockroach1-data:/data
+      - ./cockroach1-log:/cockroach-log/
+    command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
+    depends_on:
+      - roach0
+
+  roach2:
+    image: cockroachdb/cockroach:beta-20170209
+    ports:
+      - "8080"
+      - "26257"
+    volumes:
+      - ./cockroach2-data:/data
+      - ./cockroach2-log:/cockroach-log/
+    command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
+    depends_on:
+      - roach0
+
+  roach3:
+    image: cockroachdb/cockroach:beta-20170209
+    ports:
+      - "8080"
+      - "26257"
+    volumes:
+      - ./cockroach3-data:/data
+      - ./cockroach3-log:/cockroach-log/
+    command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
+    depends_on:
+      - roach0
+
+  roach4:
+    image: cockroachdb/cockroach:beta-20170209
+    ports:
+      - "8080"
+      - "26257"
+    volumes:
+      - ./cockroach4-data:/data
+      - ./cockroach4-log:/cockroach-log/
+    command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
+    depends_on:
+      - roach0
