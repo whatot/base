@@ -37,3 +37,11 @@ sudo docker-compose run web env
 sudo docker-compose stop
 sudo docker-compose down --volumes  # also remove the data-volumes
 ```
+
+### entrypoint and command in docker-compose.yml
+
+whatever specified in the "command" in docker-compose should get appended
+to the entrypoint defined in the dockerfile provided entrypoint is defined
+in exec form in the DockerFile.
+
+If the EntryPoint is defined in shell form, then any CMD arguments will be ignored.
