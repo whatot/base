@@ -23,8 +23,8 @@ psql -h 127.0.0.1 -p 5432 -U postgres
 
 default with `sync` worker, `-k gevent` set `gevent` async worker
 ```
-gunicorn -w 4 -b :8201 post:app
-gunicorn -w 4 -k gevent -b :8201 post:app
+gunicorn -w 4 -b :8201 todo:app
+gunicorn -w 4 -k gevent -b :8201 todo:app
 ```
 
 ## todo project

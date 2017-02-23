@@ -1,0 +1,25 @@
+version: "2"
+
+services:
+  flask:
+    restart: always
+    build: ./web
+    expose:
+      - "8201"
+    env_file: .env
+
+  nginx:
+    restart: always
+    build: ./nginx/
+    ports:
+      - "80:80"
+
+  postgres:
+    restart: always
+    image: postgres:latest
+    env_file: .env
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
