@@ -7,10 +7,17 @@ check the files inside a image
 sudo docker run -i --rm --entrypoint /bin/bash -t image-name
 ```
 
+Use the `docker exec` command to use the command inside the container
 ```
-sudo docker build -f flask/Dockerfile -t flask-post .
-sudo docker run -i --rm -p 8201:8201 --name flask-post whatot/flask-post
-sudo docker run -i --rm -p 5432:5432 --name postgres postgres:latest
+sudo docker exec -it postgres-web /bin/bash
+```
+
+build and run example
+```
+cd flask/web/
+sudo docker build -t flask-todo .
+sudo docker run -i --rm -p 8201:8201 --name flask-todo whatot/flask-todo
+sudo docker run -i --rm -p 5432:5432 --name postgres-web postgres:latest
 sudo docker ps
 sudo docker inspect --format '{{ .NetworkSettings.IPAddress }}' ID
 ```
