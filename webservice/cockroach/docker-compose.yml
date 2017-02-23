@@ -16,50 +16,34 @@ services:
       - ./cockroach0-log:/cockroach-log/
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G
 
+  # Exporting the ports of this cockroach is a fallback choice.
   roach1:
     image: cockroachdb/cockroach:beta-20170209
     ports:
-      - "8080"
-      - "26257"
+      - "28080:8080"
+      - "36257:26257"
     volumes:
       - ./cockroach1-data:/data
       - ./cockroach1-log:/cockroach-log/
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
-    depends_on:
-      - roach0
 
   roach2:
     image: cockroachdb/cockroach:beta-20170209
-    ports:
-      - "8080"
-      - "26257"
     volumes:
       - ./cockroach2-data:/data
       - ./cockroach2-log:/cockroach-log/
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
-    depends_on:
-      - roach0
 
   roach3:
     image: cockroachdb/cockroach:beta-20170209
-    ports:
-      - "8080"
-      - "26257"
     volumes:
       - ./cockroach3-data:/data
       - ./cockroach3-log:/cockroach-log/
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
-    depends_on:
-      - roach0
 
   roach4:
     image: cockroachdb/cockroach:beta-20170209
-    ports:
-      - "8080"
-      - "26257"
     volumes:
       - ./cockroach4-data:/data
       - ./cockroach4-log:/cockroach-log/
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
-    depends_on:
-      - roach0

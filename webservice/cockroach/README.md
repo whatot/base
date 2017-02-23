@@ -29,6 +29,11 @@ SELECT * FROM bank.accounts;
 in psql:
 ```
 psql -h 127.0.0.1 -p 26257 -U root
+show databases;
+\c bank;
+show tables;
+SELECT * FROM accounts;
+SELECT * FROM bank.accounts;
 ```
 
 but `\d` and `\l` return error like below:
