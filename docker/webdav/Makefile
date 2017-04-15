@@ -1,4 +1,4 @@
-.PHONY: clean distclean up daemon
+.PHONY: clean distclean up daemon stop
 
 clean:
 	sudo rm -rf webdav-log
@@ -8,6 +8,9 @@ distclean: clean
 
 up:
 	sudo docker-compose up
+
+stop:
+	sudo docker-compose stop
 
 daemon:
 	sudo docker-compose up -d
