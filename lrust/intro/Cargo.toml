@@ -1,0 +1,15 @@
+[package]
+name = "intro"
+version = "0.1.0"
+authors = ["whatot <whatot2@gmail.com>"]
+
+[dependencies]
+rand = "0.3.15"
+
+[[bin]]
+name = "guessing"
+path = "./src/bin/guessing.rs"
+
+[[bin]]
+name = "ls"
+path = "./src/bin/ls.rs"

@@ -2,7 +2,7 @@ use std::env;
 use std::fs;
 use std::error::Error;
 
-fn example() -> Result<(), Box<Error>> {
+fn ls_current() -> Result<(), Box<Error>> {
     let here = try!(env::current_dir());
     println!("list current dir: {}", here.display());
     for entry in try!(fs::read_dir(&here)) {
@@ -14,5 +14,5 @@ fn example() -> Result<(), Box<Error>> {
 }
 
 fn main() {
-    example().unwrap()
+    ls_current().unwrap()
 }
