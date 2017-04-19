@@ -45,3 +45,40 @@ to the entrypoint defined in the dockerfile provided entrypoint is defined
 in exec form in the DockerFile.
 
 If the EntryPoint is defined in shell form, then any CMD arguments will be ignored.
+
+## command to remove all unused images
+
+* https://docs.docker.com/engine/reference/commandline/system_prune/
+* http://stackoverflow.com/questions/32723111/how-to-remove-old-and-unused-docker-images
+* https://forums.docker.com/t/command-to-remove-all-unused-images/20
+
+### system cmd from docker upstream, delete ALL unused data
+```
+sudo docker system prune
+```
+
+cmds for each resource type
+```
+docker container prune
+docker image prune
+docker network prune
+docker volume prune
+```
+
+### removing all stopped docker containers
+it will list all images (docker ps), but only show the id's.
+And then run a docker rm command for each one of them.
+```
+sudo docker ps -q |xargs docker rm
+```
+
+### in order to get rid of all untagged images
+```
+sudo docker rmi -f $(docker images | grep "<none>" | awk "{print \$3}")
+```
+
+### remove weeks/months ago docker images
+we can add `hours|days|weeks|months` to clean more, but is too dangerous.
+```
+sudo docker images | grep " [months|weeks]* ago" | awk '{print $3}' | xargs docker rmi
+```
