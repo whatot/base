@@ -13,3 +13,15 @@ path = "./src/bin/guessing.rs"
 [[bin]]
 name = "ls"
 path = "./src/bin/ls.rs"
+
+[[bin]]
+name = "1-formatting"
+path = "./src/bin/1-formatting.rs"
+
+[[bin]]
+name = "2-primitives"
+path = "./src/bin/2-primitives.rs"
+
+[[bin]]
+name = "3-custom-types"
+path = "./src/bin/3-custom-types.rs"
