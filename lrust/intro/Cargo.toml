@@ -25,3 +25,7 @@ path = "./src/bin/2-primitives.rs"
 [[bin]]
 name = "3-custom-types"
 path = "./src/bin/3-custom-types.rs"
+
+[[bin]]
+name = "7-flow-control"
+path = "./src/bin/7-flow-control.rs"
