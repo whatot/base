@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  music:
+    restart: always
+    build: ./netease-music
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - $XAUTHORITY:/home/netease/.Xauthority
+    environment:
+      - DISPLAY=unix$DISPLAY
+      - QT_GRAPHICSSYSTEM=native
+    devices:
+      - /dev/snd
