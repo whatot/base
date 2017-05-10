@@ -33,3 +33,7 @@ path = "./src/bin/7-flow-control.rs"
 [[bin]]
 name = "8-functions"
 path = "./src/bin/8-functions.rs"
+
+[[bin]]
+name = "9-modules"
+path = "./src/bin/9-modules.rs"
