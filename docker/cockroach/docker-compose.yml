@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 # whatever specified in the "command" in docker-compose should get appended
 # to the entrypoint defined in the dockerfile provided entrypoint is defined
@@ -7,7 +7,7 @@ version: '2'
 
 services:
   roach0:
-    image: cockroachdb/cockroach:beta-20170209
+    image: cockroachdb/cockroach:v1.0
     ports:
       - "8080:8080"
       - "26257:26257"
@@ -18,7 +18,7 @@ services:
 
   # Exporting the ports of this cockroach is a fallback choice.
   roach1:
-    image: cockroachdb/cockroach:beta-20170209
+    image: cockroachdb/cockroach:v1.0
     ports:
       - "28080:8080"
       - "36257:26257"
@@ -28,21 +28,21 @@ services:
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
 
   roach2:
-    image: cockroachdb/cockroach:beta-20170209
+    image: cockroachdb/cockroach:v1.0
     volumes:
       - ./cockroach2-data:/data
       - ./cockroach2-log:/cockroach-log/
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
 
   roach3:
-    image: cockroachdb/cockroach:beta-20170209
+    image: cockroachdb/cockroach:v1.0
     volumes:
       - ./cockroach3-data:/data
       - ./cockroach3-log:/cockroach-log/
     command: start --store=path=/data --insecure --log-dir=/cockroach-log --cache 1G --join=roach0
 
   roach4:
-    image: cockroachdb/cockroach:beta-20170209
+    image: cockroachdb/cockroach:v1.0
     volumes:
       - ./cockroach4-data:/data
       - ./cockroach4-log:/cockroach-log/
