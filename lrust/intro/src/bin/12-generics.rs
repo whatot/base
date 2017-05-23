@@ -6,6 +6,10 @@ fn main() {
     c5_multiple_bounds();
     println!();
     c6_where_bounds();
+    println!();
+    c7_associated_items_1();
+    println!();
+    c7_associated_items_2();
 }
 
 use std::fmt::Debug;
@@ -132,4 +136,93 @@ impl<T> PrintInOption for T
 fn c6_where_bounds() {
     let vec = vec![1, 2, 3];
     vec.print_in_option();
+}
+
+fn c7_associated_items_1() {
+    struct Container(i32, i32);
+    trait Contains<A, B> {
+        fn contains(&self, &A, &B) -> bool; // explicitly requires A amd B
+        fn first(&self) -> i32; // doesn't explicitly requires A and B
+        fn last(&self) -> i32; // doesn't explicitly requires A and B
+    }
+
+    impl Contains<i32, i32> for Container {
+        fn contains(&self, num1: &i32, num2: &i32) -> bool {
+            (&self.0 == num1) && (&self.1 == num2)
+        }
+        fn first(&self) -> i32 {
+            self.0
+        }
+        fn last(&self) -> i32 {
+            self.1
+        }
+    }
+
+    // `C` contains `A` and `B`. In light of that, having to express `A` and
+    // `B` again is a nuisance.
+    fn difference<A, B, C>(container: &C) -> i32
+        where C: Contains<A, B>
+    {
+        container.last() - container.first()
+    }
+
+    let number_1 = 3;
+    let number_2 = 8;
+    let container = Container(number_1, number_2);
+    println!("Does container contains {} and {} : {}",
+             &number_1,
+             &number_2,
+             container.contains(&number_1, &number_2));
+    println!("First number: {}", container.first());
+    println!("Last number: {}", container.last());
+    println!("The difference is : {}", difference(&container));
+}
+
+// Associated types
+fn c7_associated_items_2() {
+    struct Container(i32, i32);
+    trait Contains {
+        // Define generic types here which methods will be able to utilize.
+        type A;
+        type B;
+
+        fn contains(&self, &Self::A, &Self::B) -> bool;
+        fn first(&self) -> i32;
+        fn last(&self) -> i32;
+    }
+
+    impl Contains for Container {
+        // Specify what types `A` and `B` are. If the `input` type
+        // is `Container(i32, i32)`, the `output` types are determined
+        // as `i32` and `i32`.
+        type A = i32;
+        type B = i32;
+
+        fn contains(&self, num1: &i32, num2: &i32) -> bool {
+            (&self.0 == num1) && (&self.1 == num2)
+        }
+        fn first(&self) -> i32 {
+            self.0
+        }
+        fn last(&self) -> i32 {
+            self.1
+        }
+    }
+
+    // `C` contains `A` and `B`. In light of that, having to express `A` and
+    // `B` again is a nuisance.
+    fn difference<C: Contains>(container: &C) -> i32 {
+        container.last() - container.first()
+    }
+
+    let number_1 = 3;
+    let number_2 = 8;
+    let container = Container(number_1, number_2);
+    println!("Does container contains {} and {} : {}",
+             &number_1,
+             &number_2,
+             container.contains(&number_1, &number_2));
+    println!("First number: {}", container.first());
+    println!("Last number: {}", container.last());
+    println!("The difference is : {}", difference(&container));
 }
