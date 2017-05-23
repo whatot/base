@@ -21,4 +21,13 @@ defmodule PortalDoorTest do
     assert Portal.Door.pop(:pd2) == {:ok, "hello"}
     assert Portal.Door.pop(:pd2) == :error
   end
+
+  test "push sequence" do
+    Portal.Door.start_link(:pd3)
+    Portal.Door.push(:pd3, 1)
+    Portal.Door.push(:pd3, 2)
+    assert Portal.Door.get(:pd3) == [2, 1]
+    Portal.Door.push(:pd3, 3)
+    assert Portal.Door.get(:pd3) == [3, 2, 1]
+  end
 end
