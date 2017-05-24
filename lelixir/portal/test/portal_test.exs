@@ -35,4 +35,31 @@ defmodule PortalTest do
     assert Portal.Door.get(p2.right) == [5]
   end
 
+  test "inspect for portal status" do
+    Portal.shoot(:c5)
+    Portal.shoot(:c6)
+    p3 = Portal.transfer(:c5, :c6, [1,2,3,4])
+    assert inspect(p3) ==
+"#Portal<
+           :c5 <=> :c6
+  [1, 2, 3, 4] <=> []
+>
+"
+
+    Portal.push_right(p3)
+    assert inspect(p3) ==
+"#Portal<
+        :c5 <=> :c6
+  [1, 2, 3] <=> [4]
+>
+"
+
+    Portal.push_left(p3)
+    assert inspect(p3) ==
+"#Portal<
+           :c5 <=> :c6
+  [1, 2, 3, 4] <=> []
+>
+"
+  end
 end
