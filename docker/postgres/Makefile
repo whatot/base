@@ -1,6 +1,9 @@
-.PHONY: up stop clean
+.PHONY: up daemon stop clean distclean
 
 up:
+	docker-compose up
+
+daemon:
 	docker-compose up -d
 
 stop:
@@ -8,3 +11,6 @@ stop:
 
 clean:
 	docker-compose rm
+
+distclean: clean
+	sudo rm ./pgdata -rf
