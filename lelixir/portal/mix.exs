@@ -4,7 +4,7 @@ defmodule Portal.Mixfile do
   def project do
     [app: :portal,
      version: "0.1.0",
-     elixir: "~> 1.4",
+     elixir: "~> 1.6",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
@@ -30,7 +30,7 @@ defmodule Portal.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:credo, "~> 0.5", only: [:dev, :test]},
+      {:credo, "~> 0.9", only: [:dev, :test]},
       {:dogma, "~> 0.1", only: [:dev]}
     ]
   end
