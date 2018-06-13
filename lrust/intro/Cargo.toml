@@ -5,39 +5,3 @@ authors = ["whatot <whatot2@gmail.com>"]
 
 [dependencies]
 rand = "0.3.15"
-
-[[bin]]
-name = "guessing"
-path = "./src/bin/guessing.rs"
-
-[[bin]]
-name = "ls"
-path = "./src/bin/ls.rs"
-
-[[bin]]
-name = "1-formatting"
-path = "./src/bin/1-formatting.rs"
-
-[[bin]]
-name = "2-primitives"
-path = "./src/bin/2-primitives.rs"
-
-[[bin]]
-name = "3-custom-types"
-path = "./src/bin/3-custom-types.rs"
-
-[[bin]]
-name = "7-flow-control"
-path = "./src/bin/7-flow-control.rs"
-
-[[bin]]
-name = "8-functions"
-path = "./src/bin/8-functions.rs"
-
-[[bin]]
-name = "9-modules"
-path = "./src/bin/9-modules.rs"
-
-[[bin]]
-name = "12-generics"
-path = "./src/bin/12-generics.rs"
