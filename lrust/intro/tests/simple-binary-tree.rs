@@ -1,8 +1,5 @@
-use std::fmt::Display;
-
 type TreeNode<K, V> = Option<Box<Node<K, V>>>;
-#[derive(Debug)]
-struct Node<K, V: Clone + Display> {
+struct Node<K, V: Clone> {
     left: TreeNode<K, V>,
     right: TreeNode<K, V>,
     key: K,
@@ -18,7 +15,7 @@ trait BinarySearchTree<K: PartialOrd, V>: BinaryTree<K, V> {
     fn insert(&mut self, key: K, value: V);
 }
 
-impl<K, V: Display + Clone> Node<K, V> {
+impl<K, V: Clone> Node<K, V> {
     fn new(key: K, value: V) -> Node<K, V> {
         Node {
             left: None,
@@ -29,7 +26,7 @@ impl<K, V: Display + Clone> Node<K, V> {
     }
 }
 
-impl<K: PartialOrd, V: Display + Clone> BinarySearchTree<K, V> for Node<K, V> {
+impl<K: PartialOrd, V: Clone> BinarySearchTree<K, V> for Node<K, V> {
     fn insert(&mut self, key: K, value: V) {
         if self.key < key {
             if let Some(ref mut right) = self.right {
@@ -47,7 +44,7 @@ impl<K: PartialOrd, V: Display + Clone> BinarySearchTree<K, V> for Node<K, V> {
     }
 }
 
-impl<K, V: Display + Clone> BinaryTree<K, V> for Node<K, V> {
+impl<K, V: Clone> BinaryTree<K, V> for Node<K, V> {
     fn pre_order(&self) -> Vec<V> {
         let mut result = Vec::new();
         result.push(self.value.clone());
@@ -99,15 +96,12 @@ fn test_binary_tree_operation() {
     root.insert(1, "1-8");
 
     if let Some(ref left) = root.left {
-        assert_eq!(2, left.key);
         assert_eq!("2-3", left.value);
     }
 
     if let Some(ref right) = root.right {
-        assert_eq!(4, right.key);
         assert_eq!("4-6", right.value);
         if let Some(ref right) = right.right {
-            assert_eq!(5, right.key);
             assert_eq!("5-5", right.value);
         }
     }
