@@ -1,11 +1,12 @@
+#[macro_use]
 extern crate clap;
 use clap::{App, Arg};
 
 fn main() {
-    let matches = App::new("Corvus-rs")
-        .version("0.1")
-        .author("whatot whatot2@gmail.com")
-        .about("A lightweight redis cluster proxy")
+    let matches = App::new(crate_name!())
+        .version(crate_version!())
+        .author(crate_authors!())
+        .about(crate_description!())
         .arg(
             Arg::with_name("config")
                 .index(1)

@@ -2,6 +2,7 @@
 name = "corvus-rs"
 version = "0.1.0"
 authors = ["whatot <whatot2@gmail.com>"]
+description = "A lightweight redis cluster proxy"
 
 [dependencies]
 clap = "~2"
