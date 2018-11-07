@@ -5,4 +5,4 @@ authors = ["whatot <whatot2@gmail.com>"]
 description = "A lightweight redis cluster proxy"
 
 [dependencies]
-clap = "~2"
+structopt = "~0.2"

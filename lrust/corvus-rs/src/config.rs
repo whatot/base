@@ -1,50 +1,45 @@
-use std::default::Default;
+extern crate structopt;
+use structopt::StructOpt;
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(StructOpt, Clone, PartialEq, Debug)]
+#[structopt(name = "corvus-rs")]
 pub struct CorvusConfig {
+    #[structopt(name = "corvus.config", raw(index = "1"))]
     pub config_file_path: String,
+    #[structopt(short = "c", long = "cluster", default_value = "default")]
     pub cluster_name: String,
+    #[structopt(short = "b", long = "bind", default_value = "12345")]
     pub bind_port: u16,
+    #[structopt(short = "n", long = "node", default_value = "")]
     pub node_address: String,
+    #[structopt(short = "t", long, default_value = "4")]
     pub thread: u32,
+    #[structopt(short = "L", long, default_value = "2")]
     pub loglevel: u32,
+    #[structopt(short = "l", long)]
     pub syslog: bool,
+    #[structopt(long, default_value = "localhost:8125")]
     pub statsd_addr: String,
+    #[structopt(long, default_value = "10")]
     pub metric_interval: u32,
+    #[structopt(long)]
     pub stats: bool,
+    #[structopt(long)]
     pub readslave: bool,
-    pub readmasterslave: bool,
+    #[structopt(long)]
+    pub readmaster: bool,
+    #[structopt(short = "P", long, default_value = "")]
     pub requirepass: String,
+    #[structopt(short = "C", long, default_value = "0")]
     pub client_timeout: u32,
+    #[structopt(short = "S", long, default_value = "0")]
     pub server_timeout: u32,
+    #[structopt(short = "B", long, default_value = "16384")]
     pub bufsize: u32,
+    #[structopt(short = "g", long, default_value = "-1")]
     pub slowlog_log_slower_than: i32,
+    #[structopt(short = "G", long, default_value = "1024")]
     pub slowlog_max_len: u32,
+    #[structopt(short = "E", long)]
     pub slowlog_statsd_enabled: bool,
-}
-
-impl Default for CorvusConfig {
-    fn default() -> CorvusConfig {
-        CorvusConfig {
-            config_file_path: "".to_string(),
-            cluster_name: "default".to_string(),
-            bind_port: 12345,
-            node_address: "".to_string(),
-            thread: 4,
-            loglevel: 2,
-            syslog: false,
-            statsd_addr: "localhost:8125".to_string(),
-            metric_interval: 10,
-            stats: false,
-            readslave: false,
-            readmasterslave: false,
-            requirepass: "".to_string(),
-            client_timeout: 0,
-            server_timeout: 0,
-            bufsize: 16384,
-            slowlog_log_slower_than: -1,
-            slowlog_max_len: 1024,
-            slowlog_statsd_enabled: false,
-        }
-    }
 }
