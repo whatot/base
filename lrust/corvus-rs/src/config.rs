@@ -4,7 +4,7 @@ use structopt::StructOpt;
 #[derive(StructOpt, Clone, PartialEq, Debug)]
 #[structopt(name = "corvus-rs")]
 pub struct CorvusConfig {
-    #[structopt(name = "corvus.config", raw(index = "1"))]
+    #[structopt(name = "corvus.config", help = "Sets a custom config file")]
     pub config_file_path: String,
     #[structopt(short = "c", long = "cluster", default_value = "default")]
     pub cluster_name: String,
