@@ -1,11 +1,16 @@
 extern crate structopt;
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(StructOpt, Clone, PartialEq, Debug)]
 #[structopt(name = "corvus-rs")]
 pub struct CorvusConfig {
-    #[structopt(name = "corvus.config", help = "Sets a custom config file")]
-    pub config_file_path: String,
+    #[structopt(
+        name = "corvus.config",
+        parse(from_os_str),
+        help = "Sets a custom config file"
+    )]
+    pub config_file_path: PathBuf,
     #[structopt(short = "c", long = "cluster", default_value = "default")]
     pub cluster_name: String,
     #[structopt(short = "b", long = "bind", default_value = "12345")]
