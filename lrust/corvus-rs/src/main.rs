@@ -2,9 +2,9 @@ extern crate structopt;
 use structopt::StructOpt;
 
 mod config;
-use config::CorvusConfig;
+use config::CorvusOpt;
 
 fn main() {
-    let config = CorvusConfig::from_args();
-    println!("match: {:?}", config);
+    let opt = CorvusOpt::from_args();
+    println!("opt: {:?}", opt);
 }

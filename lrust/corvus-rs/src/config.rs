@@ -4,7 +4,7 @@ use structopt::StructOpt;
 
 #[derive(StructOpt, Clone, PartialEq, Debug)]
 #[structopt(name = "corvus-rs")]
-pub struct CorvusConfig {
+pub struct CorvusOpt {
     #[structopt(
         name = "corvus.config",
         parse(from_os_str),
