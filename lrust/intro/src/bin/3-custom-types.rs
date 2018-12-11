@@ -138,7 +138,7 @@ fn print_c_enums() {
     println!("violets are #{:06x}", Color::Blue as i32);
 }
 
-use List::*;
+use crate::List::*;
 enum List {
     // Cons: Tuple struct that wraps an element and a pointer to the next node
     Cons(u32, Box<List>),

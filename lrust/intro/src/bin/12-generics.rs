@@ -141,7 +141,7 @@ fn c6_where_bounds() {
 fn c7_associated_items_1() {
     struct Container(i32, i32);
     trait Contains<A, B> {
-        fn contains(&self, &A, &B) -> bool; // explicitly requires A amd B
+        fn contains(&self, _: &A, _: &B) -> bool; // explicitly requires A amd B
         fn first(&self) -> i32; // doesn't explicitly requires A and B
         fn last(&self) -> i32; // doesn't explicitly requires A and B
     }
@@ -186,7 +186,7 @@ fn c7_associated_items_2() {
         type A;
         type B;
 
-        fn contains(&self, &Self::A, &Self::B) -> bool;
+        fn contains(&self, _: &Self::A, _: &Self::B) -> bool;
         fn first(&self) -> i32;
         fn last(&self) -> i32;
     }

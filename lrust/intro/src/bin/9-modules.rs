@@ -109,7 +109,7 @@ mod deeply {
     }
 }
 
-use deeply::nested::function as other_function;
+use crate::deeply::nested::function as other_function;
 
 fn c3_use() {
     // easier access to deeply::nested::function
@@ -120,7 +120,7 @@ fn c3_use() {
     {
         // This is equivalent to `use deeply::nested::function as function`.
         // This `function()` will shadow the outer one.
-        use deeply::nested::function;
+        use crate::deeply::nested::function;
         function();
 
         // `use` bindings have a local scope. In this case, the
@@ -168,7 +168,7 @@ mod c4_my {
         // This will bind to the `cool::function` in the *crate* scope.
         // In this case the crate scope is the outermost scope.
         {
-            use cool::function as root_function;
+            use crate::cool::function as root_function;
             root_function();
         }
     }
