@@ -3,10 +3,9 @@ version: "2"
 services:
   webdav:
     restart: always
-    build: ./apache-webdav
+    build: ./docker-webdav
     ports:
       - "80:80"
     volumes:
-      - /webdav:/var/webdav
-      - ./webdav-log:/var/log/apache2
+      - /webdav:/var/www
     env_file: .env
