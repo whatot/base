@@ -3,7 +3,7 @@ version: "2"
 services:
   webdav:
     restart: always
-    build: ./docker-webdav
+    build: ./nginx-webdav
     ports:
       - "80:80"
     volumes:
