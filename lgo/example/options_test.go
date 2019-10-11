@@ -4,7 +4,10 @@ package example
 
 import (
 	"fmt"
+	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type Server struct {
@@ -34,8 +37,19 @@ func (s *Server) WithRetry(b bool) *Server {
 	return s
 }
 
-func ExampleOptionChaining() {
+func (s *Server) Summary() string {
+	return fmt.Sprint(s.x, s.y, s.timeout, s.retry)
+}
+
+func TestOptionChaining(t *testing.T) {
 	// It is not suitable for error-handle.
+	s := NewServer().WithXY(10, 100).WithTimeOut(time.Second).WithRetry(true)
+
+	expect := "10 100 1s true"
+	assert.Equal(t, expect, s.Summary())
+}
+
+func ExampleOptionChaining() {
 	s := NewServer().
 		WithXY(10, 100).
 		WithTimeOut(time.Second).
@@ -78,10 +92,10 @@ func SetTimeout(t time.Duration) func(*Server) error {
 	}
 }
 
-func ExampleOptionClosure() {
+func TestOptionClosure(t *testing.T) {
 	// the nicer way to deal with options
 	s, _ := NewServerPlus(HaveRetry, SetXY(1, 2), SetTimeout(time.Second))
-	fmt.Println(s)
-	// Output:
-	// &{1 2 1000000000 true}
+
+	expect := "1 2 1s true"
+	assert.Equal(t, expect, s.Summary())
 }

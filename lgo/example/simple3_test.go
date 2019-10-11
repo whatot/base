@@ -224,8 +224,8 @@ func TestStringFormat(t *testing.T) {
 	}
 }
 
-func sp(v ...interface{}) string {
-	return fmt.Sprint(v)
+func sp(i ...interface{}) string {
+	return fmt.Sprint(i...)
 }
 
 func TestRegularExpressions(t *testing.T) {
@@ -234,19 +234,19 @@ func TestRegularExpressions(t *testing.T) {
 		actual string
 		expect string
 	}{
-		{sp(regexp.MatchString("p([a-z]+)ch", "peach")), "[true <nil>]"},
-		{sp(r.MatchString("peach")), "[true]"},
-		{sp(r.FindString("peach punch")), "[peach]"},
-		{sp(r.FindStringIndex("peach punch")), "[[0 5]]"},
-		{sp(r.FindStringSubmatch("peach punch")), "[[peach ea]]"},
-		{sp(r.FindStringSubmatchIndex("peach punch")), "[[0 5 1 3]]"},
+		{sp(regexp.MatchString("p([a-z]+)ch", "peach")), "true <nil>"},
+		{sp(r.MatchString("peach")), "true"},
+		{sp(r.FindString("peach punch")), "peach"},
+		{sp(r.FindStringIndex("peach punch")), "[0 5]"},
+		{sp(r.FindStringSubmatch("peach punch")), "[peach ea]"},
+		{sp(r.FindStringSubmatchIndex("peach punch")), "[0 5 1 3]"},
 		{sp(r.FindAllString("peach punch pinch", -1)),
-			"[[peach punch pinch]]"},
+			"[peach punch pinch]"},
 		{sp(r.FindAllStringSubmatchIndex("peach punch pinch", -1)),
-			"[[[0 5 1 3] [6 11 7 9] [12 17 13 15]]]"},
-		{sp(r.FindAllString("peach punch pinch", 1)), "[[peach]]"},
-		{sp(r.Match([]byte("peach"))), "[true]"},
-		{sp(r.ReplaceAllString("a peach", "<fruit>")), "[a <fruit>]"},
+			"[[0 5 1 3] [6 11 7 9] [12 17 13 15]]"},
+		{sp(r.FindAllString("peach punch pinch", 1)), "[peach]"},
+		{sp(r.Match([]byte("peach"))), "true"},
+		{sp(r.ReplaceAllString("a peach", "<fruit>")), "a <fruit>"},
 		{string(r.ReplaceAllFunc([]byte("a peach"), bytes.ToUpper)),
 			"a PEACH"},
 	}
@@ -329,27 +329,27 @@ func TestTime(t *testing.T) {
 		actual string
 		expect string
 	}{
-		{sp(now), "[2016-10-30 15:05:20.651387237 +0000 UTC]"},
-		{sp(then), "[2017-06-07 08:09:10.000006521 +0000 UTC]"},
-		{sp(diff), "[5273h3m49.348619284s]"},
-		{sp(then.Year()), "[2017]"},
-		{sp(then.Month()), "[June]"},
-		{sp(then.Day()), "[7]"},
-		{sp(then.Hour()), "[8]"},
-		{sp(then.Minute()), "[9]"},
-		{sp(then.Second()), "[10]"},
-		{sp(then.Nanosecond()), "[6521]"},
-		{sp(then.Location()), "[UTC]"},
-		{sp(then.Weekday()), "[Wednesday]"},
-		{sp(then.Before(now)), "[false]"},
-		{sp(then.After(now)), "[true]"},
-		{sp(then.Equal(now)), "[false]"},
-		{sp(diff.Hours()), "[5273.063707949801]"},
-		{sp(diff.Minutes()), "[316383.8224769881]"},
-		{sp(diff.Seconds()), "[1.8983029348619282e+07]"},
-		{sp(diff.Nanoseconds()), "[18983029348619284]"},
-		{sp(then.Add(diff)), "[2018-01-13 01:12:59.348625805 +0000 UTC]"},
-		{sp(then.Add(-diff)), "[2016-10-30 15:05:20.651387237 +0000 UTC]"},
+		{sp(now), "2016-10-30 15:05:20.651387237 +0000 UTC"},
+		{sp(then), "2017-06-07 08:09:10.000006521 +0000 UTC"},
+		{sp(diff), "5273h3m49.348619284s"},
+		{sp(then.Year()), "2017"},
+		{sp(then.Month()), "June"},
+		{sp(then.Day()), "7"},
+		{sp(then.Hour()), "8"},
+		{sp(then.Minute()), "9"},
+		{sp(then.Second()), "10"},
+		{sp(then.Nanosecond()), "6521"},
+		{sp(then.Location()), "UTC"},
+		{sp(then.Weekday()), "Wednesday"},
+		{sp(then.Before(now)), "false"},
+		{sp(then.After(now)), "true"},
+		{sp(then.Equal(now)), "false"},
+		{sp(diff.Hours()), "5273.063707949801"},
+		{sp(diff.Minutes()), "316383.8224769881"},
+		{sp(diff.Seconds()), "1.8983029348619282e+07"},
+		{sp(diff.Nanoseconds()), "18983029348619284"},
+		{sp(then.Add(diff)), "2018-01-13 01:12:59.348625805 +0000 UTC"},
+		{sp(then.Add(-diff)), "2016-10-30 15:05:20.651387237 +0000 UTC"},
 	}
 
 	for i, tc := range cases {
@@ -463,5 +463,5 @@ func ExampleNumberParse() {
 	// 7304
 	// 789
 	// 124
-	// strconv.ParseInt: parsing "what": invalid syntax
+	// strconv.Atoi: parsing "what": invalid syntax
 }

@@ -15,7 +15,7 @@ func fib(n int) chan int {
 	return c
 }
 
-func ExampleFib() {
+func Example_fib() {
 	for x := range fib(10) {
 		fmt.Println(x)
 	}
