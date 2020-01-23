@@ -1,8 +1,7 @@
-use std::fmt::{self, Formatter, Display};
+use std::fmt::{self, Display, Formatter};
 use std::mem;
 
 fn print_literals() {
-
     // Integer addition
     println!("1 + 2 = {}", 1u32 + 2);
 
@@ -23,7 +22,8 @@ fn print_literals() {
     println!("0x80 >> 2 is 0x{:x}", 0x80u32 >> 2);
 
     // Use underscores to improve readability!
-    println!("One million is written as {}", 1_000_000u32);
+    let long_number = 1_000_000u32;
+    println!("One million is written as {}", long_number);
 }
 
 fn reverse(pair: (i32, bool)) -> (bool, i32) {
@@ -43,7 +43,9 @@ fn transpose(matrix: Matrix) -> Matrix {
 
 fn print_tuples() {
     // A tuple with a bunch of different types
-    let long_tuple = (1u8, 2u16, 3u32, 4u64, -1i8, -2i16, -3i32, -4i64, 0.1f32, 0.2f64, 'a', true);
+    let long_tuple = (
+        1u8, 2u16, 3u32, 4u64, -1i8, -2i16, -3i32, -4i64, 0.1f32, 0.2f64, 'a', true,
+    );
     println!("first of long tuple: {}", long_tuple.0);
     println!("second of long tuple: {}", long_tuple.1);
 

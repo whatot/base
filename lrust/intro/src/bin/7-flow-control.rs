@@ -3,8 +3,6 @@ fn main() {
     println!();
     c2_loop();
     println!();
-    c2_nested_loop();
-    println!();
     c3_while();
     println!();
     c4_for_range();
@@ -30,14 +28,6 @@ fn main() {
 
 fn c1_if_else() {
     let n = 9;
-
-    if n < 0 {
-        print!("{} is negative", n);
-    } else if n > 0 {
-        print!("{} is positive", n);
-    } else {
-        print!("{} is zero", n);
-    }
 
     let big_n = if n < 10 && n > -10 {
         println!(", and is a small number, increase ten-fold");
@@ -67,24 +57,6 @@ fn c2_loop() {
             break;
         }
     }
-}
-
-#[allow(unreachable_code)]
-fn c2_nested_loop() {
-    'outer: loop {
-        println!("Entered the outer loop");
-        'inner: loop {
-            println!("Entered the inner loop");
-
-            // This would break only the inner loop
-            //break;
-
-            // This breaks the outer loop
-            break 'outer;
-        }
-        println!("This point will never be reached");
-    }
-    println!("Exited the outer loop");
 }
 
 fn fizzbuzz(n: u32) {
@@ -123,19 +95,10 @@ fn c5_match() {
         // Match several values
         2 | 3 | 5 | 7 | 11 => println!("This is a prime"),
         // Match an inclusive range
-        13...19 => println!("A teen"),
+        13..=19 => println!("A teen"),
         // Handle the rest of cases
         _ => println!("Ain't special"),
     }
-
-    let boolean = true;
-    // Match is an expression too
-    let binary = match boolean {
-        // The arms of a match must cover all the possible values
-        false => 0,
-        true => 1,
-    };
-    println!("{} -> {}", boolean, binary);
 }
 
 fn c5_match_destructure_tuple() {
@@ -173,14 +136,10 @@ fn c5_match_destructure_enum() {
         Color::HSV(h, s, v) => println!("Hue: {}, saturation: {}, value: {}!", h, s, v),
         Color::HSL(h, s, l) => println!("Hue: {}, saturation: {}, lightness: {}!", h, s, l),
         Color::CMY(c, m, y) => println!("Cyan: {}, magenta: {}, yellow: {}!", c, m, y),
-        Color::CMYK(c, m, y, k) => {
-            println!("Cyan: {}, magenta: {}, yellow: {}, key (black): {}!",
-                     c,
-                     m,
-                     y,
-                     k)
-        }
-        // Don't need another arm because all variants have been examined
+        Color::CMYK(c, m, y, k) => println!(
+            "Cyan: {}, magenta: {}, yellow: {}, key (black): {}!",
+            c, m, y, k
+        ), // Don't need another arm because all variants have been examined
     }
 }
 
@@ -188,16 +147,6 @@ fn c5_match_destructure_pointer_ref() {
     // Assign a reference of type `i32`. The `&` signifies there
     // is a reference being assigned.
     let reference = &4;
-
-    match reference {
-        // If `reference`s is pattern matched against `&val`, it results
-        // in a comparison like:
-        // `&i32`
-        // `&val`
-        // ^ We see that if the matching `&`s are dropped, then the `i32`
-        // should be assigned to `val`.
-        &val => println!("Got a value via destructuring: {:?}", val),
-    }
 
     // To avoid the `&`, you dereference before matching.
     match *reference {
@@ -209,10 +158,9 @@ fn c5_match_destructure_pointer_ref() {
     // a reference because the right side is not one.
     let _not_a_reference = 3;
 
-    // Rust provides `ref` for exactly this purpose. It modifies the
-    // assignment so that a reference is created for the element; this
-    // reference is assigned.
-    let ref _is_a_reference = 3;
+    // `ref` on an entire `let` pattern is discouraged,
+    // take a reference with `&` instead
+    let _is_a_reference = &3;
 
     // Accordingly, by defining 2 values without references, references
     // can be retrieved via `ref` and `ref mut`.
@@ -242,21 +190,21 @@ fn c5_destructure_struct() {
     }
 
     // destructure members of the struct
-    let foo = Foo { x: (1, 2), y: 3 };
-    let Foo { x: (a, b), y } = foo;
+    let cage = Foo { x: (1, 2), y: 3 };
+    let Foo { x: (a, b), y } = cage;
     println!("a = {}, b = {}, y = {}", a, b, y);
 
     // you can destructure structs and rename the variables,
     // the order is not important
-    let Foo { y: i, x: j } = foo;
+    let Foo { y: i, x: j } = cage;
     println!("i = {:?}, j = {:?}", i, j);
 
     // and you can also ignore some variables:
-    let Foo { y, .. } = foo;
+    let Foo { y, .. } = cage;
     println!("y = {}", y);
 
     // this will give an error: pattern does not mention field `x`
-    // let Foo { y } = foo;
+    // let Foo { y } = cage;
 }
 
 fn c5_match_guard() {
@@ -276,8 +224,8 @@ fn age() -> u32 {
 fn c5_match_binding() {
     match age() {
         0 => println!("I'm not born yet I guess"),
-        n @ 1...12 => println!("I'm a child of age {:?}", n),
-        n @ 13...19 => println!("I'm a teen of age {:?}", n),
+        n @ 1..=12 => println!("I'm a child of age {:?}", n),
+        n @ 13..=19 => println!("I'm a teen of age {:?}", n),
         n => println!("I'm an old person of age {:?}", n),
     }
 }
@@ -307,8 +255,8 @@ fn c6_if_let() {
 
     if let Some(i) = emotion {
         println!("Matched {:?}!", i);
-        // Destructure failed. Evaluate an `else if` condition to see if the
-        // alternate failure branch should be taken:
+    // Destructure failed. Evaluate an `else if` condition to see if the
+    // alternate failure branch should be taken:
     } else if i_like_letters {
         println!("Didn't match a number, let's go with a letter");
     } else {
@@ -322,25 +270,16 @@ fn c7_while_let() {
     let mut optional = Some(0);
 
     // Repeatedly try this test.
-    loop {
-        match optional {
-            // If `optional` destructures, evaluate the block.
-            Some(i) => {
-                if i > 3 {
-                    println!("Greater than 3, quit!");
-                    optional = None;
-                } else {
-                    println!("`i` is `{:?}`. Try again.", i);
-                    optional = Some(i + 1);
-                }
-                // ^ Requires 3 indentations!
-            }
-            // Quit the loop when the destructure fails:
-            _ => {
-                break;
-            }
-            // ^ Why should this be required? There must be a better way!
+    while let Some(i) = optional {
+        // If `optional` destructures, evaluate the block.
+        if i > 3 {
+            println!("Greater than 3, quit!");
+            optional = None;
+        } else {
+            println!("`i` is `{:?}`. Try again.", i);
+            optional = Some(i + 1);
         }
+        // ^ Requires 3 indentations!
     }
 
     // Better way to handle the situation like up

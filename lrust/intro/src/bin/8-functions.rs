@@ -28,12 +28,12 @@ fn c0_fizzbuzz() {
 }
 
 fn fizzbuzz_to(n: u32) {
-    for n in 1..n + 1 {
+    for n in 1..=n {
         fizzbuzz(n)
     }
 }
 
-fn fizzbuzz(n: u32) -> () {
+fn fizzbuzz(n: u32) {
     fn is_divisible_by(l: u32, r: u32) -> bool {
         if r == 0 {
             return false;
@@ -63,7 +63,7 @@ impl Point {
     }
 
     fn new(x: f64, y: f64) -> Point {
-        Point { x: x, y: y }
+        Point { x, y }
     }
 }
 
@@ -206,7 +206,8 @@ fn c2_closures_capture() {
 // FnOnce capture variables by value, T
 fn c2_closures_as_input_parameter() {
     fn apply<F>(f: F)
-        where F: FnOnce()
+    where
+        F: FnOnce(),
     {
         f();
     }
@@ -240,7 +241,8 @@ fn c2_closures_as_input_parameter() {
     let double = |x| 2 * x;
 
     fn apply_to_3<F>(f: F) -> i32
-        where F: Fn(i32) -> i32
+    where
+        F: Fn(i32) -> i32,
     {
         f(3)
     }
@@ -252,7 +254,8 @@ fn c2_closures_type_anonymity() {
     // `F` must implement `Fn` for a closure which takes no inputs
     // and returns nothing - exactly what is required for `print`.
     fn apply_anonymity<F>(f: F)
-        where F: Fn()
+    where
+        F: Fn(),
     {
         f();
     }
@@ -289,13 +292,13 @@ fn c2_closures_input_function() {
 // This is required because any captures by reference would be dropped
 // as soon as the function exited, leaving invalid references in the closure.
 fn c2_closures_as_output_parameter() {
-    fn create_fn() -> Box<Fn()> {
+    fn create_fn() -> Box<dyn Fn()> {
         let text = "Fn".to_owned();
 
         Box::new(move || println!("This is a: {}", text))
     }
 
-    fn create_fnmut() -> Box<FnMut()> {
+    fn create_fnmut() -> Box<dyn FnMut()> {
         let text = "FnMut".to_owned();
 
         Box::new(move || println!("This is a: {}", text))
@@ -325,7 +328,7 @@ fn c2_closures_std_iterator_any() {
     // `iter()` for arrays yields `&i32`.
     println!("2 in array1: {}", array1.iter().any(|&x| x == 2));
     // `into_iter()` for arrays unusually yields `&i32`.
-    println!("2 in array2: {}", array2.into_iter().any(|&x| x == 2));
+    println!("2 in array2: {}", array2.iter().any(|&x| x == 2));
 }
 
 // fn find<P>(&mut self, predicate: P) -> Option<Self::Item> where
@@ -350,8 +353,7 @@ fn c2_closures_std_iterator_find() {
     // `iter()` for arrays yields `&i32`
     println!("Find 2 in array1: {:?}", array1.iter().find(|&&x| x == 2));
     // `into_iter()` for arrays unusually yields `&i32`
-    println!("Find 2 in array2: {:?}",
-             array2.into_iter().find(|&&x| x == 2));
+    println!("Find 2 in array2: {:?}", array2.iter().find(|&&x| x == 2));
 }
 
 fn c3_higher_order_functions() {
@@ -380,6 +382,6 @@ fn c3_higher_order_functions() {
         .map(|n| n * n)
         .take_while(|&n| n < upper)
         .filter(|&n| is_odd(n))
-        .fold(0, |sum, i| sum + i);
+        .sum();
     println!("functional style: {}", sum_of_squared_odd_numbers);
 }

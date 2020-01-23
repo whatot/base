@@ -8,7 +8,6 @@ fn main() {
     print_linked_list();
 }
 
-
 // A unit struct
 struct OneUnit;
 
@@ -74,8 +73,10 @@ fn print_structures() {
     println!("pair contains {:?} and {:?}", integer, decimal);
 
     println!("area of rectangle: {}", _rectangle.area());
-    println!("area of new square rectangle: {}",
-             square(Point { x: 1.1, y: 2.2 }, 3.3).area());
+    println!(
+        "area of new square rectangle: {}",
+        square(Point { x: 1.1, y: 2.2 }, 3.3).area()
+    );
 }
 
 #[allow(dead_code)]
@@ -126,9 +127,9 @@ enum Number {
 
 #[allow(dead_code)]
 enum Color {
-    Red = 0xff0000,
-    Green = 0x00ff00,
-    Blue = 0x0000ff,
+    Red = 0x00ff_0000,
+    Green = 0x0000_ff00,
+    Blue = 0x0000_00ff,
 }
 
 fn print_c_enums() {
@@ -182,7 +183,7 @@ impl List {
                 // allocated string instead of printing to the console
                 format!("{}, {}", head, tail.stringify())
             }
-            Nil => format!("Nil"),
+            Nil => "Nil".to_string(),
         }
     }
 }
@@ -203,6 +204,6 @@ fn print_linked_list() {
 
 // constants
 #[allow(dead_code)]
-static LANGUAGE: &'static str = "rust";
+static LANGUAGE: &str = "rust";
 #[allow(dead_code)]
 const THRESHOLD: i32 = 10;

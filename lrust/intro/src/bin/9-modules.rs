@@ -76,14 +76,16 @@ mod c2_my {
     impl<T> BlackBox<T> {
         // A public constructor method
         pub fn new(contents: T) -> BlackBox<T> {
-            BlackBox { contents: contents }
+            BlackBox { contents }
         }
     }
 }
 
 fn c2_struct_visibility() {
     // Public structs with public fields can be constructed as usual
-    let white_box = c2_my::WhiteBox { contents: "public information" };
+    let white_box = c2_my::WhiteBox {
+        contents: "public information",
+    };
 
     // and their fields can be normally accessed.
     println!("The white box contains: {}", white_box.contents);
