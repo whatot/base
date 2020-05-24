@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
 
@@ -96,6 +97,105 @@ func tick_boom() {
 	}
 }
 
+type Tree struct {
+	Left  *Tree
+	Value int
+	Right *Tree
+}
+
+func New(k int) *Tree {
+	var t *Tree
+	for _, v := range rand.Perm(15) {
+		t = insert(t, (1+v)*k)
+	}
+	return t
+}
+
+func insert(t *Tree, v int) *Tree {
+	if t == nil {
+		return &Tree{nil, v, nil}
+	}
+	if v < t.Value {
+		t.Left = insert(t.Left, v)
+	} else {
+		t.Right = insert(t.Right, v)
+	}
+	return t
+}
+
+func (t *Tree) String() string {
+	if t == nil {
+		return "()"
+	}
+	s := ""
+	if t.Left != nil {
+		s += t.Left.String() + " "
+	}
+	s += fmt.Sprint(t.Value)
+	if t.Right != nil {
+		s += " " + t.Right.String()
+	}
+	return "(" + s + ")"
+}
+
+// walk tree, send value into ch
+func Walk(t *Tree, ch chan int) {
+	walkRecurse(t, ch)
+	// use close to indicate walk finished
+	close(ch)
+}
+
+func walkRecurse(t *Tree, ch chan int) {
+	if t == nil {
+		return
+	}
+	if t.Left != nil {
+		walkRecurse(t.Left, ch)
+	}
+	ch <- t.Value
+	if t.Right != nil {
+		walkRecurse(t.Right, ch)
+	}
+}
+
+// check two tree have same values
+func Same(t1, t2 *Tree) bool {
+	c1 := make(chan int, 10)
+	go Walk(t1, c1)
+
+	c2 := make(chan int, 10)
+	go Walk(t2, c2)
+
+	for {
+		v1, ok1 := <-c1
+		v2, ok2 := <-c2
+
+		// fmt.Printf("v1:%d, ok1:%v, v2:%d, ok2:%v\n", v1, ok1, v2, ok2)
+		// all read normally
+		if ok1 && ok2 {
+			if v1 != v2 {
+				return false
+			}
+		}
+
+		// all closed
+		if !ok1 && !ok2 {
+			return true
+		}
+
+		// anyone closed first
+		if (ok1 && !ok2) || (!ok1 && ok2) {
+			return false
+		}
+	}
+}
+
+func check_same_tree() {
+	fmt.Println(New(1))
+	fmt.Println(Same(New(1), New(2)))
+	fmt.Println(Same(New(1), New(1)))
+}
+
 func main() {
 	go say("world")
 	say("hello")
@@ -104,4 +204,5 @@ func main() {
 	fibonacci_with_one_chan()
 	fibonacci_with_select_chan()
 	tick_boom()
+	check_same_tree()
 }
