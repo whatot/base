@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -196,6 +197,33 @@ func check_same_tree() {
 	fmt.Println(Same(New(1), New(1)))
 }
 
+type SafeCounter struct {
+	v   map[string]int
+	mux sync.Mutex
+}
+
+func (c *SafeCounter) Inc(key string) {
+	c.mux.Lock()
+	c.v[key]++
+	c.mux.Unlock()
+}
+
+func (c *SafeCounter) Value(key string) int {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+	return c.v[key]
+}
+
+func counter_with_mutex() {
+	c := SafeCounter{v: make(map[string]int)}
+	for i := 0; i < 1000; i++ {
+		go c.Inc("ssr")
+	}
+
+	time.Sleep(500 * time.Millisecond)
+	fmt.Println(c.Value("ssr"))
+}
+
 func main() {
 	go say("world")
 	say("hello")
@@ -205,4 +233,5 @@ func main() {
 	fibonacci_with_select_chan()
 	tick_boom()
 	check_same_tree()
+	counter_with_mutex()
 }
