@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"image"
+	"image/color"
 	"io"
 	"math"
 	"os"
@@ -188,6 +190,39 @@ func rot13_about() {
 	r := rot13Reader{s}
 	// You cracked the code!
 	io.Copy(os.Stdout, r)
+	fmt.Println()
+}
+
+type Image struct {
+	X, Y int
+}
+
+func (i Image) ColorModel() color.Model {
+	return color.RGBAModel
+}
+
+func (i Image) Bounds() image.Rectangle {
+	return image.Rect(0, 0, i.X, i.Y)
+}
+
+func (i Image) At(x, y int) color.Color {
+	v := uint8(float64(x) * math.Log(float64(y)))
+	// (x+y)/2
+	// x*y
+	// x^y
+	// x*log(y)
+	// x%(y+1)
+	return color.RGBA{v, v, 255, 255}
+}
+
+func images() {
+	m := image.NewRGBA(image.Rect(0, 0, 100, 100))
+	fmt.Println(m.Bounds())
+	fmt.Println(m.At(0, 0).RGBA())
+
+	m2 := Image{100, 100}
+	fmt.Println(m2.Bounds())
+	fmt.Println(m2.At(50, 50).RGBA())
 }
 
 func main() {
@@ -199,4 +234,5 @@ func main() {
 	error_about()
 	reader()
 	rot13_about()
+	images()
 }
