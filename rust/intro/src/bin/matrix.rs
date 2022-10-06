@@ -15,6 +15,7 @@ struct Matrix<T> {
 /// xxx   xx     xx
 /// xxx x xx ==> xx  left(h=2,w=3) x right(h=3,w=2) = result(h=2,w=2)
 ///       xx
+#[allow(dead_code)]
 impl<T> Matrix<T>
 where
     T: Mul<Output = T> + Add<Output = T> + Copy + Debug,
