@@ -28,3 +28,4 @@ tmp
 # Cargo-fuzz
 corpus
 artifacts
+Cargo.lock
