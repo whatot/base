@@ -13,6 +13,12 @@
   - https://doc.rust-lang.org/book/
 - https://wiki.rust-china.org/
 
+## inner
+
+- GAT
+  - https://www.cloudwego.io/zh/docs/motore/faq/q1_gat/ GAT in motore
+  - https://rustmagazine.github.io/rust_magazine_2021/chapter_5/rust-gat.html
+
 ## rust gui
 
 - [tauri](https://github.com/tauri-apps/tauri)
@@ -35,3 +41,18 @@
   - https://www.shuttle.rs/blog/2022/09/14/serentity-discord-bot
 - lark/feishu
   - https://github.com/second-state/serverless-reactor-starter
+
+## WebAssembly
+
+- https://docs.wasmtime.dev/wasm-rust.html
+- spin
+  - https://github.com/fermyon/spin
+  - https://developer.fermyon.com/spin/quickstart/
+
+## cloud-native
+
+- youki: oci runtime, similar to runc
+  - https://github.com/containers/youki
+- volo: rust lightweight rpc framework from 字节
+  - https://github.com/cloudwego/volo
+  - https://www.cloudwego.io/zh/docs/volo/

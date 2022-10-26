@@ -1,21 +1,10 @@
-# lgo
+# golang
 
-only to archive the code snippets, or test
+## framework
 
-## a useful Makefile for go projects
-
-https://github.com/cloudflare/hellogopher/
-
-init setup
-```
-wget https://raw.githubusercontent.com/cloudflare/hellogopher/master/Makefile
-$EDITOR Makefile # modify IMPORT_PATH
-make setup
-git add Makefile .gitignore vendor/
-```
-
-add more depends into vendor
-```
-./bin/gvt fetch github.com/fatih/color
-git add vendor/
-```
+- hertz: http 字节
+  - https://github.com/cloudwego/hertz
+  - https://www.cloudwego.io/zh/docs/hertz/overview/
+- kitex: rpc 字节
+  - https://github.com/cloudwego/kitex
+  - https://www.cloudwego.io/zh/docs/kitex/overview/
