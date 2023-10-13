@@ -6,4 +6,4 @@ description = "A lightweight redis cluster proxy"
 edition = "2021"
 
 [dependencies]
-structopt = "~0.3"
+structopt = "0.3"

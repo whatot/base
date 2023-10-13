@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokio = {version="1.28.0", features = ["macros", "rt-multi-thread"]}
-axum = {version="0.6.17", features=["headers"]}
-askama = {version="0.12.0", features=["markdown"]}
-sqlx = {version = "0.6.3", features = ["runtime-tokio-rustls", "sqlite", "macros", "time"]}
+tokio = {version="1.33", features = ["macros", "rt-multi-thread"]}
+axum = {version="0.6", features=["headers"]}
+askama = {version="0.12", features=["markdown"]}
+sqlx = {version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "macros", "time"]}
 tower-http = {version = "0.4", features=["full"]}
