@@ -6,11 +6,13 @@ use ggez::{
 use resources::Time;
 use specs::{RunNow, World, WorldExt};
 use std::path;
-use systems::{GameplayStateSystem, InputSystem, RenderingSystem};
+use systems::{EventSystem, GameplayStateSystem, InputSystem, RenderingSystem};
 
+mod audio;
 mod components;
 mod constants;
 mod entities;
+mod events;
 mod map;
 mod resources;
 mod systems;
@@ -42,6 +44,12 @@ impl event::EventHandler<ggez::GameError> for Game {
             // Get and update time resource
             let mut time = self.world.write_resource::<Time>();
             time.delta += timer::delta(&context);
+        }
+
+        {
+            // Run event system
+            let mut es = EventSystem { context };
+            es.run_now(&self.world)
         }
 
         Ok(())
@@ -101,7 +109,9 @@ fn main() -> GameResult {
         )
         .add_resource_path(path::PathBuf::from("./crates/sokoban-rs/resources"));
 
-    let (context, event_loop) = context_builder.build()?;
+    let (mut context, event_loop) = context_builder.build()?;
+    audio::initialize_sounds(&mut world, &mut context);
+
     // Create the game state
     let game = Game { world };
     // Run the main event loop

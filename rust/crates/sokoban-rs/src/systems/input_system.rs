@@ -6,13 +6,15 @@ use specs::{world::Index, Entities, Join, ReadStorage, System, Write, WriteStora
 use crate::{
     components::{Immovable, Movable, Player, Position},
     constants,
-    resources::{GamePlay, InputQueue},
+    events::{EntityMoved, EventKind},
+    resources::{EventQueue, GamePlay, InputQueue},
 };
 
 pub struct InputSystem {}
 
 impl<'a> System<'a> for InputSystem {
     type SystemData = (
+        Write<'a, EventQueue>,
         Write<'a, InputQueue>,
         Write<'a, GamePlay>,
         Entities<'a>,
@@ -24,6 +26,7 @@ impl<'a> System<'a> for InputSystem {
 
     fn run(&mut self, data: Self::SystemData) {
         let (
+            mut event_queue,
             mut input_queue,
             mut gameplay,
             entities,
@@ -81,7 +84,10 @@ impl<'a> System<'a> for InputSystem {
                             // if it exists, we need to stop and not move anything
                             // if it doesn't exist, we stop because we found a gap
                             match immov.get(&pos) {
-                                Some(_id) => to_move.clear(),
+                                Some(_id) => {
+                                    to_move.clear();
+                                    event_queue.events.push(EventKind::PlayerHitObstacle {});
+                                }
                                 None => break,
                             }
                         }
@@ -107,6 +113,11 @@ impl<'a> System<'a> for InputSystem {
                     _ => (),
                 }
             }
+
+            // Fire an event for the entity that just moved
+            event_queue
+                .events
+                .push(EventKind::EntityMoved(EntityMoved { id }));
         }
     }
 }
