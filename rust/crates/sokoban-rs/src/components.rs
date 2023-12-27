@@ -68,7 +68,6 @@ pub fn create_wall(world: &mut World, position: Position) {
             path: "/images/wall.png".to_string(),
         })
         .with(Wall {})
-        .with(Immovable {})
         .build();
 }
 
@@ -79,7 +78,6 @@ pub fn create_floor(world: &mut World, position: Position) {
         .with(Renderable {
             path: "/images/floor.png".to_string(),
         })
-        .with(Immovable {})
         .build();
 }
 
@@ -103,7 +101,6 @@ pub fn create_box_spot(world: &mut World, position: Position) {
             path: "/images/box_spot.png".to_string(),
         })
         .with(BoxSpot {})
-        .with(Immovable {})
         .build();
 }
 
