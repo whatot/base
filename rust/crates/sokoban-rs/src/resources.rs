@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, time::Duration};
 
 use ggez::event::KeyCode;
 use specs::World;
@@ -35,7 +35,13 @@ pub struct GamePlay {
     pub moves_count: u32,
 }
 
+#[derive(Default)]
+pub struct Time {
+    pub delta: Duration,
+}
+
 pub fn register_resources(world: &mut World) {
     world.insert(InputQueue::default());
     world.insert(GamePlay::default());
+    world.insert(Time::default());
 }
