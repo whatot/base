@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use ggez::{
     graphics::{self, Color, DrawParam, Image},
-    Context,
+    timer, Context,
 };
 use glam::{vec2, Vec2};
 use specs::{Join, Read, ReadStorage, System};
@@ -52,6 +52,8 @@ impl<'a> System<'a> for RenderingSystem<'a> {
         // Render any text
         self.draw_text(&gameplay.state.to_string(), 525.0, 80.0);
         self.draw_text(&gameplay.moves_count.to_string(), 525.0, 100.0);
+        let fps = format!("FPS: {:.0}", timer::fps(self.context));
+        self.draw_text(&fps, 525.0, 120.0);
 
         // Finally, present the context, this will actually display everything  on the screen.
         graphics::present(self.context).expect("expected to present");
