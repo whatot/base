@@ -96,7 +96,6 @@ fn c4_empty_bounds() {
     // Error: the trait bound `Turkey: Red` is not satisfied
 }
 
-
 fn compare_prints<T: Debug + Display>(t: &T) {
     println!("Debug: {:?}", t);
     println!("Display: {}", t);
@@ -124,7 +123,8 @@ trait PrintInOption {
 }
 
 impl<T> PrintInOption for T
-    where Option<T>: Debug
+where
+    Option<T>: Debug,
 {
     // We want `Option<T>: Debug` as our bound because that is what's
     // being printed. Doing otherwise would be using the wrong bound.
@@ -161,7 +161,8 @@ fn c7_associated_items_1() {
     // `C` contains `A` and `B`. In light of that, having to express `A` and
     // `B` again is a nuisance.
     fn difference<A, B, C>(container: &C) -> i32
-        where C: Contains<A, B>
+    where
+        C: Contains<A, B>,
     {
         container.last() - container.first()
     }
@@ -169,10 +170,12 @@ fn c7_associated_items_1() {
     let number_1 = 3;
     let number_2 = 8;
     let container = Container(number_1, number_2);
-    println!("Does container contains {} and {} : {}",
-             &number_1,
-             &number_2,
-             container.contains(&number_1, &number_2));
+    println!(
+        "Does container contains {} and {} : {}",
+        &number_1,
+        &number_2,
+        container.contains(&number_1, &number_2)
+    );
     println!("First number: {}", container.first());
     println!("Last number: {}", container.last());
     println!("The difference is : {}", difference(&container));
@@ -218,10 +221,12 @@ fn c7_associated_items_2() {
     let number_1 = 3;
     let number_2 = 8;
     let container = Container(number_1, number_2);
-    println!("Does container contains {} and {} : {}",
-             &number_1,
-             &number_2,
-             container.contains(&number_1, &number_2));
+    println!(
+        "Does container contains {} and {} : {}",
+        &number_1,
+        &number_2,
+        container.contains(&number_1, &number_2)
+    );
     println!("First number: {}", container.first());
     println!("Last number: {}", container.last());
     println!("The difference is : {}", difference(&container));
