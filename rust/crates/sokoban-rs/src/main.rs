@@ -3,11 +3,9 @@ use ggez::{
     event::{self, KeyCode, KeyMods},
     Context, GameResult,
 };
-use specs::WorldExt;
-use specs::{RunNow, World};
+use specs::{RunNow, World, WorldExt};
 use std::path;
-use systems::InputSystem;
-use systems::RenderingSystem;
+use systems::{GameplayStateSystem, InputSystem, RenderingSystem};
 
 mod components;
 mod constants;
@@ -31,6 +29,12 @@ impl event::EventHandler<ggez::GameError> for Game {
             // Run input system
             let mut is = InputSystem {};
             is.run_now(&self.world);
+        }
+
+        {
+            // Run gameplay state system
+            let mut gss = GameplayStateSystem {};
+            gss.run_now(&self.world);
         }
 
         Ok(())
