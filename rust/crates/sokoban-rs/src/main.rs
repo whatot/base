@@ -3,16 +3,18 @@ use ggez::{
     event::{self, KeyCode, KeyMods},
     Context, GameResult,
 };
-use input::InputSystem;
-use render::RenderingSystem;
 use specs::WorldExt;
 use specs::{RunNow, World};
 use std::path;
+use systems::input_system::InputSystem;
+use systems::render_system::RenderingSystem;
 
 mod components;
-mod input;
-mod render;
-mod sk_const;
+mod constants;
+mod entities;
+mod map;
+mod resources;
+mod systems;
 
 // This struct will hold all our game state
 // For now there is nothing to be held, but we'll add
@@ -55,7 +57,7 @@ impl event::EventHandler<ggez::GameError> for Game {
     ) {
         println!("Key pressed: {:?}", keycode);
 
-        let mut input_queue = self.world.write_resource::<components::InputQueue>();
+        let mut input_queue = self.world.write_resource::<resources::InputQueue>();
         input_queue.keys_pressed.push(keycode);
     }
 }
@@ -63,15 +65,15 @@ impl event::EventHandler<ggez::GameError> for Game {
 fn main() -> GameResult {
     let mut world = World::new();
     components::register_components(&mut world);
-    components::register_resources(&mut world);
-    components::initialize_level(&mut world);
+    resources::register_resources(&mut world);
+    map::initialize_level(&mut world);
 
     // 2080=32*65,1280=32*40,40/65=0.615
     // Create a game context and event loop
     let context_builder = ggez::ContextBuilder::new("rust_sokoban", "sokoban")
         .window_setup(WindowSetup::default().title("Rust Sokoban"))
         .window_mode(
-            WindowMode::default().dimensions(sk_const::WINDOWS_WIDTH, sk_const::WINDOWS_HEIGHT),
+            WindowMode::default().dimensions(constants::WINDOWS_WIDTH, constants::WINDOWS_HEIGHT),
         )
         .add_resource_path(path::PathBuf::from("./crates/sokoban-rs/resources"));
 

@@ -6,7 +6,7 @@ use glam::vec2;
 use specs::{Join, ReadStorage, System};
 
 use crate::components::{Position, Renderable};
-use crate::sk_const;
+use crate::constants;
 
 pub struct RenderingSystem<'a> {
     pub context: &'a mut Context,
@@ -31,8 +31,8 @@ impl<'a> System<'a> for RenderingSystem<'a> {
         for (postion, renderable) in rendering_data.iter() {
             // load the image
             let image = Image::new(self.context, renderable.path.clone()).expect("expected image");
-            let x = postion.x as f32 * sk_const::TILE_WIDTH;
-            let y = postion.y as f32 * sk_const::TILE_WIDTH;
+            let x = postion.x as f32 * constants::TILE_WIDTH;
+            let y = postion.y as f32 * constants::TILE_WIDTH;
 
             // draw
             let draw_params = DrawParam::new().dest(vec2(x, y));

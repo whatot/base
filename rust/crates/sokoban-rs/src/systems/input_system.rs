@@ -4,8 +4,9 @@ use ggez::event::KeyCode;
 use specs::{world::Index, Entities, Join, ReadStorage, System, Write, WriteStorage};
 
 use crate::{
-    components::{Immovable, InputQueue, Movable, Player, Position},
-    sk_const,
+    components::{Immovable, Movable, Player, Position},
+    constants,
+    resources::InputQueue,
 };
 
 pub struct InputSystem {}
@@ -42,9 +43,9 @@ impl<'a> System<'a> for InputSystem {
                 // on the correct axis and check what needs to move.
                 let (start, end, is_x) = match key {
                     KeyCode::Up => (position.y, 0, false),
-                    KeyCode::Down => (position.y, sk_const::MAP_HEIGHT, false),
+                    KeyCode::Down => (position.y, constants::MAP_HEIGHT, false),
                     KeyCode::Left => (position.x, 0, true),
-                    KeyCode::Right => (position.x, sk_const::MAP_WIDTH, true),
+                    KeyCode::Right => (position.x, constants::MAP_WIDTH, true),
                     _ => continue,
                 };
 
