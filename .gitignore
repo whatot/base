@@ -6,7 +6,6 @@
 *.tar.bz2
 *.bin
 *.jpg
-*.png
 *.db
 *.beam
 
