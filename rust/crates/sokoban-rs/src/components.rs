@@ -1,6 +1,6 @@
 use ggez::event::KeyCode;
-use specs::{storage, Component, NullStorage, VecStorage};
 use specs::{Builder, World, WorldExt};
+use specs::{Component, NullStorage, VecStorage};
 
 #[derive(Component, Debug, Clone, Copy)]
 #[storage(VecStorage)]

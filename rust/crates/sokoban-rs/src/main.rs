@@ -48,7 +48,7 @@ impl event::EventHandler<ggez::GameError> for Game {
 
     fn key_down_event(
         &mut self,
-        ctx: &mut Context,
+        _ctx: &mut Context,
         keycode: KeyCode,
         _keymods: KeyMods,
         _repeat: bool,
@@ -63,8 +63,8 @@ impl event::EventHandler<ggez::GameError> for Game {
 fn main() -> GameResult {
     let mut world = World::new();
     components::register_components(&mut world);
-    components::initialize_level(&mut world);
     components::register_resources(&mut world);
+    components::initialize_level(&mut world);
 
     // 2080=32*65,1280=32*40,40/65=0.615
     // Create a game context and event loop
