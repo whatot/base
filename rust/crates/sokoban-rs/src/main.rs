@@ -6,8 +6,8 @@ use ggez::{
 use specs::WorldExt;
 use specs::{RunNow, World};
 use std::path;
-use systems::input_system::InputSystem;
-use systems::render_system::RenderingSystem;
+use systems::InputSystem;
+use systems::RenderingSystem;
 
 mod components;
 mod constants;
@@ -17,8 +17,6 @@ mod resources;
 mod systems;
 
 // This struct will hold all our game state
-// For now there is nothing to be held, but we'll add
-// things shortly.
 struct Game {
     world: World,
 }
@@ -62,11 +60,26 @@ impl event::EventHandler<ggez::GameError> for Game {
     }
 }
 
+pub fn initialize_level(world: &mut World) {
+    const MAP: &str = "
+    N N W W W W W W
+    W W W . . . . W
+    W . . . B . . W
+    W . . . . . . W 
+    W . P . . . . W
+    W . . . . . . W
+    W . . S . . . W
+    W . . . . . . W
+    W W W W W W W W
+    ";
+    map::load_map(world, MAP.to_string());
+}
+
 fn main() -> GameResult {
     let mut world = World::new();
     components::register_components(&mut world);
     resources::register_resources(&mut world);
-    map::initialize_level(&mut world);
+    initialize_level(&mut world);
 
     // 2080=32*65,1280=32*40,40/65=0.615
     // Create a game context and event loop
