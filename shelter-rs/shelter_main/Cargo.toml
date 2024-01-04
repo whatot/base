@@ -5,6 +5,7 @@ edition = "2021"
 description = "Dog Shelter: A sample application to experiment with Rust-based microservices"
 
 [dependencies]
+migration = { path = "../migration" }
 anyhow = "1"
 clap = {version = "4", default-features = true, features = ["cargo"]}
 dotenv = "0.15"
@@ -18,3 +19,4 @@ tracing-log = { version = "0.1" }
 tracing-subscriber = { version = "0.2", features = ["registry", "env-filter"] }
 tower-http = { version = "0.3.5", features = ["trace"] }
 arc-swap = "1.6.0"
+sea-orm = { version = "0.12", features = [ "sqlx-postgres", "runtime-tokio-rustls", "macros" ] }
