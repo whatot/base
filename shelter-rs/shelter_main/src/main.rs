@@ -2,6 +2,8 @@ use anyhow::Result;
 use clap::{crate_authors, crate_description, crate_name, crate_version, Arg, Command};
 use dotenv::dotenv;
 use shelter_main::{commands, settings};
+use tracing::{level_filters::LevelFilter, Level};
+use tracing_subscriber::{layer::SubscriberExt, Registry};
 
 pub fn main() -> Result<()> {
     dotenv().ok();
@@ -28,20 +30,13 @@ pub fn main() -> Result<()> {
         .unwrap_or("");
 
     let settings = settings::Settings::new(config_location, "SHELTER")?;
+
+    let subscriber = Registry::default()
+        .with(LevelFilter::from_level(Level::DEBUG))
+        .with(tracing_subscriber::fmt::Layer::default().with_writer(std::io::stdout));
+    tracing::subscriber::set_global_default(subscriber).expect("Failed to set subscriber");
+
     commands::handle(&matches, &settings)?;
-
-    println!(
-        "db url: {}",
-        settings
-            .database
-            .url
-            .unwrap_or("missing database url".to_string())
-    );
-
-    println!(
-        "log level: {}",
-        settings.logging.log_level.unwrap_or("info".to_string())
-    );
 
     Ok(())
 }
