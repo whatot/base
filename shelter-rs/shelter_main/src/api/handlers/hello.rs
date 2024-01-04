@@ -1,5 +1,18 @@
-use axum::http::StatusCode;
+use std::sync::Arc;
 
-pub async fn hello() -> Result<String, StatusCode> {
-    Ok("\nHello World\n\n".to_string())
+use axum::{extract::State, http::StatusCode};
+
+use crate::state::ApplicationState;
+
+pub async fn hello(State(state): State<Arc<ApplicationState>>) -> Result<String, StatusCode> {
+    Ok(format!(
+        "\nHello World! Using configuration from {}\n\n",
+        state
+            .settings
+            .load()
+            .config
+            .location
+            .clone()
+            .unwrap_or("-".to_string())
+    ))
 }
