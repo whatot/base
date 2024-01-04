@@ -8,3 +8,6 @@ description = "Dog Shelter: A sample application to experiment with Rust-based m
 anyhow = "1"
 clap = {version = "4", default-features = true, features = ["cargo"]}
 dotenv = "0.15"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1"
+config = "0.13"

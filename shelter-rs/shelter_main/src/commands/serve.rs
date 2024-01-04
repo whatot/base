@@ -1,6 +1,8 @@
 use anyhow::Ok;
 use clap::{value_parser, Arg, ArgMatches, Command};
 
+use crate::settings::Settings;
+
 pub fn configure() -> Command {
     Command::new("serve").about("Start HTTP Server").arg(
         Arg::new("port")
@@ -13,7 +15,7 @@ pub fn configure() -> Command {
     )
 }
 
-pub fn handle(matches: &ArgMatches) -> anyhow::Result<()> {
+pub fn handle(matches: &ArgMatches, _settings: &Settings) -> anyhow::Result<()> {
     if let Some(matches) = matches.subcommand_matches("serve") {
         let port: u16 = *matches.get_one("port").unwrap_or(&8080);
 
