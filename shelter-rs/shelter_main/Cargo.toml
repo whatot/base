@@ -2,5 +2,9 @@
 name = "shelter_main"
 version = "0.1.0"
 edition = "2021"
+description = "Dog Shelter: A sample application to experiment with Rust-based microservices"
 
 [dependencies]
+anyhow = "1"
+clap = {version = "4", default-features = true, features = ["cargo"]}
+dotenv = "0.15"
