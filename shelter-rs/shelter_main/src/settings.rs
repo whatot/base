@@ -45,3 +45,9 @@ impl Settings {
         Ok(settings)
     }
 }
+
+impl Settings {
+    pub fn get_db_url(&self) -> String {
+        self.database.url.clone().unwrap_or("".to_string())
+    }
+}

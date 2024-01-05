@@ -1,6 +1,3 @@
 [workspace]
 resolver = "2"
-
-members = [
-  "shelter_main","migration"
-]
+members = ["shelter_main", "migration", "entity"]

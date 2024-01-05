@@ -16,7 +16,7 @@ pub fn handle(matches: &ArgMatches, settings: &Settings) -> anyhow::Result<()> {
             .build()
             .unwrap()
             .block_on(async move {
-                let db_url = settings.database.url.clone().unwrap_or("".to_string());
+                let db_url = settings.get_db_url();
                 let conn = Database::connect(db_url)
                     .await
                     .expect("Database connection failed");
