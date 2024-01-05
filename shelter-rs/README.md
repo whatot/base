@@ -21,3 +21,22 @@ create database shelter;
 ## execute migrate
 ./target/debug/shelter_main migrate
 ```
+
+## curl
+
+```shell
+
+curl -v 127.0.0.1:8080/v1/hello
+
+## no matched username
+curl -X POST -v 127.0.0.1:8080/v1/login -H 'Content-Type: application/json' \
+-d '{"username": "admin123", "password": "pass"}'
+
+## error password
+curl -X POST -v 127.0.0.1:8080/v1/login -H 'Content-Type: application/json' \
+-d '{"username": "admin", "password": "pass"}'
+
+## success password
+curl -X POST -v 127.0.0.1:8080/v1/login -H 'Content-Type: application/json' \
+-d '{"username": "admin", "password": "Pa$$wd123"}'
+```

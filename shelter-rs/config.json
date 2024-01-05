@@ -1,5 +1,7 @@
 {
    "database": {
        "url": "postgresql://postgres:postgres@127.0.0.1:5432/shelter"
-   }
+   },
+   "token_secret": "super secret string",
+   "token_timeout_seconds": 3600
 }

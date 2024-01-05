@@ -27,3 +27,5 @@ sea-orm = { version = "0.12", features = [
 ] }
 password-hash = "0.5"
 argon2 = "0.5"
+jsonwebtoken = "9.2"
+chrono = "0.4"
