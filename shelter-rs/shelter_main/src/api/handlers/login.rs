@@ -6,10 +6,7 @@ use password_hash::{PasswordHash, PasswordVerifier};
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 
 use crate::{
-    api::{
-        request::login::LoginRequest,
-        response::{login::LoginResponse, TokenClaims},
-    },
+    api::dto::{login::LoginRequest, login::LoginResponse, TokenClaims},
     state::ApplicationState,
 };
 use std::sync::Arc;

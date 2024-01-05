@@ -4,9 +4,8 @@ use axum::Router;
 
 use crate::state::ApplicationState;
 
+mod dto;
 mod handlers;
-mod request;
-mod response;
 mod v1;
 
 pub fn configure(state: Arc<ApplicationState>) -> Router {
