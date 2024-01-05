@@ -1,8 +1,10 @@
 use serde::{Deserialize, Serialize};
 
+pub mod dogs;
+pub mod errors;
 pub mod login;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TokenClaims {
     // the token subject (generally username or user id)
     pub sub: String,

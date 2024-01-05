@@ -6,6 +6,7 @@ use std::{
 use anyhow::Ok;
 use clap::{value_parser, Arg, ArgMatches, Command};
 use sea_orm::Database;
+use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 
 use crate::{settings::Settings, state::ApplicationState};
@@ -46,14 +47,17 @@ fn start_tokio(port: u16, settings: &Settings) -> anyhow::Result<()> {
             let state = Arc::new(ApplicationState::new(settings, db_conn)?);
 
             let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), port);
+            let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
 
-            let routes = crate::api::configure(state).layer(TraceLayer::new_for_http());
+            let routes = crate::api::configure(state).layer(
+                ServiceBuilder::new()
+                    .layer(TraceLayer::new_for_http())
+                    .into_inner(),
+            );
 
             tracing::info!("starting axum on port {}", port);
 
-            axum::Server::bind(&addr)
-                .serve(routes.into_make_service())
-                .await?;
+            axum::serve(listener, routes).await?;
 
             Ok(())
         })?;
