@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::errors::Status;
+
 #[derive(Deserialize)]
 pub struct LoginRequest {
     pub username: String,
@@ -8,6 +10,6 @@ pub struct LoginRequest {
 
 #[derive(Serialize)]
 pub struct LoginResponse {
-    pub status: String,
+    pub status: Status,
     pub token: String,
 }

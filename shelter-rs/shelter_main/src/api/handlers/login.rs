@@ -1,30 +1,50 @@
 use anyhow::anyhow;
 use argon2::Argon2;
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{extract::State, http::StatusCode};
 use jsonwebtoken::{encode, EncodingKey, Header};
 use password_hash::{PasswordHash, PasswordVerifier};
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 
 use crate::{
-    api::dto::{login::LoginRequest, login::LoginResponse, TokenClaims},
+    api::{
+        dto::{
+            errors::{AppError, Status},
+            login::LoginRequest,
+            login::LoginResponse,
+            TokenClaims,
+        },
+        middleware::json::CustomJson,
+    },
     state::ApplicationState,
 };
 use std::sync::Arc;
 
 pub async fn login(
     State(state): State<Arc<ApplicationState>>,
-    Json(payload): Json<LoginRequest>,
-) -> Result<Json<LoginResponse>, StatusCode> {
-    if let Ok(Some(user)) = entity::user::Entity::find()
+    CustomJson(payload): CustomJson<LoginRequest>,
+) -> Result<CustomJson<LoginResponse>, AppError> {
+    match entity::user::Entity::find()
         .filter(entity::user::Column::Username.eq(&payload.username))
         .one(state.db_conn.load().as_ref())
         .await
     {
-        if validate_password(&payload.password, &user.password).is_err() {
-            return Err(StatusCode::UNAUTHORIZED);
+        Ok(Some(user)) => {
+            if validate_password(&payload.password, &user.password).is_err() {
+                return Err(AppError(
+                    StatusCode::UNAUTHORIZED,
+                    anyhow!("Password Mismatch"),
+                ));
+            }
         }
-    } else {
-        return Err(StatusCode::UNAUTHORIZED);
+        Ok(None) => {
+            return Err(AppError(
+                StatusCode::UNAUTHORIZED,
+                anyhow!("User is not an admin"),
+            ));
+        }
+        Err(e) => {
+            return Err(AppError(StatusCode::UNAUTHORIZED, e.into()));
+        }
     }
 
     let secret = &state.settings.load().token_secret;
@@ -32,11 +52,11 @@ pub async fn login(
     let token = calc_token(timeout, payload, secret);
 
     let response = LoginResponse {
-        status: "success".to_string(),
+        status: Status::Success,
         token,
     };
 
-    Ok(Json(response))
+    Ok(CustomJson(response))
 }
 
 fn calc_token(timeout: i64, payload: LoginRequest, secret: &String) -> String {
@@ -55,7 +75,7 @@ fn calc_token(timeout: i64, payload: LoginRequest, secret: &String) -> String {
         &claims,
         &EncodingKey::from_secret(secret.as_bytes()),
     )
-    .unwrap()
+    .unwrap_or("".to_string())
 }
 
 fn validate_password(password: &str, hash: &str) -> anyhow::Result<()> {

@@ -28,6 +28,9 @@ create database shelter;
 
 curl -v 127.0.0.1:8080/v1/hello
 
+## invalid json request
+curl -X POST -v 127.0.0.1:8080/v1/login -H 'Content-Type: application/json' -d '{"user": "admin123", "password": "pass"}'
+
 ## no matched username
 curl -X POST -v 127.0.0.1:8080/v1/login -H 'Content-Type: application/json' -d '{"username": "admin123", "password": "pass"}'
 

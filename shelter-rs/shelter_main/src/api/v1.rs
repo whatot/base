@@ -8,7 +8,8 @@ use axum::{
 
 use crate::state::ApplicationState;
 
-use super::handlers::{self, jwt::auth};
+use super::handlers::{self};
+use super::middleware::jwt::auth;
 
 pub fn configure(state: Arc<ApplicationState>) -> Router {
     Router::new()

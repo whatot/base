@@ -5,21 +5,29 @@ use axum::{
 };
 use serde::Serialize;
 
-pub struct AppError(anyhow::Error);
+pub struct AppError(pub StatusCode, pub anyhow::Error);
+
+#[derive(Serialize, Debug)]
+pub enum Status {
+    #[serde(rename = "success")]
+    Success,
+    #[serde(rename = "error")]
+    Error,
+}
 
 #[derive(Debug, Serialize)]
 pub struct ErrorResponse {
-    pub status: &'static str,
+    pub status: Status,
     pub message: String,
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         (
-            StatusCode::INTERNAL_SERVER_ERROR,
+            self.0,
             Json(ErrorResponse {
-                status: "error",
-                message: self.0.to_string(),
+                status: Status::Error,
+                message: self.1.to_string(),
             }),
         )
             .into_response()
@@ -31,6 +39,6 @@ where
     E: Into<anyhow::Error>,
 {
     fn from(error: E) -> Self {
-        Self(error.into())
+        Self(StatusCode::INTERNAL_SERVER_ERROR, error.into())
     }
 }

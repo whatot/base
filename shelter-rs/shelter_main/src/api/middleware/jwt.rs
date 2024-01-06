@@ -9,7 +9,10 @@ use axum::{
 use jsonwebtoken::{decode, DecodingKey, Validation};
 
 use crate::{
-    api::dto::{errors::ErrorResponse, TokenClaims},
+    api::dto::{
+        errors::{ErrorResponse, Status},
+        TokenClaims,
+    },
     state::ApplicationState,
 };
 use std::sync::Arc;
@@ -31,7 +34,7 @@ pub async fn auth(
 
     let token = token.ok_or_else(|| {
         let json_error = ErrorResponse {
-            status: "error",
+            status: Status::Error,
             message: "Missing bearer token".to_string(),
         };
         (StatusCode::UNAUTHORIZED, Json(json_error))
@@ -46,7 +49,7 @@ pub async fn auth(
     )
     .map_err(|_| {
         let json_error = ErrorResponse {
-            status: "error",
+            status: Status::Error,
             message: "Invalid bearer token".to_string(),
         };
         (StatusCode::UNAUTHORIZED, Json(json_error))
