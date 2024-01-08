@@ -47,9 +47,14 @@ curl -v -XPOST -d '{"name": "Fido", "description": "...", "date_of_birth": "2022
    http://127.0.0.1:8080/v1/dogs
 
 
-
 curl -v -XPOST -d '{"name": "Fido","hair": "brown"}' \
    -H 'Content-Type: application/json' \
    -H 'Authorization: Bearer eyJ0eXAiOiJxNzA0NDgyNTc5fQ.KRLduzwEm7HwKP-o-pAkURSfYbFJ_r3cxGjYEyEafHI' \
    http://127.0.0.1:8080/v1/dogs
 ```
+
+## more refer
+
+- json middleware in github [ep-10 shelter](https://github.com/sapati/shelter-project/blob/ep-10/shelter_main/src/api/middleware/json.rs)
+- json middleware in axum 0.7 [axum error handling example](https://github.com/tokio-rs/axum/blob/main/examples/error-handling/src/main.rs)
+- signoz [docker-compose install github](https://github.com/SigNoz/signoz/blob/develop/deploy/docker/clickhouse-setup/docker-compose.yaml) [doc homepage install by docker](https://signoz.io/docs/install/docker/)
