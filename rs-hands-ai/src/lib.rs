@@ -3,3 +3,4 @@ mod classification;
 mod clustering;
 mod association_rule;
 mod automl;
+mod tools;
