@@ -51,15 +51,10 @@ mod tests {
     use super::least_squares_algebraic;
     use super::square_loss;
     use anyhow::Ok;
-    use linfa::prelude::Predict;
-    use linfa::traits::Fit;
-    use linfa::Dataset;
-    use ndarray::array;
-    use ndarray::concatenate;
-    use ndarray::Array;
-    use ndarray::Array1;
-    use ndarray::Array2;
-    use ndarray::Axis;
+    use linfa::prelude::*;
+    use linfa::{traits::Fit, Dataset};
+    use ndarray::{array, concatenate, Array, Array1, Array2, Axis};
+    use polars::prelude::*;
 
     const X_ARRAY: [f64; 10] = [56., 72., 69., 88., 102., 86., 76., 79., 94., 74.];
     const Y_ARRAY: [f64; 10] = [92., 102., 86., 110., 130., 99., 96., 102., 105., 92.];
@@ -130,6 +125,83 @@ mod tests {
         let (w0, w1) = least_squares_matrix(&x_matrix, &y_matrix)?;
         assert_approx_eq!(w0, EXPECT_W0);
         assert_approx_eq!(w1, EXPECT_W1);
+
+        Ok(())
+    }
+
+    // polars
+    // https://docs.pola.rs/user-guide/migration/pandas/
+
+    #[test]
+    fn test_boston_dataset() -> anyhow::Result<()> {
+        let boston_data = CsvReader::from_path("resources/ch03_boston.csv")?
+            .has_header(true)
+            .finish()?;
+
+        let features = boston_data.select(&["crim", "rm", "lstat"])?;
+
+        // 目标值数据
+        let target_series = boston_data.column("medv")?;
+        let targets: Vec<f64> = target_series
+            .f64()?
+            .into_iter()
+            .map(|item| item.unwrap())
+            .collect();
+
+        // 得到 70% 位置
+        let split_num = (features[0].len() as f32 * 0.7f32) as usize;
+        let left_num = features[0].len() - split_num;
+
+        // 训练集特征x,训练集目标y
+        let x_train = features
+            .head(Some(split_num))
+            .to_ndarray::<Float64Type>(IndexOrder::C)?;
+        let y_train = Array1::from_iter(
+            targets
+                .iter()
+                .take(split_num)
+                .cloned()
+                .collect::<Vec<f64>>(),
+        );
+        let dataset_train = Dataset::new(x_train, y_train);
+
+        // 测试集特征x,测试集目标
+        let x_test = features
+            .tail(Some(left_num))
+            .to_ndarray::<Float64Type>(IndexOrder::C)?;
+        let y_test = Array1::from_iter(
+            targets
+                .iter()
+                .skip(split_num)
+                .cloned()
+                .collect::<Vec<f64>>(),
+        );
+        let dataset_test = Dataset::new(x_test, y_test);
+
+        let lin_reg = linfa_linear::LinearRegression::new();
+        let model = lin_reg.fit(&dataset_train)?;
+        // dbg!(&model);
+
+        // y = 0.6997 * x1 + 10.1356 * x2 - 0.2053 * x3
+        assert_approx_eq!(model.intercept(), -38.00096988969018f64);
+        assert_approx_eq!(model.params()[0], 0.69979497f64);
+        assert_approx_eq!(model.params()[1], 10.13564218f64);
+        assert_approx_eq!(model.params()[2], -0.20532653f64);
+
+        // 对测试集做预测
+        let predict_result = model.predict(&dataset_test);
+
+        // 通过寻找到 SingleTargetRegression，找到下面两个统计函数
+
+        // 均方误差（MSE）= sum(np.square(y_true - y_pred)) / n
+        let mean_squared_error = predict_result.mean_squared_error(&dataset_test)?;
+        assert_approx_eq!(&mean_squared_error, 303.8331247223676f64);
+        // dbg!(&mean_squared_error);
+
+        // 平均绝对误差（MAE）= sum(np.abs(y_true - y_pred)) / n
+        let mean_absolute_error = predict_result.mean_absolute_error(&dataset_test)?;
+        assert_approx_eq!(&mean_absolute_error, 13.022063072780362f64);
+        // dbg!(&mean_absolute_error);
 
         Ok(())
     }
