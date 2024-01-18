@@ -60,6 +60,9 @@ mod tests {
 
     const X_ARRAY: [u32; 10] = [56, 72, 69, 88, 102, 86, 76, 79, 94, 74];
     const Y_ARRAY: [u32; 10] = [92, 102, 86, 110, 130, 99, 96, 102, 105, 92];
+    const EXPECT_W0: f64 = 41.33509168550616f64;
+    const EXPECT_W1: f64 = 0.7545842753077117f64;
+    const EXPECT_LOSS: f64 = 447.69153479025357f64;
 
     #[test]
     fn test_solve_by_linfa() -> anyhow::Result<()> {
@@ -83,9 +86,9 @@ mod tests {
         let loss = square_loss(&x, &y, w0, w1);
         // println!("w0:{} w1:{} loss:{}", w0, w1, loss);
 
-        assert_approx_eq!(w0, 41.33509168550616f64);
-        assert_approx_eq!(w1, 0.7545842753077117f64);
-        assert_approx_eq!(loss, 447.69153479025357f64);
+        assert_approx_eq!(w0, EXPECT_W0);
+        assert_approx_eq!(w1, EXPECT_W1);
+        assert_approx_eq!(loss, EXPECT_LOSS);
 
         Ok(())
     }
@@ -110,8 +113,8 @@ mod tests {
         assert_eq!(1, y_matrix.len_of(Axis(1)));
 
         let (w0, w1) = least_squares_matrix(&x_matrix, &y_matrix)?;
-        assert_approx_eq!(w0, 41.33509168550616f64);
-        assert_approx_eq!(w1, 0.7545842753077117f64);
+        assert_approx_eq!(w0, EXPECT_W0);
+        assert_approx_eq!(w1, EXPECT_W1);
 
         Ok(())
     }
