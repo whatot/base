@@ -33,6 +33,9 @@ mod tests {
     use anyhow::Ok;
     use linfa::traits::Fit;
     use ndarray::array;
+    use ndarray::concatenate;
+    use ndarray::Array;
+    use ndarray::Axis;
 
     #[test]
     fn test_linfa_linear_regression() -> anyhow::Result<()> {
@@ -65,6 +68,19 @@ mod tests {
 
     #[test]
     fn test_solve_regression_by_matrix() -> anyhow::Result<()> {
+        let x = vec![56, 72, 69, 88, 102, 86, 76, 79, 94, 74];
+        let y = vec![92, 102, 86, 110, 130, 99, 96, 102, 105, 92];
+
+        let x_matrix = concatenate![
+            Axis(1),
+            Array::ones((x.len(), 1)),
+            Array::from_shape_vec((x.len(), 1), x)?
+        ];
+        println!("{}", x_matrix);
+
+        let y_matrix = Array::from_shape_vec((y.len(), 1), y)?;
+        println!("{}", y_matrix);
+
         Ok(())
     }
 }
