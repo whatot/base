@@ -9,17 +9,16 @@ use ndarray_linalg::Inverse;
 #[allow(dead_code)]
 pub fn least_squares_algebraic(x: &Array1<f64>, y: &Array1<f64>) -> (f64, f64) {
     let n = x.len_of(Axis(0)) as f64;
-    let w1 = (n * (x * y).sum() - x.sum() * y.sum()) as f64
-        / (n * (x * x).sum() - x.sum() * x.sum()) as f64;
-    let w0 = ((x * x).sum() * y.sum() - x.sum() * (x * y).sum()) as f64
-        / (n * (x * x).sum() - x.sum() * x.sum()) as f64;
+    let w1 = (n * (x * y).sum() - x.sum() * y.sum()) / (n * (x * x).sum() - x.sum() * x.sum());
+    let w0 = ((x * x).sum() * y.sum() - x.sum() * (x * y).sum())
+        / (n * (x * x).sum() - x.sum() * x.sum());
     return (w0, w1);
 }
 
 /// 平方损失函数
 #[allow(dead_code)]
 pub fn square_loss(x: &Array1<f64>, y: &Array1<f64>, w0: f64, w1: f64) -> f64 {
-    (y.mapv(|yv| yv as f64) - x.mapv(|value| w0 + w1 * value as f64))
+    (y - x.mapv(|value| w0 + w1 * value))
         .mapv(|value| value * value)
         .sum()
 }
