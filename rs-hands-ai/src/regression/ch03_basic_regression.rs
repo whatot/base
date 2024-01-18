@@ -52,11 +52,14 @@ mod tests {
     use super::least_squares_algebraic;
     use super::square_loss;
     use anyhow::Ok;
+    use linfa::prelude::Predict;
     use linfa::traits::Fit;
     use linfa::Dataset;
+    use ndarray::array;
     use ndarray::concatenate;
     use ndarray::Array;
     use ndarray::Array1;
+    use ndarray::Array2;
     use ndarray::Axis;
 
     const X_ARRAY: [f64; 10] = [56., 72., 69., 88., 102., 86., 76., 79., 94., 74.];
@@ -76,6 +79,19 @@ mod tests {
 
         assert_approx_eq!(model.intercept(), EXPECT_W0);
         assert_approx_eq!(model.params()[0], EXPECT_W1);
+
+        let expect_150_result = 154.5227329816629f64;
+
+        // predict y when x=150
+        let predict_x = Array2::from_elem((1, 1), 150.0f64);
+        let predict_result = model.predict(&predict_x);
+        assert_approx_eq!(predict_result[0], expect_150_result);
+
+        // predict multi x
+        let predict_multi = array![[150.0], [200.0], [300.0]];
+        let predict_result = model.predict(&predict_multi);
+        assert_eq!(predict_result.len(), 3);
+        assert_approx_eq!(predict_result[0], expect_150_result);
 
         Ok(())
     }
