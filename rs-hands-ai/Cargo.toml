@@ -11,4 +11,4 @@ linfa = { version = "0.7", features = ["serde"] }
 linfa-linear = { version = "0.7", features = ["serde"] }
 ndarray = { version = "0.15.6", features = ["serde"] }
 ndarray-linalg = { version = "0.16", features = ["openblas-system"] }
-polars = { version = "0.36", features = ["ndarray"] }
+polars = { version = "0.36", features = ["ndarray", "decompress"] }

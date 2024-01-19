@@ -4,6 +4,8 @@ use ndarray_linalg::Inverse;
 // ndarray
 // https://docs.rs/ndarray/latest/ndarray/doc/ndarray_for_numpy_users/index.html
 // https://docs.rs/ndarray/latest/ndarray/struct.ArrayBase.html#method.mapv
+// polars
+// https://docs.pola.rs/user-guide/migration/pandas/
 
 /// 最小二乘法代数求解
 #[allow(dead_code)]
@@ -129,12 +131,9 @@ mod tests {
         Ok(())
     }
 
-    // polars
-    // https://docs.pola.rs/user-guide/migration/pandas/
-
     #[test]
     fn test_boston_dataset() -> anyhow::Result<()> {
-        let boston_data = CsvReader::from_path("resources/ch03_boston.csv")?
+        let boston_data = CsvReader::from_path("resources/ch03_boston_house_price.csv.zst")?
             .has_header(true)
             .finish()?;
 
