@@ -17,7 +17,6 @@ pub fn least_squares_algebraic(x: &Array1<f64>, y: &Array1<f64>) -> (f64, f64) {
 }
 
 /// 平方损失函数
-#[allow(dead_code)]
 pub fn square_loss(x: &Array1<f64>, y: &Array1<f64>, w0: f64, w1: f64) -> f64 {
     (y - x.mapv(|value| w0 + w1 * value))
         .mapv(|value| value * value)
@@ -26,7 +25,6 @@ pub fn square_loss(x: &Array1<f64>, y: &Array1<f64>, w0: f64, w1: f64) -> f64 {
 
 /// 最小二乘法矩阵求解
 ///  (x.T * x).I * x.T * y
-#[allow(dead_code)]
 pub fn least_squares_matrix(x: &Array2<f64>, y: &Array2<f64>) -> anyhow::Result<(f64, f64)> {
     // 计算x的转置乘以x
     let xtx = x.t().dot(x);

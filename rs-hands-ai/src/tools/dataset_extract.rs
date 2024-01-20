@@ -25,27 +25,22 @@ impl SplitDataset {
         let features = df.select(feature_column_names)?;
 
         // 目标值数据
-        let target_series = df.column(target_column_name)?;
-        let targets: Vec<f64> = target_series
-            .f64()?
-            .into_iter()
-            .map(|item| item.unwrap())
-            .collect();
+        let target = df.select(vec![target_column_name])?;
 
         // 得到训练集与测试集的切分位置
         let split_num = (features[0].len() as f32 * split_percent) as usize;
         let left_num = features[0].len() - split_num;
 
         // 训练集
-        let x_train: Array2<f64> = features
+        let x_train = features
             .head(Some(split_num))
             .to_ndarray::<Float64Type>(IndexOrder::C)?;
-        let y_train: Array1<f64> = Array1::from_iter(
-            targets
-                .iter()
-                .take(split_num)
-                .cloned()
-                .collect::<Vec<f64>>(),
+        let y_train = Array1::from_iter(
+            target
+                .head(Some(split_num))
+                .to_ndarray::<Float64Type>(IndexOrder::C)?
+                .column(0)
+                .to_vec(),
         );
 
         // 测试集
@@ -53,11 +48,11 @@ impl SplitDataset {
             .tail(Some(left_num))
             .to_ndarray::<Float64Type>(IndexOrder::C)?;
         let y_test = Array1::from_iter(
-            targets
-                .iter()
-                .skip(split_num)
-                .cloned()
-                .collect::<Vec<f64>>(),
+            target
+                .tail(Some(left_num))
+                .to_ndarray::<Float64Type>(IndexOrder::C)?
+                .column(0)
+                .to_vec(),
         );
 
         Ok(SplitDataset {
