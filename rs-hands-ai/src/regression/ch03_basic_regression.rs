@@ -8,7 +8,6 @@ use ndarray_linalg::Inverse;
 // https://docs.pola.rs/user-guide/migration/pandas/
 
 /// 最小二乘法代数求解
-#[allow(dead_code)]
 pub fn least_squares_algebraic(x: &Array1<f64>, y: &Array1<f64>) -> (f64, f64) {
     let n = x.len_of(Axis(0)) as f64;
     let w1 = (n * (x * y).sum() - x.sum() * y.sum()) / (n * (x * x).sum() - x.sum() * x.sum());
@@ -49,6 +48,7 @@ mod tests {
 
     use crate::assert_approx_eq;
     use crate::regression::ch03_basic_regression::least_squares_matrix;
+    use crate::tools::SplitDataset;
 
     use super::least_squares_algebraic;
     use super::square_loss;
@@ -137,45 +137,11 @@ mod tests {
             .has_header(true)
             .finish()?;
 
-        let features = boston_data.select(&["crim", "rm", "lstat"])?;
-
-        // 目标值数据
-        let target_series = boston_data.column("medv")?;
-        let targets: Vec<f64> = target_series
-            .f64()?
-            .into_iter()
-            .map(|item| item.unwrap())
-            .collect();
-
-        // 得到 70% 位置
-        let split_num = (features[0].len() as f32 * 0.7f32) as usize;
-        let left_num = features[0].len() - split_num;
-
-        // 训练集特征x,训练集目标y
-        let x_train = features
-            .head(Some(split_num))
-            .to_ndarray::<Float64Type>(IndexOrder::C)?;
-        let y_train = Array1::from_iter(
-            targets
-                .iter()
-                .take(split_num)
-                .cloned()
-                .collect::<Vec<f64>>(),
-        );
-        let dataset_train = Dataset::new(x_train, y_train);
-
-        // 测试集特征x,测试集目标
-        let x_test = features
-            .tail(Some(left_num))
-            .to_ndarray::<Float64Type>(IndexOrder::C)?;
-        let y_test = Array1::from_iter(
-            targets
-                .iter()
-                .skip(split_num)
-                .cloned()
-                .collect::<Vec<f64>>(),
-        );
-        let dataset_test = Dataset::new(x_test, y_test);
+        // 切分训练集与测试集
+        let split_dataset =
+            SplitDataset::new(&boston_data, vec!["crim", "rm", "lstat"], "medv", 0.7f32)?;
+        let dataset_train = split_dataset.train_dataset();
+        let dataset_test = split_dataset.test_dataset();
 
         let lin_reg = linfa_linear::LinearRegression::new();
         let model = lin_reg.fit(&dataset_train)?;
