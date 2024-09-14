@@ -1,6 +1,10 @@
+use std::io::Error;
+
 use crossterm::event::Event::Key;
 use crossterm::event::KeyCode::Char;
 use crossterm::event::{KeyEvent, KeyModifiers};
+use crossterm::execute;
+use crossterm::terminal::{Clear, ClearType};
 use crossterm::{
     event::read,
     terminal::{disable_raw_mode, enable_raw_mode},
@@ -16,16 +20,13 @@ impl Editor {
     }
 
     pub fn run(&mut self) {
-        if let Err(err) = self.repl() {
-            panic!("{err:?}");
-        }
-
-        println!("Goodbye!");
+        Self::initialize().unwrap();
+        let result = self.repl();
+        Self::terminate().unwrap();
+        result.unwrap();
     }
 
     fn repl(&mut self) -> Result<(), std::io::Error> {
-        enable_raw_mode()?;
-
         loop {
             if let Key(KeyEvent {
                 code,
@@ -47,8 +48,20 @@ impl Editor {
                 break;
             }
         }
-
-        disable_raw_mode()?;
         Ok(())
+    }
+
+    fn initialize() -> Result<(), Error> {
+        enable_raw_mode()?;
+        Self::clear_screen()
+    }
+
+    fn terminate() -> Result<(), Error> {
+        disable_raw_mode()
+    }
+
+    fn clear_screen() -> Result<(), Error> {
+        let mut stdout = std::io::stdout();
+        execute!(stdout, Clear(ClearType::All))
     }
 }
