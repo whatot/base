@@ -13,19 +13,24 @@ impl Editor {
     }
 
     pub fn run(&self) {
-        enable_raw_mode().unwrap();
+        if let Err(err) = self.repl() {
+            panic!("{err:?}");
+        }
+
+        println!("Goodbye!");
+    }
+
+    fn repl(&self) -> Result<(), std::io::Error> {
+        enable_raw_mode()?;
 
         loop {
             match read() {
                 Ok(Key(event)) => {
                     println!("{event:?} \r");
-                    match event.code {
-                        Char(c) => {
-                            if c == 'q' {
-                                break;
-                            }
+                    if let Char(c) = event.code {
+                        if c == 'q' {
+                            break;
                         }
-                        _ => {}
                     }
                 }
                 Err(e) => {
@@ -36,6 +41,7 @@ impl Editor {
             }
         }
 
-        disable_raw_mode().unwrap();
+        disable_raw_mode()?;
+        Ok(())
     }
 }
