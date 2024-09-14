@@ -1,6 +1,7 @@
 use std::io::Error;
 
-use crossterm::event::Event::Key;
+use crossterm::cursor::MoveTo;
+use crossterm::event::Event::{self, Key};
 use crossterm::event::KeyCode::Char;
 use crossterm::event::{KeyEvent, KeyModifiers};
 use crossterm::execute;
@@ -26,24 +27,11 @@ impl Editor {
         result.unwrap();
     }
 
-    fn repl(&mut self) -> Result<(), std::io::Error> {
+    fn repl(&mut self) -> Result<(), Error> {
         loop {
-            if let Key(KeyEvent {
-                code,
-                modifiers,
-                kind,
-                state,
-            }) = read()?
-            {
-                println!("Code:{code:?} Modifiers:{modifiers:?} Kind:{kind:?} State:{state:?} \r");
-                match code {
-                    Char('q') if modifiers == KeyModifiers::CONTROL => {
-                        self.should_quit = true;
-                    }
-                    _ => {}
-                }
-            }
-
+            let event = read()?;
+            self.evaluate_event(&event);
+            self.refresh_screen()?;
             if self.should_quit {
                 break;
             }
@@ -62,6 +50,26 @@ impl Editor {
 
     fn clear_screen() -> Result<(), Error> {
         let mut stdout = std::io::stdout();
+        execute!(stdout, MoveTo(0, 0))?;
         execute!(stdout, Clear(ClearType::All))
+    }
+
+    fn evaluate_event(&mut self, event: &Event) {
+        if let Key(KeyEvent {
+            code: Char('q'),
+            modifiers: KeyModifiers::CONTROL,
+            ..
+        }) = event
+        {
+            self.should_quit = true;
+        }
+    }
+
+    fn refresh_screen(&self) -> Result<(), Error> {
+        if self.should_quit {
+            Self::clear_screen()?;
+            println!("Goodbye!\r\n");
+        }
+        Ok(())
     }
 }
