@@ -38,12 +38,17 @@ impl Terminal {
     }
 
     pub fn size() -> Result<Size, Error> {
-        let (width, height) = size()?;
-        Ok(Size { width, height })
+        let (width_u16, height_u16) = size()?;
+        #[allow(clippy::as_conversions)]
+        Ok(Size {
+            width: width_u16 as usize,
+            height: height_u16 as usize,
+        })
     }
 
     pub fn move_cursor_to(p: Position) -> Result<(), Error> {
-        Self::queue_command(MoveTo(p.x, p.y))?;
+        #[allow(clippy::as_conversions, clippy::cast_possible_truncation)]
+        Self::queue_command(MoveTo(p.x as u16, p.y as u16))?;
         Ok(())
     }
 
@@ -75,12 +80,12 @@ impl Terminal {
 
 #[derive(Copy, Clone)]
 pub struct Size {
-    pub width: u16,
-    pub height: u16,
+    pub width: usize,
+    pub height: usize,
 }
 
 #[derive(Copy, Clone)]
 pub struct Position {
-    pub x: u16,
-    pub y: u16,
+    pub x: usize,
+    pub y: usize,
 }
