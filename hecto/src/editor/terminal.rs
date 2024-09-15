@@ -16,7 +16,6 @@ impl Terminal {
     pub fn initialize() -> Result<(), Error> {
         enable_raw_mode()?;
         Self::clear_screen()?;
-        Self::move_cursor_to(Position { x: 0, y: 0 })?;
         Self::execute()?;
         Ok(())
     }
@@ -46,18 +45,18 @@ impl Terminal {
         })
     }
 
-    pub fn move_cursor_to(p: Position) -> Result<(), Error> {
+    pub fn move_caret_to(p: Position) -> Result<(), Error> {
         #[allow(clippy::as_conversions, clippy::cast_possible_truncation)]
-        Self::queue_command(MoveTo(p.x as u16, p.y as u16))?;
+        Self::queue_command(MoveTo(p.col as u16, p.row as u16))?;
         Ok(())
     }
 
-    pub fn hide_cursor() -> Result<(), Error> {
+    pub fn hide_caret() -> Result<(), Error> {
         Self::queue_command(cursor::Hide)?;
         Ok(())
     }
 
-    pub fn show_cursor() -> Result<(), Error> {
+    pub fn show_caret() -> Result<(), Error> {
         Self::queue_command(cursor::Show)?;
         Ok(())
     }
@@ -78,14 +77,14 @@ impl Terminal {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct Size {
     pub width: usize,
     pub height: usize,
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Default)]
 pub struct Position {
-    pub x: usize,
-    pub y: usize,
+    pub col: usize,
+    pub row: usize,
 }
