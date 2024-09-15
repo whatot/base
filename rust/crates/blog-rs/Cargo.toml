@@ -7,5 +7,5 @@ edition = "2021"
 tokio = {version="1.33", features = ["macros", "rt-multi-thread"]}
 axum = {version="0.6", features=["headers"]}
 askama = {version="0.12", features=["markdown"]}
-sqlx = {version = "0.7", features = ["runtime-tokio-rustls", "sqlite", "macros", "time"]}
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "sqlite", "macros", "time"] }
 tower-http = {version = "0.4", features=["full"]}
