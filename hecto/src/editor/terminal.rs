@@ -1,9 +1,13 @@
-use std::io::{stdout, Error, Write};
+use std::{
+    fmt::Display,
+    io::{stdout, Error, Write},
+};
 
 use crossterm::{
     cursor::{self, MoveTo},
     queue, style,
     terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType},
+    Command,
 };
 
 pub struct Terminal {}
@@ -24,12 +28,12 @@ impl Terminal {
     }
 
     pub fn clear_screen() -> Result<(), Error> {
-        queue!(stdout(), Clear(ClearType::All))?;
+        Self::queue_command(Clear(ClearType::All))?;
         Ok(())
     }
 
     pub fn clear_line() -> Result<(), Error> {
-        queue!(stdout(), Clear(ClearType::CurrentLine))?;
+        Self::queue_command(Clear(ClearType::CurrentLine))?;
         Ok(())
     }
 
@@ -39,22 +43,27 @@ impl Terminal {
     }
 
     pub fn move_cursor_to(p: Position) -> Result<(), Error> {
-        queue!(stdout(), MoveTo(p.x, p.y))?;
+        Self::queue_command(MoveTo(p.x, p.y))?;
         Ok(())
     }
 
     pub fn hide_cursor() -> Result<(), Error> {
-        queue!(stdout(), cursor::Hide)?;
+        Self::queue_command(cursor::Hide)?;
         Ok(())
     }
 
     pub fn show_cursor() -> Result<(), Error> {
-        queue!(stdout(), cursor::Show)?;
+        Self::queue_command(cursor::Show)?;
         Ok(())
     }
 
-    pub fn print(s: &str) -> Result<(), Error> {
-        queue!(stdout(), style::Print(s))?;
+    pub fn print(t: impl Display) -> Result<(), Error> {
+        Self::queue_command(style::Print(t))?;
+        Ok(())
+    }
+
+    pub fn queue_command(command: impl Command) -> Result<(), Error> {
+        queue!(stdout(), command)?;
         Ok(())
     }
 
