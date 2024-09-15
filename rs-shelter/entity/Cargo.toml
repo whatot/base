@@ -9,5 +9,5 @@ path = "src/lib.rs"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-sea-orm = { version = "0.12" }
+sea-orm = { version = "1" }
 chrono = { version = "0.4" }
