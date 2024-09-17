@@ -8,17 +8,24 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub struct View {}
 
 impl View {
-    pub fn drow_rows() -> Result<(), Error> {
+    pub fn render() -> Result<(), Error> {
         let Size { height, .. } = Terminal::size()?;
         for cur in 0..height {
             Terminal::clear_line()?;
 
-            #[allow(clippy::integer_division)]
-            if cur == height / 3 {
-                Self::drow_welcome_message()?;
-            } else {
-                Self::drow_empty_row()?;
+            match cur {
+                0 => {
+                    Terminal::print("Hello, World!")?;
+                }
+                #[allow(clippy::integer_division)]
+                i if i == height / 3 => {
+                    Self::drow_welcome_message()?;
+                }
+                _ => {
+                    Self::drow_empty_row()?;
+                }
             }
+
             if cur.saturating_add(1) < height {
                 Terminal::print("\r\n")?;
             }
@@ -35,7 +42,7 @@ impl View {
         let spaces = " ".repeat(padding.saturating_sub(1));
         welcome_message = format!("~{spaces} {welcome_message}");
         welcome_message.truncate(width);
-        Terminal::print(welcome_message)?;
+        Terminal::print(&welcome_message)?;
         Ok(())
     }
 
