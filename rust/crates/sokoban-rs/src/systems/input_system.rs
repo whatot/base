@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
-use ggez::event::KeyCode;
 use specs::{world::Index, Entities, Join, ReadStorage, System, Write, WriteStorage};
+
+use ggez::input::keyboard::KeyCode;
 
 use crate::{
     components::{Immovable, Movable, Player, Position},

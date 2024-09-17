@@ -1,7 +1,8 @@
 use ggez::{
     conf::{WindowMode, WindowSetup},
-    event::{self, KeyCode, KeyMods},
-    timer, Context, GameResult,
+    event::{self},
+    input::keyboard::KeyInput,
+    Context, GameError, GameResult,
 };
 use resources::Time;
 use specs::{RunNow, World, WorldExt};
@@ -43,7 +44,7 @@ impl event::EventHandler<ggez::GameError> for Game {
         {
             // Get and update time resource
             let mut time = self.world.write_resource::<Time>();
-            time.delta += timer::delta(&context);
+            time.delta += context.time.delta();
         }
 
         {
@@ -68,14 +69,16 @@ impl event::EventHandler<ggez::GameError> for Game {
     fn key_down_event(
         &mut self,
         _ctx: &mut Context,
-        keycode: KeyCode,
-        _keymods: KeyMods,
+        key_input: KeyInput,
         _repeat: bool,
-    ) {
-        println!("Key pressed: {:?}", keycode);
+    ) -> Result<(), GameError> {
+        println!("Key pressed: {:?}", key_input);
 
         let mut input_queue = self.world.write_resource::<resources::InputQueue>();
-        input_queue.keys_pressed.push(keycode);
+        if let Some(key) = key_input.keycode {
+            input_queue.keys_pressed.push(key);
+        }
+        Ok(())
     }
 }
 

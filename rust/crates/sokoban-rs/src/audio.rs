@@ -29,6 +29,6 @@ impl AudioStore {
             .sounds
             .get_mut(sound)
             .expect("expected sound")
-            .play_detached(&context);
+            .play_detached(context);
     }
 }

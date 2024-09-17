@@ -1,6 +1,6 @@
 use std::{fmt::Display, time::Duration};
 
-use ggez::event::KeyCode;
+use ggez::input::keyboard::KeyCode;
 use specs::World;
 
 use crate::{audio::AudioStore, events::EventKind};

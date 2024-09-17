@@ -1,10 +1,11 @@
 use std::{collections::HashMap, time::Duration};
 
+use ggez::graphics::{Canvas, DrawParam, Drawable, InstanceArray, Rect};
 use ggez::{
-    graphics::{self, spritebatch::SpriteBatch, Color, DrawParam, Image},
-    timer, Context,
+    graphics::{self, Color, Image},
+    Context,
 };
-use glam::{vec2, Vec2};
+use glam::vec2;
 use specs::{Join, Read, ReadStorage, System};
 
 use crate::{components::RenderableKind, constants, resources::Time};
@@ -31,7 +32,7 @@ impl<'a> System<'a> for RenderingSystem<'a> {
         let (gameplay, time, postions, renderables) = data;
 
         // Clearing the screen (this gives us the background colour)
-        graphics::clear(self.context, graphics::Color::new(0.95, 0.95, 0.95, 1.0));
+        let mut canvas = Canvas::from_frame(self.context, Color::from([0.95, 0.95, 0.95, 1.0]));
 
         // Get all the renderables with their positions and sort by the position z
         // This will allow us to have entities layered visually.
@@ -65,43 +66,35 @@ impl<'a> System<'a> for RenderingSystem<'a> {
             .sorted_by(|a, b| Ord::cmp(&a.0, &b.0))
         {
             for (image_path, draw_params) in group {
-                let image = Image::new(self.context, image_path).expect("expected image");
-                let mut sprite_batch = SpriteBatch::new(image);
+                let image = Image::from_path(self.context, image_path).expect("expected image");
+                let mut instance_array = InstanceArray::new(self.context, image);
                 for draw_param in draw_params {
-                    sprite_batch.add(*draw_param);
+                    instance_array.push(*draw_param);
                 }
 
-                graphics::draw(self.context, &sprite_batch, graphics::DrawParam::new())
-                    .expect("expected render");
+                instance_array.draw(&mut canvas, DrawParam::new());
             }
         }
 
         // Render any text
-        self.draw_text(&gameplay.state.to_string(), 525.0, 80.0);
-        self.draw_text(&gameplay.moves_count.to_string(), 525.0, 100.0);
-        let fps = format!("FPS: {:.0}", timer::fps(self.context));
-        self.draw_text(&fps, 525.0, 120.0);
+        self.draw_text(&mut canvas, &gameplay.state.to_string(), 525.0, 80.0);
+        self.draw_text(&mut canvas, &gameplay.moves_count.to_string(), 525.0, 100.0);
+        let fps = format!("FPS: {:.0}", self.context.time.fps());
+        self.draw_text(&mut canvas, &fps, 525.0, 120.0);
 
         // Finally, present the context, this will actually display everything  on the screen.
-        graphics::present(self.context).expect("expected to present");
+        let _ = canvas.finish(self.context);
     }
 }
 
 impl RenderingSystem<'_> {
-    pub fn draw_text(&mut self, text_string: &str, x: f32, y: f32) {
+    pub fn draw_text(&self, canvas: &mut Canvas, text_string: &str, x: f32, y: f32) {
         let text = graphics::Text::new(text_string);
-        let destination = Vec2::new(x, y);
-        let color = Some(Color::new(0.0, 0.0, 0.0, 1.0));
-        let dimensions = Vec2::new(0.0, 20.0);
+        let color = Color::new(0.0, 0.0, 0.0, 1.0);
+        let rect = Rect::new(x, y, 1.0, 1.0);
 
-        graphics::queue_text(self.context, &text, dimensions, color);
-        graphics::draw_queued_text(
-            self.context,
-            graphics::DrawParam::new().dest(destination),
-            None,
-            graphics::FilterMode::Linear,
-        )
-        .expect("expected drawing queued text");
+        text.draw(canvas, DrawParam::new().dest_rect(rect).color(color));
+        canvas.set_sampler(graphics::FilterMode::Linear);
     }
 
     pub fn get_image(&mut self, renderable: &Renderable, delte: Duration) -> String {
