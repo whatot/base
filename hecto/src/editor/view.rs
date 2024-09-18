@@ -1,35 +1,41 @@
 use std::io::Error;
 
-use super::terminal::{Size, Terminal};
+use super::{
+    buffer::Buffer,
+    terminal::{Size, Terminal},
+};
 
 const NAME: &str = env!("CARGO_PKG_NAME");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub struct View {}
+#[derive(Default)]
+pub struct View {
+    pub buffer: Buffer,
+}
 
 impl View {
-    pub fn render() -> Result<(), Error> {
+    pub fn render(&self) -> Result<(), Error> {
         let Size { height, .. } = Terminal::size()?;
+
+        #[allow(clippy::integer_division)]
+        let welcome_line = height / 3;
+
         for cur in 0..height {
             Terminal::clear_line()?;
 
-            match cur {
-                0 => {
-                    Terminal::print("Hello, World!")?;
-                }
-                #[allow(clippy::integer_division)]
-                i if i == height / 3 => {
-                    Self::drow_welcome_message()?;
-                }
-                _ => {
-                    Self::drow_empty_row()?;
-                }
+            if let Some(value) = self.buffer.lines.get(cur) {
+                Terminal::print(value)?;
+            } else if cur == welcome_line && self.buffer.lines.is_empty() {
+                Self::drow_welcome_message()?;
+            } else {
+                Self::drow_empty_row()?;
             }
 
             if cur.saturating_add(1) < height {
                 Terminal::print("\r\n")?;
             }
         }
+
         Ok(())
     }
 
