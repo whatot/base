@@ -2,15 +2,26 @@ use std::io::Error;
 
 use super::{
     buffer::Buffer,
-    terminal::{Size, Terminal},
+    terminal::{Position, Size, Terminal},
 };
 
 const NAME: &str = env!("CARGO_PKG_NAME");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-#[derive(Default)]
 pub struct View {
     pub buffer: Buffer,
+    pub need_redraw: bool,
+    pub size: Size,
+}
+
+impl Default for View {
+    fn default() -> Self {
+        Self {
+            buffer: Buffer::default(),
+            need_redraw: true,
+            size: Terminal::size().unwrap_or_default(),
+        }
+    }
 }
 
 impl View {
@@ -20,73 +31,66 @@ impl View {
         }
     }
 
-    pub fn render(&self) -> Result<(), Error> {
-        if self.buffer.is_empty() {
-            self.render_welcome_message()?;
-        } else {
-            self.render_buffer()?;
-        }
-        Ok(())
+    pub fn resize(&mut self, size: Size) {
+        self.size = size;
+        self.need_redraw = true;
     }
 
-    fn render_buffer(&self) -> Result<(), Error> {
-        let Size { height, .. } = Terminal::size()?;
-
-        for cur in 0..height {
-            Terminal::clear_line()?;
-
-            if let Some(value) = self.buffer.lines.get(cur) {
-                Terminal::print(value)?;
-            } else {
-                Self::drow_empty_row()?;
-            }
-
-            if cur.saturating_add(1) < height {
-                Terminal::print("\r\n")?;
-            }
+    pub fn render(&mut self) -> Result<(), Error> {
+        if !self.need_redraw {
+            return Ok(());
         }
 
-        Ok(())
-    }
-
-    fn render_welcome_message(&self) -> Result<(), Error> {
-        let Size { height, .. } = Terminal::size()?;
+        let Size { width, height } = self.size;
+        if height == 0 || width == 0 {
+            return Ok(());
+        }
 
         #[allow(clippy::integer_division)]
-        let welcome_line = height / 3;
+        let vertical_center = height / 3;
 
         for cur in 0..height {
-            Terminal::clear_line()?;
-
-            if cur == welcome_line && self.buffer.is_empty() {
-                Self::drow_welcome_message()?;
+            if let Some(line) = self.buffer.lines.get(cur) {
+                let truncated_line = if line.len() > width {
+                    &line[0..width]
+                } else {
+                    line
+                };
+                Self::render_line(cur, truncated_line)?;
+            } else if cur == vertical_center && self.buffer.is_empty() {
+                Self::render_line(cur, &Self::build_welcome_message(width))?;
             } else {
-                Self::drow_empty_row()?;
-            }
-
-            if cur.saturating_add(1) < height {
-                Terminal::print("\r\n")?;
+                Self::render_line(cur, "~")?;
             }
         }
 
+        self.need_redraw = false;
         Ok(())
     }
 
-    fn drow_welcome_message() -> Result<(), Error> {
+    fn build_welcome_message(width: usize) -> String {
+        if width == 0 {
+            return " ".to_string();
+        }
+
         let mut welcome_message = format!("{NAME} editor -- version {VERSION}");
-        let width = Terminal::size()?.width;
-        let length = welcome_message.len();
+        let len = welcome_message.len();
+        if width <= len {
+            return "~".to_string();
+        }
+
         #[allow(clippy::integer_division)]
-        let padding = (width.saturating_sub(length)) / 2;
-        let spaces = " ".repeat(padding.saturating_sub(1));
-        welcome_message = format!("~{spaces} {welcome_message}");
+        let padding = (width.saturating_sub(len).saturating_sub(1)) / 2;
+        let spaces = " ".repeat(padding);
+        welcome_message = format!("~{spaces}{welcome_message}");
         welcome_message.truncate(width);
-        Terminal::print(&welcome_message)?;
-        Ok(())
+        welcome_message
     }
 
-    fn drow_empty_row() -> Result<(), Error> {
-        Terminal::print("~")?;
+    fn render_line(at: usize, line_text: &str) -> Result<(), Error> {
+        Terminal::move_caret_to(Position { row: at, col: 0 })?;
+        Terminal::clear_line()?;
+        Terminal::print(line_text)?;
         Ok(())
     }
 }
