@@ -14,7 +14,42 @@ pub struct View {
 }
 
 impl View {
+    pub fn load(&mut self, filename: &str) {
+        if let Ok(buffer) = Buffer::load(filename) {
+            self.buffer = buffer;
+        }
+    }
+
     pub fn render(&self) -> Result<(), Error> {
+        if self.buffer.is_empty() {
+            self.render_welcome_message()?;
+        } else {
+            self.render_buffer()?;
+        }
+        Ok(())
+    }
+
+    pub fn render_buffer(&self) -> Result<(), Error> {
+        let Size { height, .. } = Terminal::size()?;
+
+        for cur in 0..height {
+            Terminal::clear_line()?;
+
+            if let Some(value) = self.buffer.lines.get(cur) {
+                Terminal::print(value)?;
+            } else {
+                Self::drow_empty_row()?;
+            }
+
+            if cur.saturating_add(1) < height {
+                Terminal::print("\r\n")?;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn render_welcome_message(&self) -> Result<(), Error> {
         let Size { height, .. } = Terminal::size()?;
 
         #[allow(clippy::integer_division)]
@@ -23,9 +58,7 @@ impl View {
         for cur in 0..height {
             Terminal::clear_line()?;
 
-            if let Some(value) = self.buffer.lines.get(cur) {
-                Terminal::print(value)?;
-            } else if cur == welcome_line && self.buffer.lines.is_empty() {
+            if cur == welcome_line && self.buffer.is_empty() {
                 Self::drow_welcome_message()?;
             } else {
                 Self::drow_empty_row()?;
