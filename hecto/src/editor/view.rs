@@ -29,7 +29,7 @@ impl View {
         Ok(())
     }
 
-    pub fn render_buffer(&self) -> Result<(), Error> {
+    fn render_buffer(&self) -> Result<(), Error> {
         let Size { height, .. } = Terminal::size()?;
 
         for cur in 0..height {
@@ -49,7 +49,7 @@ impl View {
         Ok(())
     }
 
-    pub fn render_welcome_message(&self) -> Result<(), Error> {
+    fn render_welcome_message(&self) -> Result<(), Error> {
         let Size { height, .. } = Terminal::size()?;
 
         #[allow(clippy::integer_division)]
