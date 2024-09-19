@@ -18,9 +18,8 @@ impl Line {
         let end = cmp::min(self.len(), range.end);
         self.string
             .graphemes(true)
-            .into_iter()
             .skip(start)
-            .take(end - start)
+            .take(end.saturating_sub(start))
             .collect::<Vec<_>>()
             .join("")
     }
