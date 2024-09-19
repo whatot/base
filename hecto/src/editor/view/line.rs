@@ -33,17 +33,16 @@ impl Line {
         let fragments = line_str
             .graphemes(true)
             .map(|str| {
-                let unicode_width = str.width();
-
-                let rendered_width = match unicode_width {
-                    0 | 1 => GraphmeWidth::Half,
-                    _ => GraphmeWidth::Full,
-                };
-
-                let replacement = match unicode_width {
-                    0 => Some('·'),
-                    _ => None,
-                };
+                let (replacement, rendered_width) = Self::replacement_character(str).map_or_else(
+                    || {
+                        let rendered_width = match str.width() {
+                            0 | 1 => GraphmeWidth::Half,
+                            _ => GraphmeWidth::Full,
+                        };
+                        (None, rendered_width)
+                    },
+                    |replacement| (Some(replacement), GraphmeWidth::Half),
+                );
 
                 TextFragment {
                     grapheme: str.to_string(),
@@ -54,6 +53,25 @@ impl Line {
             .collect();
 
         Self { fragments }
+    }
+
+    fn replacement_character(for_str: &str) -> Option<char> {
+        let width = for_str.len();
+        match for_str {
+            " " => None,
+            "\t" => Some(' '),
+            _ if width > 0 && for_str.trim().is_empty() => Some('␣'),
+            _ if width == 0 => {
+                let mut chars = for_str.chars();
+                if let Some(ch) = chars.next() {
+                    if ch.is_control() && chars.next().is_none() {
+                        return Some('▯');
+                    }
+                }
+                Some('·')
+            }
+            _ => None,
+        }
     }
 
     pub fn get_visible_graphemes(&self, range: Range<usize>) -> String {
