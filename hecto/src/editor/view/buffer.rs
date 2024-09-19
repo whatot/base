@@ -12,6 +12,10 @@ impl Buffer {
         self.lines.is_empty()
     }
 
+    pub fn height(&self) -> usize {
+        self.lines.len()
+    }
+
     pub fn load(filename: &str) -> Result<Self, Error> {
         let file_content = std::fs::read_to_string(filename)?;
         let lines = file_content.lines().map(Line::from).collect();
