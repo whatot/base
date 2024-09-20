@@ -18,6 +18,8 @@ pub enum EditorCommand {
     Resize(Size),
     Quit,
     Insert(char),
+    Delete,
+    Backspace,
 }
 
 impl TryFrom<Event> for EditorCommand {
@@ -34,6 +36,8 @@ impl TryFrom<Event> for EditorCommand {
             }) => match (code, modifiers) {
                 (KeyCode::Char('q'), KeyModifiers::CONTROL) => Ok(Self::Quit),
                 (KeyCode::Char(c), KeyModifiers::NONE | KeyModifiers::SHIFT) => Ok(Self::Insert(c)),
+                (KeyCode::Backspace, _) => Ok(Self::Backspace),
+                (KeyCode::Delete, _) => Ok(Self::Delete),
                 (KeyCode::Down, _) => Ok(Self::Move(Direction::Down)),
                 (KeyCode::Up, _) => Ok(Self::Move(Direction::Up)),
                 (KeyCode::Left, _) => Ok(Self::Move(Direction::Left)),

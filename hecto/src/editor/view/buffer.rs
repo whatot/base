@@ -32,4 +32,23 @@ impl Buffer {
             line.insert_char(c, at.grapheme_index);
         }
     }
+
+    pub fn delete(&mut self, at: Location) {
+        if let Some(line) = self.lines.get(at.line_index) {
+            if at.grapheme_index >= line.grapheme_count()
+                && self.lines.len() > at.line_index.saturating_add(1)
+            {
+                // 行尾删除右侧的内容，把下一行的内容拼接到当前行
+                let next_line = self.lines.remove(at.line_index.saturating_add(1));
+                // clippy::indexing_slicing: We checked for existence of this line in the surrounding if statment
+                #[allow(clippy::indexing_slicing)]
+                self.lines[at.line_index].append(&next_line);
+            } else if at.grapheme_index < line.grapheme_count() {
+                // 行内删除右侧的内容
+                // clippy::indexing_slicing: We checked for existence of this line in the surrounding if statment
+                #[allow(clippy::indexing_slicing)]
+                self.lines[at.line_index].delete(at.grapheme_index);
+            }
+        }
+    }
 }

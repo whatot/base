@@ -55,16 +55,18 @@ impl View {
             EditorCommand::Move(direction) => self.move_text_location(direction),
             EditorCommand::Quit => (),
             EditorCommand::Insert(c) => self.insert_char(*c),
+            EditorCommand::Backspace => self.backspace(),
+            EditorCommand::Delete => self.delete(),
         }
     }
 
-    pub fn resize(&mut self, to: Size) {
+    fn resize(&mut self, to: Size) {
         self.size = to;
         self.scroll_text_location_into_view();
         self.need_redraw = true;
     }
 
-    pub fn insert_char(&mut self, c: char) {
+    fn insert_char(&mut self, c: char) {
         let old_line_len = self
             .buffer
             .lines
@@ -81,8 +83,22 @@ impl View {
 
         let grapheme_delta = new_line_len.saturating_sub(old_line_len);
         if grapheme_delta > 0 {
-            self.move_right();
+            self.move_text_location(&Direction::Right);
         }
+        self.need_redraw = true;
+    }
+
+    // 删除光标左边的内容
+    fn backspace(&mut self) {
+        if self.text_location.grapheme_index != 0 || self.text_location.line_index != 0 {
+            self.move_text_location(&Direction::Left);
+            self.delete();
+        }
+    }
+
+    // 删除光标右边的内容
+    fn delete(&mut self) {
+        self.buffer.delete(self.text_location);
         self.need_redraw = true;
     }
 
@@ -242,7 +258,7 @@ impl View {
     fn move_left(&mut self) {
         if self.text_location.grapheme_index > 0 {
             self.text_location.grapheme_index -= 1;
-        } else {
+        } else if self.text_location.line_index > 0 {
             self.move_up(1);
             self.move_to_end_of_line();
         }
