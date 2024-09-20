@@ -10,6 +10,7 @@ use line::Line;
 use super::{
     editorcommand::{Direction, EditorCommand},
     terminal::Position,
+    DocumentStatus,
 };
 
 const NAME: &str = env!("CARGO_PKG_NAME");
@@ -29,19 +30,31 @@ pub struct Location {
     pub line_index: usize,
 }
 
-impl Default for View {
-    fn default() -> Self {
+impl View {
+    pub fn new(margin_bottom: usize) -> Self {
+        let terminal_size = Terminal::size().unwrap_or_default();
+
         Self {
             buffer: Buffer::default(),
             need_redraw: true,
-            size: Terminal::size().unwrap_or_default(),
+            size: Size {
+                width: terminal_size.width,
+                height: terminal_size.height.saturating_sub(margin_bottom),
+            },
             text_location: Location::default(),
             scroll_offset: Position::default(),
         }
     }
-}
 
-impl View {
+    pub fn get_status(&self) -> DocumentStatus {
+        DocumentStatus {
+            total_lines: self.buffer.height(),
+            current_line_index: self.text_location.line_index,
+            is_modified: self.buffer.dirty,
+            file_name: self.buffer.file_name.clone(),
+        }
+    }
+
     pub fn load(&mut self, filename: &str) {
         if let Ok(buffer) = Buffer::load(filename) {
             self.buffer = buffer;
@@ -52,7 +65,7 @@ impl View {
     pub fn handle_command(&mut self, command: &EditorCommand) {
         match command {
             EditorCommand::Resize(size) => self.resize(*size),
-            EditorCommand::Move(direction) => self.move_text_location(direction),
+            EditorCommand::Move(direction) => self.move_text_location(*direction),
             EditorCommand::Quit => (),
             EditorCommand::Insert(c) => self.insert_char(*c),
             EditorCommand::Backspace => self.delete_backward(),
@@ -63,7 +76,7 @@ impl View {
         }
     }
 
-    fn save(&self) {
+    fn save(&mut self) {
         let _ = self.buffer.save();
     }
 
@@ -90,7 +103,7 @@ impl View {
 
         let grapheme_delta = new_line_len.saturating_sub(old_line_len);
         if grapheme_delta > 0 {
-            self.move_text_location(&Direction::Right);
+            self.move_text_location(Direction::Right);
         }
         self.need_redraw = true;
     }
@@ -98,7 +111,7 @@ impl View {
     // 删除光标左边的内容
     fn delete_backward(&mut self) {
         if self.text_location.grapheme_index != 0 || self.text_location.line_index != 0 {
-            self.move_text_location(&Direction::Left);
+            self.move_text_location(Direction::Left);
             self.delete();
         }
     }
@@ -111,7 +124,7 @@ impl View {
 
     fn insert_newline(&mut self) {
         self.buffer.insert_newline(self.text_location);
-        self.move_text_location(&Direction::Right);
+        self.move_text_location(Direction::Right);
         self.need_redraw = true;
     }
 
@@ -221,7 +234,7 @@ impl View {
     }
 
     #[allow(clippy::arithmetic_side_effects)]
-    fn move_text_location(&mut self, direction: &Direction) {
+    fn move_text_location(&mut self, direction: Direction) {
         let Size { height, .. } = self.size;
 
         match direction {

@@ -7,7 +7,8 @@ use super::{line::Line, Location};
 #[derive(Default)]
 pub struct Buffer {
     pub lines: Vec<Line>,
-    file_name: Option<String>,
+    pub file_name: Option<String>,
+    pub dirty: bool,
 }
 
 impl Buffer {
@@ -25,6 +26,7 @@ impl Buffer {
         Ok(Buffer {
             lines,
             file_name: Some(file_name.to_string()),
+            dirty: false,
         })
     }
 
@@ -34,8 +36,10 @@ impl Buffer {
         }
         if at.line_index == self.height() {
             self.lines.push(Line::from(&c.to_string()));
+            self.dirty = true;
         } else if let Some(line) = self.lines.get_mut(at.line_index) {
             line.insert_char(c, at.grapheme_index);
+            self.dirty = true;
         }
     }
 
@@ -49,11 +53,13 @@ impl Buffer {
                 // clippy::indexing_slicing: We checked for existence of this line in the surrounding if statment
                 #[allow(clippy::indexing_slicing)]
                 self.lines[at.line_index].append(&next_line);
+                self.dirty = true;
             } else if at.grapheme_index < line.grapheme_count() {
                 // 行内删除右侧的内容
                 // clippy::indexing_slicing: We checked for existence of this line in the surrounding if statment
                 #[allow(clippy::indexing_slicing)]
                 self.lines[at.line_index].delete(at.grapheme_index);
+                self.dirty = true;
             }
         }
     }
@@ -62,20 +68,24 @@ impl Buffer {
         // 有效行之外
         if at.line_index >= self.height() {
             self.lines.push(Line::default());
+            self.dirty = true;
         } else if let Some(line) = self.lines.get_mut(at.line_index) {
             // 行首、行中、行尾
             let new_line = line.split(at.grapheme_index);
             self.lines.insert(at.line_index.saturating_add(1), new_line);
+            self.dirty = true;
         }
     }
 
-    pub fn save(&self) -> Result<(), Error> {
+    pub fn save(&mut self) -> Result<(), Error> {
         if let Some(file_name) = &self.file_name {
             let mut file = File::create(file_name)?;
             for line in &self.lines {
                 writeln!(file, "{line}")?;
             }
         }
+
+        self.dirty = false;
         Ok(())
     }
 }
