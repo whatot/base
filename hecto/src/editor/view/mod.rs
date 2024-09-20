@@ -54,12 +54,35 @@ impl View {
             EditorCommand::Resize(size) => self.resize(*size),
             EditorCommand::Move(direction) => self.move_text_location(direction),
             EditorCommand::Quit => (),
+            EditorCommand::Insert(c) => self.insert_char(*c),
         }
     }
 
     pub fn resize(&mut self, to: Size) {
         self.size = to;
         self.scroll_text_location_into_view();
+        self.need_redraw = true;
+    }
+
+    pub fn insert_char(&mut self, c: char) {
+        let old_line_len = self
+            .buffer
+            .lines
+            .get(self.text_location.line_index)
+            .map_or(0, Line::grapheme_count);
+
+        self.buffer.insert_char(c, self.text_location);
+
+        let new_line_len = self
+            .buffer
+            .lines
+            .get(self.text_location.line_index)
+            .map_or(0, Line::grapheme_count);
+
+        let grapheme_delta = new_line_len.saturating_sub(old_line_len);
+        if grapheme_delta > 0 {
+            self.move_right();
+        }
         self.need_redraw = true;
     }
 
@@ -128,7 +151,9 @@ impl View {
         } else {
             false
         };
-        self.need_redraw = self.need_redraw || offset_changed;
+        if offset_changed {
+            self.need_redraw = true;
+        }
     }
 
     fn scroll_horizontally(&mut self, to: usize) {
@@ -142,7 +167,9 @@ impl View {
         } else {
             false
         };
-        self.need_redraw = self.need_redraw || offset_changed;
+        if offset_changed {
+            self.need_redraw = true;
+        }
     }
 
     fn scroll_text_location_into_view(&mut self) {
