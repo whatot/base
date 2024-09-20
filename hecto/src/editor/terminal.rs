@@ -2,8 +2,12 @@ use std::io::{stdout, Error, Write};
 
 use crossterm::{
     cursor::{self, MoveTo},
-    queue, style,
-    terminal::{self, disable_raw_mode, enable_raw_mode, size, Clear, ClearType},
+    queue,
+    style::{self, Attribute},
+    terminal::{
+        self, disable_raw_mode, enable_raw_mode, size, Clear, ClearType, DisableLineWrap,
+        EnableLineWrap,
+    },
     Command,
 };
 
@@ -13,6 +17,7 @@ impl Terminal {
     pub fn initialize() -> Result<(), Error> {
         enable_raw_mode()?;
         Self::enter_alternate_screen()?;
+        Self::disable_line_wrap()?;
         Self::clear_screen()?;
         Self::execute()?;
         Ok(())
@@ -20,6 +25,7 @@ impl Terminal {
 
     pub fn terminate() -> Result<(), Error> {
         Self::leave_alternate_screen()?;
+        Self::enable_line_wrap()?;
         Self::show_caret()?;
         Self::execute()?;
         disable_raw_mode()?;
@@ -41,6 +47,19 @@ impl Terminal {
         Self::clear_line()?;
         Self::print(line_text)?;
         Ok(())
+    }
+
+    pub fn print_inverted_row(row: usize, line_text: &str) -> Result<(), Error> {
+        let width = Self::size()?.width;
+        Self::print_row(
+            row,
+            &format!(
+                "{}{:width$.width$}{}",
+                Attribute::Reverse,
+                line_text,
+                Attribute::Reset
+            ),
+        )
     }
 
     pub fn size() -> Result<Size, Error> {
@@ -90,6 +109,21 @@ impl Terminal {
 
     pub fn execute() -> Result<(), Error> {
         stdout().flush()?;
+        Ok(())
+    }
+
+    pub fn disable_line_wrap() -> Result<(), Error> {
+        Self::queue_command(DisableLineWrap)?;
+        Ok(())
+    }
+
+    pub fn enable_line_wrap() -> Result<(), Error> {
+        Self::queue_command(EnableLineWrap)?;
+        Ok(())
+    }
+
+    pub fn set_title(title: &str) -> Result<(), Error> {
+        Self::queue_command(terminal::SetTitle(title))?;
         Ok(())
     }
 }
