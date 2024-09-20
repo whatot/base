@@ -1,10 +1,13 @@
-use std::io::Error;
+use std::{fs::File, io::Error};
+
+use std::io::Write;
 
 use super::{line::Line, Location};
 
 #[derive(Default)]
 pub struct Buffer {
     pub lines: Vec<Line>,
+    file_name: Option<String>,
 }
 
 impl Buffer {
@@ -16,10 +19,13 @@ impl Buffer {
         self.lines.len()
     }
 
-    pub fn load(filename: &str) -> Result<Self, Error> {
-        let file_content = std::fs::read_to_string(filename)?;
+    pub fn load(file_name: &str) -> Result<Self, Error> {
+        let file_content = std::fs::read_to_string(file_name)?;
         let lines = file_content.lines().map(Line::from).collect();
-        Ok(Buffer { lines })
+        Ok(Buffer {
+            lines,
+            file_name: Some(file_name.to_string()),
+        })
     }
 
     pub fn insert_char(&mut self, c: char, at: Location) {
@@ -61,5 +67,15 @@ impl Buffer {
             let new_line = line.split(at.grapheme_index);
             self.lines.insert(at.line_index.saturating_add(1), new_line);
         }
+    }
+
+    pub fn save(&self) -> Result<(), Error> {
+        if let Some(file_name) = &self.file_name {
+            let mut file = File::create(file_name)?;
+            for line in &self.lines {
+                writeln!(file, "{line}")?;
+            }
+        }
+        Ok(())
     }
 }

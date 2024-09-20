@@ -59,7 +59,12 @@ impl View {
             EditorCommand::Delete => self.delete(),
             EditorCommand::Tab => self.insert_char('\t'),
             EditorCommand::Enter => self.insert_newline(),
+            EditorCommand::Save => self.save(),
         }
+    }
+
+    fn save(&self) {
+        let _ = self.buffer.save();
     }
 
     fn resize(&mut self, to: Size) {
