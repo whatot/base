@@ -8,8 +8,8 @@ use buffer::Buffer;
 use line::Line;
 
 use super::{
+    command::{Edit, Move},
     documentstatus::DocumentStatus,
-    editorcommand::{Direction, EditorCommand},
     terminal::Position,
     uicomponent::UIComponent,
     NAME, VERSION,
@@ -41,28 +41,38 @@ impl View {
         }
     }
 
-    pub fn load(&mut self, filename: &str) {
-        if let Ok(buffer) = Buffer::load(filename) {
-            self.buffer = buffer;
-            self.set_needs_redraw(true);
-        }
+    pub fn load(&mut self, filename: &str) -> Result<(), Error> {
+        self.buffer = Buffer::load(filename)?;
+        self.set_needs_redraw(true);
+        Ok(())
     }
 
-    pub fn handle_command(&mut self, command: &EditorCommand) {
+    pub fn handle_edit_command(&mut self, command: Edit) {
         match command {
-            EditorCommand::Resize(_) | EditorCommand::Quit => (),
-            EditorCommand::Move(direction) => self.move_text_location(*direction),
-            EditorCommand::Insert(c) => self.insert_char(*c),
-            EditorCommand::Backspace => self.delete_backward(),
-            EditorCommand::Delete => self.delete(),
-            EditorCommand::Tab => self.insert_char('\t'),
-            EditorCommand::Enter => self.insert_newline(),
-            EditorCommand::Save => self.save(),
+            Edit::Insert(c) => self.insert_char(c),
+            Edit::DeleteBackward => self.delete_backward(),
+            Edit::Delete => self.delete(),
+            Edit::InsertNewline => self.insert_newline(),
         }
     }
 
-    fn save(&mut self) {
-        let _ = self.buffer.save();
+    pub fn handle_move_command(&mut self, command: Move) {
+        let Size { height, .. } = self.size;
+        match command {
+            Move::Up => self.move_up(1),
+            Move::Down => self.move_down(1),
+            Move::Left => self.move_left(),
+            Move::Right => self.move_right(),
+            Move::PageUp => self.move_up(height.saturating_sub(1)),
+            Move::PageDown => self.move_down(height.saturating_sub(1)),
+            Move::StartOfLine => self.move_to_start_of_line(),
+            Move::EndOfLine => self.move_to_end_of_line(),
+        }
+        self.scroll_text_location_into_view();
+    }
+
+    pub fn save(&mut self) -> Result<(), Error> {
+        self.buffer.save()
     }
 
     fn insert_char(&mut self, c: char) {
@@ -82,7 +92,7 @@ impl View {
 
         let grapheme_delta = new_line_len.saturating_sub(old_line_len);
         if grapheme_delta > 0 {
-            self.move_text_location(Direction::Right);
+            self.handle_move_command(Move::Right);
         }
         self.set_needs_redraw(true);
     }
@@ -90,7 +100,7 @@ impl View {
     // 删除光标左边的内容
     fn delete_backward(&mut self) {
         if self.text_location.grapheme_index != 0 || self.text_location.line_index != 0 {
-            self.move_text_location(Direction::Left);
+            self.handle_move_command(Move::Left);
             self.delete();
         }
     }
@@ -103,7 +113,7 @@ impl View {
 
     fn insert_newline(&mut self) {
         self.buffer.insert_newline(self.text_location);
-        self.move_text_location(Direction::Right);
+        self.handle_move_command(Move::Right);
         self.set_needs_redraw(true);
     }
 
@@ -175,23 +185,6 @@ impl View {
             line.width_until(self.text_location.grapheme_index)
         });
         Position { col, row }
-    }
-
-    #[allow(clippy::arithmetic_side_effects)]
-    fn move_text_location(&mut self, direction: Direction) {
-        let Size { height, .. } = self.size;
-
-        match direction {
-            Direction::Up => self.move_up(1),
-            Direction::Down => self.move_down(1),
-            Direction::Left => self.move_left(),
-            Direction::Right => self.move_right(),
-            Direction::PageUp => self.move_up(height.saturating_sub(1)),
-            Direction::PageDown => self.move_down(height.saturating_sub(1)),
-            Direction::Home => self.move_to_start_of_line(),
-            Direction::End => self.move_to_end_of_line(),
-        }
-        self.scroll_text_location_into_view();
     }
 
     fn move_up(&mut self, step: usize) {
