@@ -1,6 +1,6 @@
 use std::io::Error;
 
-use super::terminal::Size;
+use super::size::Size;
 
 pub trait UIComponent {
     // Marks this UI component as in need of redrawing (or not)

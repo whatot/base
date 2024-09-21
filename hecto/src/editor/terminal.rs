@@ -11,6 +11,8 @@ use crossterm::{
     Command,
 };
 
+use super::{position::Position, size::Size};
+
 pub struct Terminal {}
 
 impl Terminal {
@@ -125,26 +127,5 @@ impl Terminal {
     pub fn set_title(title: &str) -> Result<(), Error> {
         Self::queue_command(terminal::SetTitle(title))?;
         Ok(())
-    }
-}
-
-#[derive(Copy, Clone, Default, PartialEq, Eq)]
-pub struct Size {
-    pub width: usize,
-    pub height: usize,
-}
-
-#[derive(Copy, Clone, Default)]
-pub struct Position {
-    pub col: usize,
-    pub row: usize,
-}
-
-impl Position {
-    pub const fn saturating_sub(self, other: Self) -> Self {
-        Self {
-            row: self.row.saturating_sub(other.row),
-            col: self.col.saturating_sub(other.col),
-        }
     }
 }

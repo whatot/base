@@ -1,16 +1,17 @@
 mod buffer;
-mod line;
+mod fileinfo;
 
 use std::{cmp::min, io::Error};
 
-use crate::editor::terminal::{Size, Terminal};
+use crate::editor::line::Line;
+use crate::editor::terminal::Terminal;
 use buffer::Buffer;
-use line::Line;
 
 use super::{
     command::{Edit, Move},
     documentstatus::DocumentStatus,
-    terminal::Position,
+    position::Position,
+    size::Size,
     uicomponent::UIComponent,
     NAME, VERSION,
 };
@@ -73,6 +74,14 @@ impl View {
 
     pub fn save(&mut self) -> Result<(), Error> {
         self.buffer.save()
+    }
+
+    pub fn is_file_loaded(&self) -> bool {
+        self.buffer.is_file_loaded()
+    }
+
+    pub fn save_as(&mut self, name: &str) -> Result<(), Error> {
+        self.buffer.save_as(name)
     }
 
     fn insert_char(&mut self, c: char) {
