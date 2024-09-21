@@ -44,7 +44,7 @@ impl View {
     pub fn load(&mut self, filename: &str) {
         if let Ok(buffer) = Buffer::load(filename) {
             self.buffer = buffer;
-            self.mark_redraw(true);
+            self.set_needs_redraw(true);
         }
     }
 
@@ -84,7 +84,7 @@ impl View {
         if grapheme_delta > 0 {
             self.move_text_location(Direction::Right);
         }
-        self.mark_redraw(true);
+        self.set_needs_redraw(true);
     }
 
     // 删除光标左边的内容
@@ -98,13 +98,13 @@ impl View {
     // 删除光标右边的内容
     fn delete(&mut self) {
         self.buffer.delete(self.text_location);
-        self.mark_redraw(true);
+        self.set_needs_redraw(true);
     }
 
     fn insert_newline(&mut self) {
         self.buffer.insert_newline(self.text_location);
         self.move_text_location(Direction::Right);
-        self.mark_redraw(true);
+        self.set_needs_redraw(true);
     }
 
     fn build_welcome_message(width: usize) -> String {
@@ -138,7 +138,7 @@ impl View {
             false
         };
         if offset_changed {
-            self.mark_redraw(true);
+            self.set_needs_redraw(true);
         }
     }
 
@@ -154,7 +154,7 @@ impl View {
             false
         };
         if offset_changed {
-            self.mark_redraw(true);
+            self.set_needs_redraw(true);
         }
     }
 
@@ -264,7 +264,7 @@ impl View {
 }
 
 impl UIComponent for View {
-    fn mark_redraw(&mut self, value: bool) {
+    fn set_needs_redraw(&mut self, value: bool) {
         self.need_redraw = value;
     }
 

@@ -4,14 +4,14 @@ use super::terminal::Size;
 
 pub trait UIComponent {
     // Marks this UI component as in need of redrawing (or not)
-    fn mark_redraw(&mut self, value: bool);
+    fn set_needs_redraw(&mut self, value: bool);
     // Determines if a component needs to be redrawn or not
     fn needs_redraw(&self) -> bool;
 
     // Updates the size and marks as redraw-needed
     fn resize(&mut self, size: Size) {
         self.set_size(size);
-        self.mark_redraw(true);
+        self.set_needs_redraw(true);
     }
     // Updates the size. Needs to be implemented by each component.
     fn set_size(&mut self, size: Size);
@@ -23,7 +23,7 @@ pub trait UIComponent {
         }
 
         match self.draw(origin_y) {
-            Ok(()) => self.mark_redraw(false),
+            Ok(()) => self.set_needs_redraw(false),
             Err(err) => {
                 #[cfg(debug_assertions)]
                 {
