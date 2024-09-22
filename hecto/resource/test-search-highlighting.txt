@@ -1,0 +1,15 @@
+needle at the start of the haystack
+haystack with needle in the middle
+what comes at the end is a needle
+invalid n eedle or need le nee
+dle 
+needle at the staert of a line to test clipping one at the left of the view, and also another one for the other side: needle
+multiple needles in one needle line: needle needle needleneedleneedle
+overlapping neeneeneeneeeeneeneeneeneeneeneeneeneeneeneeneeneedle 
+needle🪡 with emoji needle🪡 needle🪡
+🧑‍🤝‍🧑🧑‍🤝‍🧑🧑‍🤝‍🧑🧑‍🤝‍🧑 needle after emoji 🧑‍🤝‍🧑🧑‍🤝‍🧑🧑‍🤝‍🧑 
+Searching for 🧑 should only highlight 🧑, but not the extended cluster 🧑‍🤝‍🧑
+Wide Character Needle: 全角文字 全角文字 全角文字
+全角文字
+
+needle among Control characters:[Escape] needle  [Bell] needle
