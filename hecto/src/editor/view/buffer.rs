@@ -108,4 +108,16 @@ impl Buffer {
         self.dirty = false;
         Ok(())
     }
+
+    pub fn search(&self, query: &str) -> Option<Location> {
+        for (line_idx, line) in self.lines.iter().enumerate() {
+            if let Some(grapheme_idx) = line.search(query) {
+                return Some(Location {
+                    line_index: line_idx,
+                    grapheme_index: grapheme_idx,
+                });
+            }
+        }
+        None
+    }
 }
