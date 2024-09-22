@@ -36,6 +36,12 @@ impl CommandBar {
 
     pub fn set_prompt(&mut self, prompt: &str) {
         self.prompt = prompt.to_string();
+        self.set_needs_redraw(true);
+    }
+
+    pub fn clear_value(&mut self) {
+        self.value = Line::default();
+        self.set_needs_redraw(true);
     }
 }
 
