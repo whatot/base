@@ -1,6 +1,5 @@
 use std::io::Error;
 
-use commandbar::CommandBar;
 use crossterm::event::Event::{self};
 use crossterm::event::KeyEvent;
 use crossterm::event::{read, KeyEventKind};
@@ -22,8 +21,10 @@ use self::{
     command::{
         Command::{self, Edit, Move, System},
         Edit::InsertNewline,
+        Move::{Down, Right},
         System::{Dismiss, Quit, Resize, Save, Search},
     },
+    commandbar::CommandBar,
     messagebar::MessageBar,
     size::Size,
     statusbar::StatusBar,
@@ -196,8 +197,6 @@ impl Editor {
 
     fn process_command_during_search(&mut self, command: Command) {
         match command {
-            // Not applicable during save, Resize already handled at this stage
-            System(Quit | Resize(_) | Search | Save) | Move(_) => {}
             System(Dismiss) => {
                 self.set_prompt(PromptType::None);
                 self.view.dismiss_search();
@@ -211,6 +210,9 @@ impl Editor {
                 let query = self.command_bar.value();
                 self.view.search(&query);
             }
+            Move(Right | Down) => self.view.search_next(),
+            // Not applicable during save, Resize already handled at this stage
+            System(Quit | Resize(_) | Search | Save) | Move(_) => {}
         }
     }
 
@@ -315,7 +317,8 @@ impl Editor {
             PromptType::Save => self.command_bar.set_prompt("Save as: "),
             PromptType::Search => {
                 self.view.enter_search();
-                self.command_bar.set_prompt("Search: ");
+                self.command_bar
+                    .set_prompt("Search (Esc to cancel, Arrows to navigate): ");
             }
         }
         self.command_bar.clear_value();
