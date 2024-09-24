@@ -1,6 +1,6 @@
-use crate::editor::terminal::Terminal;
-
-use super::{documentstatus::DocumentStatus, size::Size, uicomponent::UIComponent};
+use crate::editor::{
+    documentstatus::DocumentStatus, size::Size, terminal::Terminal, uicomponents::UIComponent,
+};
 
 #[derive(Default)]
 pub struct StatusBar {

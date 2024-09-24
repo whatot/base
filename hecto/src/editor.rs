@@ -8,16 +8,12 @@ use position::Position;
 
 mod annotate;
 mod command;
-mod commandbar;
 mod documentstatus;
 mod line;
-mod messagebar;
 mod position;
 mod size;
-mod statusbar;
 mod terminal;
-mod uicomponent;
-mod view;
+mod uicomponents;
 
 use self::{
     command::{
@@ -26,13 +22,13 @@ use self::{
         Move::{Down, Right},
         System::{Dismiss, Quit, Resize, Save, Search},
     },
-    commandbar::CommandBar,
-    messagebar::MessageBar,
     size::Size,
-    statusbar::StatusBar,
     terminal::Terminal,
-    uicomponent::UIComponent,
-    view::View,
+    uicomponents::CommandBar,
+    uicomponents::MessageBar,
+    uicomponents::StatusBar,
+    uicomponents::UIComponent,
+    uicomponents::View,
 };
 
 const NAME: &str = env!("CARGO_PKG_NAME");

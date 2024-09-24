@@ -11,12 +11,12 @@ use buffer::Buffer;
 use location::Location;
 use searchinfo::SearchInfo;
 
-use super::{
+use crate::editor::{
     command::{Edit, Move},
     documentstatus::DocumentStatus,
     position::{Col, Position, Row},
     size::Size,
-    uicomponent::UIComponent,
+    uicomponents::UIComponent,
     NAME, VERSION,
 };
 

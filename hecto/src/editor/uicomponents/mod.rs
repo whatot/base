@@ -1,5 +1,15 @@
 use std::io::Error;
 
+mod commandbar;
+mod messagebar;
+mod statusbar;
+mod view;
+
+pub use commandbar::CommandBar;
+pub use messagebar::MessageBar;
+pub use statusbar::StatusBar;
+pub use view::View;
+
 use super::size::Size;
 
 pub trait UIComponent {

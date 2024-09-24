@@ -2,7 +2,7 @@ use std::cmp::min;
 
 use crate::editor::terminal::Terminal;
 
-use super::{command::Edit, line::Line, size::Size, uicomponent::UIComponent};
+use crate::editor::{command::Edit, line::Line, size::Size, uicomponents::UIComponent};
 
 #[derive(Default)]
 pub struct CommandBar {
