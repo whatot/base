@@ -36,11 +36,11 @@ impl Line {
     fn str_to_fragments(line_str: &str) -> Vec<TextFragment> {
         line_str
             .grapheme_indices(true)
-            .map(|(bype_idx, str)| {
-                let (replacement, rendered_width) = Self::get_replacement_character(str)
+            .map(|(bype_idx, grapheme)| {
+                let (replacement, rendered_width) = Self::get_replacement_character(grapheme)
                     .map_or_else(
                         || {
-                            let rendered_width = match str.width() {
+                            let rendered_width = match grapheme.width() {
                                 0 | 1 => GraphemeWidth::Half,
                                 _ => GraphemeWidth::Full,
                             };
@@ -50,7 +50,7 @@ impl Line {
                     );
 
                 TextFragment {
-                    grapheme: str.to_string(),
+                    grapheme: grapheme.to_string(),
                     rendered_width,
                     replacement,
                     start_byte_idx: bype_idx,
@@ -106,8 +106,10 @@ impl Line {
         if range.start >= range.end {
             return AnnotatedString::default();
         }
+
         // Create a new annotated string
         let mut result = AnnotatedString::from(&self.string);
+
         // Annotate it based on the search results
         if let Some(query) = query {
             if !query.is_empty() {
@@ -132,6 +134,7 @@ impl Line {
                 );
             }
         }
+
         // Insert replacement characters, and truncate if needed.
         // We do this backwards, otherwise the byte indices would be off in case a replacement character has a different width than the original character.
         let mut fragment_start = self.width();
@@ -139,8 +142,10 @@ impl Line {
             let fragment_end = fragment_start;
             fragment_start = fragment_start.saturating_sub(fragment.rendered_width.into());
             if fragment_start > range.end {
-                continue; // No  processing needed if we haven't reached the visible range yet.
+                // No  processing needed if we haven't reached the visible range yet.
+                continue;
             }
+
             // clip right if the fragment is partially visible
             if fragment_start < range.end && fragment_end > range.end {
                 result.replace(fragment.start_byte_idx, self.string.len(), "⋯");
@@ -150,6 +155,7 @@ impl Line {
                 result.replace(fragment.start_byte_idx, self.string.len(), "");
                 continue;
             }
+
             // Fragment ends at the start of the range: Remove the entire left side of the string (if not already at start of string)
             if fragment_end <= range.start {
                 result.replace(
@@ -169,8 +175,10 @@ impl Line {
                         .saturating_add(fragment.grapheme.len()),
                     "⋯",
                 );
-                break; //End processing since all remaining fragments will be invisible.
+                //End processing since all remaining fragments will be invisible.
+                break;
             }
+
             // Fragment is fully within range: Apply replacement characters if appropriate
             if fragment_start >= range.start && fragment_end <= range.end {
                 if let Some(replacement) = fragment.replacement {
@@ -180,6 +188,7 @@ impl Line {
                 }
             }
         }
+
         result
     }
 
@@ -202,6 +211,7 @@ impl Line {
         self.width_until(self.grapheme_count())
     }
 
+    // Inserts a character into the line, or appends it at the end if at == grapheme_count + 1
     pub fn insert_char(&mut self, c: char, at: GraphemeIdx) {
         debug_assert!(at.saturating_sub(1) <= self.grapheme_count());
         if let Some(fragment) = self.fragments.get(at) {
@@ -313,13 +323,16 @@ impl Line {
     fn find_all(&self, query: &str, range: Range<ByteIdx>) -> Vec<(ByteIdx, GraphemeIdx)> {
         let end_byte_idx = range.end;
         let start_byte_idx = range.start;
+
         self.string
             .get(start_byte_idx..end_byte_idx)
             .map_or_else(Vec::new, |substr| {
                 substr
-                    .match_indices(query) // find _potential_ matches within the substring
+                    // find _potential_ matches within the substring
+                    .match_indices(query)
                     .filter_map(|(relative_start_idx, _)| {
-                        let absolute_start_idx = relative_start_idx.saturating_add(start_byte_idx); //convert their relative indices to absolute indices
+                        //convert their relative indices to absolute indices
+                        let absolute_start_idx = relative_start_idx.saturating_add(start_byte_idx);
                         self.byte_idx_to_grapheme_idx(absolute_start_idx)
                             .map(|grapheme_idx| (absolute_start_idx, grapheme_idx))
                     })
