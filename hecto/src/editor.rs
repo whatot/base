@@ -1,5 +1,6 @@
 use std::io::Error;
 
+use command::Move::{Left, Up};
 use crossterm::event::Event::{self};
 use crossterm::event::KeyEvent;
 use crossterm::event::{read, KeyEventKind};
@@ -82,6 +83,7 @@ impl Editor {
 
         let args: Vec<String> = std::env::args().collect();
         if let Some(filename) = args.get(1) {
+            debug_assert!(!filename.is_empty());
             if editor.view.load(filename).is_err() {
                 editor.update_message(&format!("ERR: Could not open file: {filename}"));
             }
@@ -123,6 +125,10 @@ impl Editor {
                     #[cfg(debug_assertions)]
                     {
                         panic!("Could not read event: {err:?}");
+                    }
+                    #[cfg(not(debug_assertions))]
+                    {
+                        let _ = err;
                     }
                 }
             }
@@ -211,6 +217,7 @@ impl Editor {
                 self.view.search(&query);
             }
             Move(Right | Down) => self.view.search_next(),
+            Move(Up | Left) => self.view.search_prev(),
             // Not applicable during save, Resize already handled at this stage
             System(Quit | Resize(_) | Search | Save) | Move(_) => {}
         }
@@ -282,7 +289,7 @@ impl Editor {
             self.view.render(0);
         }
 
-        let new_caras_pos = if self.in_prompt() {
+        let new_caret_pos = if self.in_prompt() {
             Position {
                 row: bottom_bar_row,
                 col: self.command_bar.caret_position_col(),
@@ -290,8 +297,10 @@ impl Editor {
         } else {
             self.view.caret_position()
         };
+        debug_assert!(new_caret_pos.col <= self.terminal_size.width);
+        debug_assert!(new_caret_pos.row <= self.terminal_size.height);
 
-        let _ = Terminal::move_caret_to(new_caras_pos);
+        let _ = Terminal::move_caret_to(new_caret_pos);
         let _ = Terminal::show_caret();
         let _ = Terminal::execute();
     }
