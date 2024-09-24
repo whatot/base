@@ -6,6 +6,7 @@ use crossterm::event::KeyEvent;
 use crossterm::event::{read, KeyEventKind};
 use position::Position;
 
+mod annotate;
 mod command;
 mod commandbar;
 mod documentstatus;

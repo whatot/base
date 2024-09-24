@@ -1,9 +1,14 @@
 use std::io::{stdout, Error, Write};
 
+use attribute::Attribute;
 use crossterm::{
     cursor::{self, MoveTo},
     queue,
-    style::{self, Attribute},
+    style::{
+        self,
+        Attribute::{Reset, Reverse},
+        ResetColor, SetBackgroundColor, SetForegroundColor,
+    },
     terminal::{
         self, disable_raw_mode, enable_raw_mode, size, Clear, ClearType, DisableLineWrap,
         EnableLineWrap,
@@ -11,7 +16,9 @@ use crossterm::{
     Command,
 };
 
-use super::{position::Position, size::Size};
+use super::{annotate::AnnotatedString, position::Position, size::Size};
+
+mod attribute;
 
 pub struct Terminal {}
 
@@ -53,15 +60,42 @@ impl Terminal {
 
     pub fn print_inverted_row(row: usize, line_text: &str) -> Result<(), Error> {
         let width = Self::size()?.width;
-        Self::print_row(
-            row,
-            &format!(
-                "{}{:width$.width$}{}",
-                Attribute::Reverse,
-                line_text,
-                Attribute::Reset
-            ),
-        )
+        Self::print_row(row, &format!("{Reverse}{line_text:width$.width$}{Reset}"))
+    }
+
+    pub fn print_annotated_row(
+        row: usize,
+        annotated_string: &AnnotatedString,
+    ) -> Result<(), Error> {
+        Self::move_caret_to(Position { col: 0, row })?;
+        Self::clear_line()?;
+        annotated_string
+            .into_iter()
+            .try_for_each(|part| -> Result<(), Error> {
+                if let Some(annotate_type) = part.annotation_type {
+                    let attribute: Attribute = annotate_type.into();
+                    Self::set_attribute(&attribute)?;
+                }
+                Self::print(part.string)?;
+                Self::reset_color()?;
+                Ok(())
+            })?;
+        Ok(())
+    }
+
+    fn set_attribute(attribute: &Attribute) -> Result<(), Error> {
+        if let Some(fg_color) = attribute.foreground {
+            Self::queue_command(SetForegroundColor(fg_color))?;
+        }
+        if let Some(bg_color) = attribute.background {
+            Self::queue_command(SetBackgroundColor(bg_color))?;
+        }
+        Ok(())
+    }
+
+    fn reset_color() -> Result<(), Error> {
+        Self::queue_command(ResetColor)?;
+        Ok(())
     }
 
     pub fn size() -> Result<Size, Error> {
