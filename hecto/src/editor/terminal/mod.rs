@@ -16,7 +16,9 @@ use crossterm::{
     Command,
 };
 
-use super::{annotate::AnnotatedString, position::Position, size::Size};
+use super::annotate::AnnotatedString;
+
+use crate::prelude::*;
 
 mod attribute;
 
@@ -51,20 +53,20 @@ impl Terminal {
         Ok(())
     }
 
-    pub fn print_row(row: usize, line_text: &str) -> Result<(), Error> {
+    pub fn print_row(row: RowIdx, line_text: &str) -> Result<(), Error> {
         Self::move_caret_to(Position { col: 0, row })?;
         Self::clear_line()?;
         Self::print(line_text)?;
         Ok(())
     }
 
-    pub fn print_inverted_row(row: usize, line_text: &str) -> Result<(), Error> {
+    pub fn print_inverted_row(row: RowIdx, line_text: &str) -> Result<(), Error> {
         let width = Self::size()?.width;
         Self::print_row(row, &format!("{Reverse}{line_text:width$.width$}{Reset}"))
     }
 
     pub fn print_annotated_row(
-        row: usize,
+        row: RowIdx,
         annotated_string: &AnnotatedString,
     ) -> Result<(), Error> {
         Self::move_caret_to(Position { col: 0, row })?;

@@ -8,6 +8,7 @@
 )]
 
 mod editor;
+mod prelude;
 use editor::Editor;
 
 fn main() {

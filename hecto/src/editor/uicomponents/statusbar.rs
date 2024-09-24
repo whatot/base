@@ -1,6 +1,7 @@
 use crate::editor::{
-    documentstatus::DocumentStatus, size::Size, terminal::Terminal, uicomponents::UIComponent,
+    documentstatus::DocumentStatus, terminal::Terminal, uicomponents::UIComponent,
 };
+use crate::prelude::*;
 
 #[derive(Default)]
 pub struct StatusBar {
@@ -31,7 +32,7 @@ impl UIComponent for StatusBar {
         self.size = size;
     }
 
-    fn draw(&mut self, origin_y: usize) -> Result<(), std::io::Error> {
+    fn draw(&mut self, origin_y: RowIdx) -> Result<(), std::io::Error> {
         //Assemble the first part of the status bar
         let line_count = self.current_status.line_count_to_string();
         let modified_indicator = self.current_status.modified_indicator_to_string();

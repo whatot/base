@@ -4,16 +4,15 @@ use command::Move::{Left, Up};
 use crossterm::event::Event::{self};
 use crossterm::event::KeyEvent;
 use crossterm::event::{read, KeyEventKind};
-use position::Position;
 
 mod annotate;
 mod command;
 mod documentstatus;
 mod line;
-mod position;
-mod size;
 mod terminal;
 mod uicomponents;
+
+use crate::prelude::*;
 
 use self::{
     command::{
@@ -22,7 +21,6 @@ use self::{
         Move::{Down, Right},
         System::{Dismiss, Quit, Resize, Save, Search},
     },
-    size::Size,
     terminal::Terminal,
     uicomponents::CommandBar,
     uicomponents::MessageBar,
@@ -31,8 +29,6 @@ use self::{
     uicomponents::View,
 };
 
-const NAME: &str = env!("CARGO_PKG_NAME");
-const VERSION: &str = env!("CARGO_PKG_VERSION");
 const QUIT_TIMES: u8 = 3;
 
 #[derive(Default, PartialEq, Eq)]

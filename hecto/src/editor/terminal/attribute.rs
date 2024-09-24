@@ -17,9 +17,9 @@ impl From<AnnotationType> for Attribute {
                     b: 255,
                 }),
                 background: Some(Color::Rgb {
-                    r: 100,
-                    g: 100,
-                    b: 100,
+                    r: 211,
+                    g: 211,
+                    b: 211,
                 }),
             },
             AnnotationType::SelectedMatch => Self {
@@ -30,8 +30,8 @@ impl From<AnnotationType> for Attribute {
                 }),
                 background: Some(Color::Rgb {
                     r: 255,
-                    g: 251,
-                    b: 0,
+                    g: 255,
+                    b: 153,
                 }),
             },
         }

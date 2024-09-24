@@ -1,6 +1,7 @@
 use std::time::{Duration, Instant};
 
-use crate::editor::{size::Size, terminal::Terminal, uicomponents::UIComponent};
+use crate::editor::{terminal::Terminal, uicomponents::UIComponent};
+use crate::prelude::*;
 
 const DEFAULT_DURATION: Duration = Duration::new(5, 0);
 
@@ -53,7 +54,7 @@ impl UIComponent for MessageBar {
 
     fn set_size(&mut self, _: Size) {}
 
-    fn draw(&mut self, origin_y: usize) -> Result<(), std::io::Error> {
+    fn draw(&mut self, origin_y: RowIdx) -> Result<(), std::io::Error> {
         if self.current_message.is_expired() {
             // Upon expiration, we need to write out "" once to clear the message.
             // To avoid clearing more than necessary, we keep track of the fact that we've already cleared the expired message once.

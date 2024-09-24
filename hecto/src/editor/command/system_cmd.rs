@@ -1,6 +1,6 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
-use crate::editor::size::Size;
+use crate::prelude::*;
 
 #[derive(Clone, Copy)]
 pub enum System {
