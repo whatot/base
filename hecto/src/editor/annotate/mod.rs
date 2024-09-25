@@ -121,7 +121,6 @@ impl Display for AnnotatedString {
 
 impl<'a> IntoIterator for &'a AnnotatedString {
     type Item = AnnotatedStringPart<'a>;
-
     type IntoIter = AnnotatedStringIterator<'a>;
 
     fn into_iter(self) -> Self::IntoIter {

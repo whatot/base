@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use std::cmp::min;
 
-use super::{annotated_string_part::AnnotatedStringPart, AnnotatedString};
+use super::{AnnotatedString, AnnotatedStringPart};
 
 pub struct AnnotatedStringIterator<'a> {
     pub annotated_string: &'a AnnotatedString,
