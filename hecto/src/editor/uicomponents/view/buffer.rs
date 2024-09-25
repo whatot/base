@@ -8,7 +8,7 @@ use crate::editor::annotate::AnnotatedString;
 use crate::editor::line::Line;
 
 use super::fileinfo::FileInfo;
-use super::highlighter::Highlighter;
+use super::Highlighter;
 use super::{GraphemeIdx, LineIdx, Location};
 
 #[derive(Default)]

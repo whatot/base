@@ -1,6 +1,5 @@
 mod buffer;
 mod fileinfo;
-mod highlighter;
 mod search_direction;
 mod searchinfo;
 
@@ -9,7 +8,6 @@ use std::{cmp::min, io::Error};
 use crate::editor::line::Line;
 use crate::editor::terminal::Terminal;
 use buffer::Buffer;
-use highlighter::Highlighter;
 use search_direction::SearchDirection;
 use searchinfo::SearchInfo;
 
@@ -21,6 +19,8 @@ use crate::editor::{
 };
 
 use crate::prelude::*;
+
+use super::Highlighter;
 
 #[derive(Default)]
 pub struct View {

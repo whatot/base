@@ -1,11 +1,13 @@
 use std::io::Error;
 
 mod commandbar;
+mod highlighter;
 mod messagebar;
 mod statusbar;
 mod view;
 
 pub use commandbar::CommandBar;
+pub use highlighter::Highlighter;
 pub use messagebar::MessageBar;
 pub use statusbar::StatusBar;
 pub use view::View;
