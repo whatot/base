@@ -1,5 +1,6 @@
 mod buffer;
 mod fileinfo;
+mod highlighter;
 mod search_direction;
 mod searchinfo;
 
@@ -8,6 +9,7 @@ use std::{cmp::min, io::Error};
 use crate::editor::line::Line;
 use crate::editor::terminal::Terminal;
 use buffer::Buffer;
+use highlighter::Highlighter;
 use search_direction::SearchDirection;
 use searchinfo::SearchInfo;
 
@@ -36,8 +38,8 @@ impl View {
         DocumentStatus {
             total_lines: self.buffer.height(),
             current_line_idx: self.text_location.line_idx,
-            is_modified: self.buffer.dirty,
-            file_name: format!("{}", self.buffer.file_info),
+            is_modified: self.buffer.is_dirty(),
+            file_name: format!("{}", self.buffer.get_file_info()),
         }
     }
 
@@ -163,19 +165,9 @@ impl View {
     }
 
     fn insert_char(&mut self, c: char) {
-        let old_line_len = self
-            .buffer
-            .lines
-            .get(self.text_location.line_idx)
-            .map_or(0, Line::grapheme_count);
-
+        let old_line_len = self.buffer.grapheme_count(self.text_location.line_idx);
         self.buffer.insert_char(c, self.text_location);
-
-        let new_line_len = self
-            .buffer
-            .lines
-            .get(self.text_location.line_idx)
-            .map_or(0, Line::grapheme_count);
+        let new_line_len = self.buffer.grapheme_count(self.text_location.line_idx);
 
         let grapheme_delta = new_line_len.saturating_sub(old_line_len);
         if grapheme_delta > 0 {
@@ -278,12 +270,10 @@ impl View {
 
     fn text_location_to_position(&self) -> Position {
         let row = self.text_location.line_idx;
-        debug_assert!(row.saturating_sub(1) <= self.buffer.lines.len());
+        debug_assert!(row.saturating_sub(1) <= self.buffer.height());
         let col = self
             .buffer
-            .lines
-            .get(row)
-            .map_or(0, |line| line.width_until(self.text_location.grapheme_idx));
+            .width_until(row, self.text_location.grapheme_idx);
         Position { col, row }
     }
 
@@ -302,12 +292,8 @@ impl View {
     // after explicitly checking that the target value will be within bounds.
     #[allow(clippy::arithmetic_side_effects)]
     fn move_right(&mut self) {
-        let line_width = self
-            .buffer
-            .lines
-            .get(self.text_location.line_idx)
-            .map_or(0, Line::grapheme_count);
-        if self.text_location.grapheme_idx < line_width {
+        let grapheme_count = self.buffer.grapheme_count(self.text_location.line_idx);
+        if self.text_location.grapheme_idx < grapheme_count {
             self.text_location.grapheme_idx += 1;
         } else {
             self.move_to_start_of_line();
@@ -331,23 +317,16 @@ impl View {
         self.text_location.grapheme_idx = 0;
     }
     fn move_to_end_of_line(&mut self) {
-        self.text_location.grapheme_idx = self
-            .buffer
-            .lines
-            .get(self.text_location.line_idx)
-            .map_or(0, Line::grapheme_count);
+        self.text_location.grapheme_idx = self.buffer.grapheme_count(self.text_location.line_idx);
     }
 
     // Ensures self.location.grapheme_index points to a valid grapheme index by snapping it to the left most grapheme if appropriate.
     // Doesn't trigger scrolling.
     fn snap_to_valid_grapheme(&mut self) {
-        self.text_location.grapheme_idx = self
-            .buffer
-            .lines
-            .get(self.text_location.line_idx)
-            .map_or(0, |line| {
-                min(line.grapheme_count(), self.text_location.grapheme_idx)
-            });
+        self.text_location.grapheme_idx = min(
+            self.text_location.grapheme_idx,
+            self.buffer.grapheme_count(self.text_location.line_idx),
+        );
     }
     // Ensures self.location.line_index points to a valid line index by snapping it to the bottom most line if appropriate.
     // Doesn't trigger scrolling.
@@ -375,25 +354,32 @@ impl UIComponent for View {
         let end_y = origin_y.saturating_add(height);
         let top_third = height.div_ceil(3);
         let scroll_top = self.scroll_offset.row;
-        let left = self.scroll_offset.col;
+
+        let query = self
+            .search_info
+            .as_ref()
+            .and_then(|search_info| search_info.query.as_deref());
+        let selected_match = query.is_some().then_some(self.text_location);
+        let mut highlighter = Highlighter::new(query, selected_match);
+
+        for current_row in 0..end_y {
+            // highlight from the start of the document to the end of the visible area, to ensure all annotations are up to date.
+            self.buffer.highlight(current_row, &mut highlighter);
+        }
 
         for cur in origin_y..end_y {
             // to get the correct line index, we have to take current_row (the absolute row on screen),
             // subtract origin_y to get the current row relative to the view (ranging from 0 to self.size.height)
             // and add the scroll offset.
             let line_idx = cur.saturating_sub(origin_y).saturating_add(scroll_top);
-            if let Some(line) = self.buffer.lines.get(line_idx) {
-                let right = left.saturating_add(width);
-                let query = self
-                    .search_info
-                    .as_ref()
-                    .and_then(|search_info| search_info.query.as_deref());
-                let selected_match = (self.text_location.line_idx == line_idx && query.is_some())
-                    .then_some(self.text_location.grapheme_idx);
-                Terminal::print_annotated_row(
-                    cur,
-                    &line.get_annotated_visible_substr(left..right, query, selected_match),
-                )?;
+
+            let left = self.scroll_offset.col;
+            let right = left.saturating_add(width);
+            if let Some(annotated_string) =
+                self.buffer
+                    .get_highlighted_substring(line_idx, left..right, &highlighter)
+            {
+                Terminal::print_annotated_row(cur, &annotated_string)?;
             } else if cur == top_third && self.buffer.is_empty() {
                 Self::render_line(cur, &Self::build_welcome_message(width))?;
             } else {

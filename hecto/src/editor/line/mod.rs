@@ -11,7 +11,7 @@ use text_fragment::TextFragment;
 use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;
 
-use super::{annotate::AnnotatedString, AnnotationType};
+use super::{annotate::AnnotatedString, Annotation};
 
 mod grapheme_width;
 mod text_fragment;
@@ -85,8 +85,7 @@ impl Line {
     // Note that the column index is not the same as the grapheme index:
     // A grapheme can have a width of 2 columns.
     pub fn get_visible_graphemes(&self, range: Range<ColIdx>) -> String {
-        self.get_annotated_visible_substr(range, None, None)
-            .to_string()
+        self.get_annotated_visible_substr(range, None).to_string()
     }
 
     // Gets the annotated string in the given column index.
@@ -99,8 +98,7 @@ impl Line {
     pub fn get_annotated_visible_substr(
         &self,
         range: Range<ColIdx>,
-        query: Option<&str>,
-        selected_match: Option<GraphemeIdx>,
+        annotations: Option<&Vec<Annotation>>,
     ) -> AnnotatedString {
         if range.start >= range.end {
             return AnnotatedString::default();
@@ -109,81 +107,10 @@ impl Line {
         // Create a new annotated string
         let mut result = AnnotatedString::from(&self.string);
 
-        // Highlight Digits
-        self.string.chars().enumerate().for_each(|(idx, ch)| {
-            if ch.is_ascii_digit() {
-                result.add_annotation(AnnotationType::Digit, idx, idx.saturating_add(1));
-            }
-        });
-
-        // Annotate it based on the search results
-        if let Some(query) = query {
-            if !query.is_empty() {
-                self.find_all(query, 0..self.string.len()).iter().for_each(
-                    |(start, grapheme_idx)| {
-                        if let Some(selected_match) = selected_match {
-                            if *grapheme_idx == selected_match {
-                                result.add_annotation(
-                                    AnnotationType::SelectedMatch,
-                                    *start,
-                                    start.saturating_add(query.len()),
-                                );
-                                return;
-                            }
-                        }
-                        result.add_annotation(
-                            AnnotationType::Match,
-                            *start,
-                            start.saturating_add(query.len()),
-                        );
-                    },
-                );
-            }
-        }
-
-        // Insert replacement characters, and truncate if needed.
-        // We do this backwards, otherwise the byte indices would be off in case a replacement character has a different width than the original character.
-        let mut fragment_start = self.width();
-        for fragment in self.fragments.iter().rev() {
-            let fragment_end = fragment_start;
-            fragment_start = fragment_start.saturating_sub(fragment.rendered_width.into());
-            if fragment_start > range.end {
-                // No  processing needed if we haven't reached the visible range yet.
-                continue;
-            }
-
-            // clip right if the fragment is partially visible
-            if fragment_start < range.end && fragment_end > range.end {
-                result.replace(fragment.start, self.string.len(), "⋯");
-                continue;
-            } else if fragment_start == range.end {
-                // Truncate right if we've reached the end of the visible range
-                result.truncate_right_from(fragment.start);
-                continue;
-            }
-
-            // Fragment ends at the start of the range: Remove the entire left side of the string (if not already at start of string)
-            if fragment_end <= range.start {
-                result.truncate_left_until(fragment.start.saturating_add(fragment.grapheme.len()));
-                break; //End processing since all remaining fragments will be invisible.
-            } else if fragment_start < range.start && fragment_end > range.start {
-                // Fragment overlaps with the start of range: Remove the left side of the string and add an ellipsis
-                result.replace(
-                    0,
-                    fragment.start.saturating_add(fragment.grapheme.len()),
-                    "⋯",
-                );
-                //End processing since all remaining fragments will be invisible.
-                break;
-            }
-
-            // Fragment is fully within range: Apply replacement characters if appropriate
-            if fragment_start >= range.start && fragment_end <= range.end {
-                if let Some(replacement) = fragment.replacement {
-                    let start = fragment.start;
-                    let end = start.saturating_add(fragment.grapheme.len());
-                    result.replace(start, end, &replacement.to_string());
-                }
+        // Apply annotations for this string
+        if let Some(annotations) = annotations {
+            for annotation in annotations {
+                result.add_annotation(annotation.annotation_type, annotation.start, annotation.end);
             }
         }
 
@@ -316,7 +243,7 @@ impl Line {
             .map(|(_, grapheme_idx)| *grapheme_idx)
     }
 
-    fn find_all(&self, query: &str, range: Range<ByteIdx>) -> Vec<(ByteIdx, GraphemeIdx)> {
+    pub fn find_all(&self, query: &str, range: Range<ByteIdx>) -> Vec<(ByteIdx, GraphemeIdx)> {
         let end = min(range.end, self.string.len());
         let start = range.start;
         debug_assert!(start <= end);
