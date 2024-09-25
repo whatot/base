@@ -1,0 +1,10 @@
+alias c := check
+alias r := run
+
+check:
+    cargo check
+    cargo fmt
+    cargo clippy
+
+run file:
+    cargo run {{file}}
