@@ -41,10 +41,14 @@ impl UIComponent for StatusBar {
             self.current_status.file_name
         );
 
-        // Assemble the whole status bar, with the position indicator at the back
+        // Assemble the back part
         let position_indicator = self.current_status.position_indicator_to_string();
+        let file_type = self.current_status.file_type_to_string();
+        let back_part = format!("{file_type} {position_indicator}");
+
+        // Assemble the whole status bar
         let remainder_len = self.size.width.saturating_sub(beginning.len());
-        let status = format!("{beginning}{position_indicator:>remainder_len$}");
+        let status = format!("{beginning}{back_part:>remainder_len$}");
 
         // Only print out the status if it fits. Otherwise write out an empty string to ensure the row is cleared.
         let to_print = if status.len() <= self.size.width {

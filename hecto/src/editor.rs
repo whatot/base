@@ -1,6 +1,5 @@
 use std::io::Error;
 
-use command::Move::{Left, Up};
 use crossterm::event::Event::{self};
 use crossterm::event::KeyEvent;
 use crossterm::event::{read, KeyEventKind};
@@ -10,12 +9,14 @@ mod annotation;
 mod annotation_type;
 mod command;
 mod documentstatus;
+mod filetype;
 mod line;
 mod terminal;
 mod uicomponents;
 
 pub use annotation::Annotation;
 pub use annotation_type::AnnotationType;
+pub use filetype::FileType;
 
 use crate::prelude::*;
 
@@ -23,7 +24,7 @@ use self::{
     command::{
         Command::{self, Edit, Move, System},
         Edit::InsertNewline,
-        Move::{Down, Right},
+        Move::{Down, Left, Right, Up},
         System::{Dismiss, Quit, Resize, Save, Search},
     },
     terminal::Terminal,
