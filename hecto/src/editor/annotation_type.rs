@@ -7,4 +7,5 @@ pub enum AnnotationType {
     Type,
     KnownValue,
     Char,
+    LifetimeSpecifier,
 }
