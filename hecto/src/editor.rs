@@ -6,11 +6,16 @@ use crossterm::event::KeyEvent;
 use crossterm::event::{read, KeyEventKind};
 
 mod annotate;
+mod annotation;
+mod annotation_type;
 mod command;
 mod documentstatus;
 mod line;
 mod terminal;
 mod uicomponents;
+
+pub use annotation::Annotation;
+pub use annotation_type::AnnotationType;
 
 use crate::prelude::*;
 

@@ -1,19 +1,15 @@
 mod annotated_string_iterator;
 mod annotated_string_part;
-mod annotation;
-mod annotation_type;
 
 use std::{
     cmp::{max, min},
     fmt::{self, Display},
 };
 
-use super::ByteIdx;
+use super::{Annotation, AnnotationType, ByteIdx};
 
 use annotated_string_iterator::AnnotatedStringIterator;
 use annotated_string_part::AnnotatedStringPart;
-use annotation::Annotation;
-pub use annotation_type::AnnotationType;
 
 #[derive(Default, Debug)]
 pub struct AnnotatedString {

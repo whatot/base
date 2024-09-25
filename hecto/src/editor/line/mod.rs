@@ -11,7 +11,7 @@ use text_fragment::TextFragment;
 use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;
 
-use super::annotate::{AnnotatedString, AnnotationType};
+use super::{annotate::AnnotatedString, AnnotationType};
 
 mod grapheme_width;
 mod text_fragment;
