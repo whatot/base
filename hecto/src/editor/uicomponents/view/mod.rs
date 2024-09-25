@@ -76,7 +76,9 @@ impl View {
     }
 
     pub fn save(&mut self) -> Result<(), Error> {
-        self.buffer.save()
+        self.buffer.save()?;
+        self.set_needs_redraw(true);
+        Ok(())
     }
 
     pub fn is_file_loaded(&self) -> bool {
@@ -84,7 +86,9 @@ impl View {
     }
 
     pub fn save_as(&mut self, name: &str) -> Result<(), Error> {
-        self.buffer.save_as(name)
+        self.buffer.save_as(name)?;
+        self.set_needs_redraw(true);
+        Ok(())
     }
 
     pub fn enter_search(&mut self) {
@@ -363,14 +367,18 @@ impl UIComponent for View {
             .as_ref()
             .and_then(|search_info| search_info.query.as_deref());
         let selected_match = query.is_some().then_some(self.text_location);
-        let mut highlighter = Highlighter::new(query, selected_match);
+        let mut highlighter = Highlighter::new(
+            query,
+            selected_match,
+            self.buffer.get_file_info().get_file_type(),
+        );
 
         for current_row in 0..end_y {
             // highlight from the start of the document to the end of the visible area, to ensure all annotations are up to date.
             self.buffer.highlight(current_row, &mut highlighter);
         }
 
-        for cur in origin_y..end_y {
+        for cur in origin_y..end_y.saturating_add(scroll_top) {
             // to get the correct line index, we have to take current_row (the absolute row on screen),
             // subtract origin_y to get the current row relative to the view (ranging from 0 to self.size.height)
             // and add the scroll offset.

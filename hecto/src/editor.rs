@@ -17,6 +17,7 @@ mod uicomponents;
 pub use annotation::Annotation;
 pub use annotation_type::AnnotationType;
 pub use filetype::FileType;
+pub use line::Line;
 
 use crate::prelude::*;
 
