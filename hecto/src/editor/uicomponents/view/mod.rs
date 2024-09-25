@@ -139,7 +139,7 @@ impl View {
             } else if direction == SearchDirection::Forward {
                 self.buffer.search_forward(query, from)
             } else {
-                self.buffer.search_backword(query, from)
+                self.buffer.search_backward(query, from)
             }
         }) {
             self.text_location = location;
