@@ -35,6 +35,9 @@ fn is_valid_number(word: &str) -> bool {
     if word.is_empty() {
         return false;
     }
+    if is_numeric_literal(word) {
+        return true;
+    }
 
     let mut chars = word.chars();
 
@@ -88,4 +91,26 @@ fn is_valid_number(word: &str) -> bool {
 
     // Must end with a digit
     prev_was_digit
+}
+
+fn is_numeric_literal(word: &str) -> bool {
+    if word.len() < 3 {
+        //For a literal, we need a leading `0`, a suffix and at least one digit
+        return false;
+    }
+
+    let mut chars = word.chars();
+    if chars.next() != Some('0') {
+        // Check the first character for a leading 0
+        return false;
+    }
+
+    let base = match chars.next() {
+        Some('b' | 'B') => 2,
+        Some('o' | 'O') => 8,
+        Some('x' | 'X') => 16,
+        _ => return false,
+    };
+
+    chars.all(|char| char.is_digit(base))
 }
