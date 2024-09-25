@@ -145,6 +145,7 @@ impl View {
             self.text_location = location;
             self.center_text_location();
         }
+        self.set_needs_redraw(true);
     }
 
     pub fn search_next(&mut self) {
