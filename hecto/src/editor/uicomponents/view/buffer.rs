@@ -49,7 +49,7 @@ impl Buffer {
 
     pub fn highlight(&self, idx: LineIdx, highlighter: &mut Highlighter) {
         if let Some(line) = self.lines.get(idx) {
-            highlighter.hightlight(idx, line);
+            highlighter.highlight(idx, line);
         }
     }
 

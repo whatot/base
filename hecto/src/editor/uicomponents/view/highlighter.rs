@@ -1,20 +1,19 @@
 use std::collections::HashMap;
 
 use crate::editor::{line::Line, Annotation, AnnotationType};
-
-use super::{LineIdx, Location};
+use crate::prelude::*;
 
 #[derive(Default)]
 pub struct Highlighter<'a> {
-    match_word: Option<&'a str>,
+    matched_word: Option<&'a str>,
     selected_match: Option<Location>,
     highlights: HashMap<LineIdx, Vec<Annotation>>,
 }
 
 impl<'a> Highlighter<'a> {
-    pub fn new(match_word: Option<&'a str>, selected_match: Option<Location>) -> Self {
+    pub fn new(matched_word: Option<&'a str>, selected_match: Option<Location>) -> Self {
         Self {
-            match_word,
+            matched_word,
             selected_match,
             highlights: HashMap::new(),
         }
@@ -36,12 +35,11 @@ impl<'a> Highlighter<'a> {
         });
     }
 
-    fn highlight_matched_word(&self, line: &Line, result: &mut Vec<Annotation>) {
-        if let Some(matched_word) = self.match_word {
+    fn highlight_matched_words(&self, line: &Line, result: &mut Vec<Annotation>) {
+        if let Some(matched_word) = self.matched_word {
             if matched_word.is_empty() {
                 return;
             }
-
             line.find_all(matched_word, 0..line.len())
                 .iter()
                 .for_each(|(start, _)| {
@@ -56,24 +54,24 @@ impl<'a> Highlighter<'a> {
 
     fn highlight_selected_match(&self, result: &mut Vec<Annotation>) {
         if let Some(selected_match) = self.selected_match {
-            if let Some(match_word) = self.match_word {
-                if match_word.is_empty() {
+            if let Some(matched_word) = self.matched_word {
+                if matched_word.is_empty() {
                     return;
                 }
                 let start = selected_match.grapheme_idx;
                 result.push(Annotation {
                     annotation_type: AnnotationType::SelectedMatch,
                     start,
-                    end: start.saturating_add(match_word.len()),
+                    end: start.saturating_add(matched_word.len()),
                 });
             }
         }
     }
 
-    pub fn hightlight(&mut self, idx: LineIdx, line: &Line) {
+    pub fn highlight(&mut self, idx: LineIdx, line: &Line) {
         let mut result = Vec::new();
         Self::highlight_digits(line, &mut result);
-        self.highlight_matched_word(line, &mut result);
+        self.highlight_matched_words(line, &mut result);
         if let Some(selected_match) = self.selected_match {
             if selected_match.line_idx == idx {
                 self.highlight_selected_match(&mut result);
