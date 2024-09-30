@@ -346,7 +346,7 @@ async fn test_replicate_to_state_machine() -> Result<()> {
 fn build_blank_entry(index: u64) -> Entry<ClientRequest> {
     Entry {
         term: 1,
-        index: index,
+        index,
         payload: EntryPayload::Blank,
     }
 }
