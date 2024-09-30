@@ -163,7 +163,7 @@ impl RaftStorage<ClientRequest, ClientResponse> for MemStore {
 
         match &mut *hs {
             Some(inner) => {
-                let (last_log_index, last_log_term) = match log.values().rev().next() {
+                let (last_log_index, last_log_term) = match log.values().last() {
                     Some(log) => (log.index, log.term),
                     None => (0, 0),
                 };
