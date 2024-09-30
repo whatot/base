@@ -273,12 +273,65 @@ impl RaftStorage<ClientRequest, ClientResponse> for MemStore {
 
     #[tracing::instrument(level = "trace", skip(self))]
     async fn do_log_compaction(&self) -> Result<CurrentSnapshotData<Self::Snapshot>> {
-        todo!()
+        let (data, last_applied_log) = {
+            // Serialize the data of the state machine.
+            // Then Release state machine read lock.
+            let sm = self.sm.read().await;
+            (serde_json::to_vec(&*sm)?, sm.last_applied_log)
+        };
+
+        let membership_config = {
+            // Go backwards through the log to find the most recent membership config <= the `through` index.
+            // Then Release log read lock.
+            let log = self.log.read().await;
+            log.values()
+                .rev()
+                .skip_while(|entry| entry.index > last_applied_log)
+                .find_map(|entry| match &entry.payload {
+                    EntryPayload::ConfigChange(cfg) => Some(cfg.membership.clone()),
+                    _ => None,
+                })
+                .unwrap_or_else(|| MembershipConfig::new_initial(self.id))
+        };
+
+        let (term, snapshot_bytes) = {
+            let mut log = self.log.write().await;
+            let mut current_snapshot = self.current_snapshot.write().await;
+            let term = log
+                .get(&last_applied_log)
+                .map(|entry| entry.term)
+                .ok_or_else(|| anyhow::anyhow!(ERR_INCONSISTENT_LOG))?;
+            *log = log.split_off(&last_applied_log);
+            log.insert(
+                last_applied_log,
+                Entry::new_snapshot_pointer(last_applied_log, term, "".into(), membership_config.clone()),
+            );
+
+            let snapshot = MemStoreSnapshot {
+                index: last_applied_log,
+                term,
+                menbership: membership_config.clone(),
+                data,
+            };
+            let snapshot_bytes = serde_json::to_vec(&snapshot)?;
+            *current_snapshot = Some(snapshot);
+            (term, snapshot_bytes)
+            // Last Release log & snapshot write locks.
+        };
+
+        tracing::trace!({ snapshot_size = snapshot_bytes.len() }, "log compaction complete");
+        Ok(CurrentSnapshotData {
+            term,
+            index: last_applied_log,
+            membership: membership_config.clone(),
+            snapshot: Box::new(Cursor::new(snapshot_bytes)),
+        })
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
     async fn create_snapshot(&self) -> Result<(String, Box<Self::Snapshot>)> {
-        todo!()
+        // Snapshot IDs are insignificant to this storage engine.
+        Ok((String::from(""), Box::new(Cursor::new(Vec::new()))))
     }
 
     #[tracing::instrument(level = "trace", skip(self, snapshot))]
@@ -290,11 +343,62 @@ impl RaftStorage<ClientRequest, ClientResponse> for MemStore {
         id: String,
         snapshot: Box<Self::Snapshot>,
     ) -> Result<()> {
-        todo!()
+        tracing::trace!(
+            { snapshot_size = snapshot.get_ref().len() },
+            "decoding snapshot for installation"
+        );
+        let raw = serde_json::to_string_pretty(snapshot.get_ref().as_slice())?;
+        println!("JSON SNAP:\n{}", raw);
+        let new_snapshot: MemStoreSnapshot = serde_json::from_slice(snapshot.get_ref().as_slice())?;
+
+        // Update log.
+        {
+            // Go backwards through the log to find the most recent membership config <= the `through` index.
+            let mut log = self.log.write().await;
+            let membership_config = log
+                .values()
+                .rev()
+                .skip_while(|entry| entry.index > index)
+                .find_map(|entry| match &entry.payload {
+                    EntryPayload::ConfigChange(cfg) => Some(cfg.membership.clone()),
+                    _ => None,
+                })
+                .unwrap_or_else(|| MembershipConfig::new_initial(self.id));
+
+            match delete_through {
+                Some(thought) => *log = log.split_off(&(thought + 1)),
+                None => log.clear(),
+            }
+            log.insert(index, Entry::new_snapshot_pointer(index, term, id, membership_config));
+        }
+
+        // Update the state machine.
+        {
+            let new_sm: MemStoreStateMachine = serde_json::from_slice(&new_snapshot.data)?;
+            let mut sm = self.sm.write().await;
+            *sm = new_sm;
+        }
+
+        // Update current snapshot.
+        let mut current_snapshot = self.current_snapshot.write().await;
+        *current_snapshot = Some(new_snapshot);
+
+        Ok(())
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
     async fn get_current_snapshot(&self) -> Result<Option<CurrentSnapshotData<Self::Snapshot>>> {
-        todo!()
+        match &*self.current_snapshot.read().await {
+            Some(snapshot) => {
+                let reader = serde_json::to_vec(&snapshot.data)?;
+                Ok(Some(CurrentSnapshotData {
+                    term: snapshot.term,
+                    index: snapshot.index,
+                    membership: snapshot.menbership.clone(),
+                    snapshot: Box::new(Cursor::new(reader)),
+                }))
+            }
+            None => Ok(None),
+        }
     }
 }
