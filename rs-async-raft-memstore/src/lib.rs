@@ -1,5 +1,4 @@
 use std::{
-    clone,
     collections::{BTreeMap, HashMap},
     io::Cursor,
 };
@@ -69,9 +68,9 @@ pub struct MemStoreSnapshot {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct MemStoreStateMachine {
     pub last_applied_log: u64,
-    /// A mapping of client IDs to their state info.
+    /// A mapping of client IDs to their state info. <clientId, (serial, status)>
     pub client_serial_responses: HashMap<String, (u64, Option<String>)>,
-    /// The current status of a client by ID.
+    /// The current status of a client by ID. <clientId, status>
     pub client_status: HashMap<String, String>,
 }
 
@@ -221,27 +220,55 @@ impl RaftStorage<ClientRequest, ClientResponse> for MemStore {
             log.split_off(&start);
         }
 
-        return Ok(());
+        Ok(())
     }
 
     #[tracing::instrument(level = "trace", skip(self, entry))]
     async fn append_entry_to_log(&self, entry: &Entry<ClientRequest>) -> Result<()> {
-        todo!()
+        let mut log = self.log.write().await;
+        log.insert(entry.index, entry.clone());
+        Ok(())
     }
 
-    #[tracing::instrument(level = "trace", skip(self, entry))]
-    async fn replicate_to_log(&self, entry: &[Entry<ClientRequest>]) -> Result<()> {
-        todo!()
+    #[tracing::instrument(level = "trace", skip(self, entries))]
+    async fn replicate_to_log(&self, entries: &[Entry<ClientRequest>]) -> Result<()> {
+        let mut log = self.log.write().await;
+        for entry in entries {
+            log.insert(entry.index, entry.clone());
+        }
+        Ok(())
     }
 
     #[tracing::instrument(level = "trace", skip(self, data))]
     async fn apply_entry_to_state_machine(&self, index: &u64, data: &ClientRequest) -> Result<ClientResponse> {
-        todo!()
+        let mut sm = self.sm.write().await;
+        sm.last_applied_log = *index;
+        if let Some((serial, res)) = sm.client_serial_responses.get_mut(&data.client) {
+            if serial == &data.serial {
+                return Ok(ClientResponse(res.clone()));
+            }
+        }
+        let previous = sm.client_status.insert(data.client.clone(), data.status.clone());
+        sm.client_serial_responses
+            .insert(data.client.clone(), (data.serial, previous.clone()));
+        Ok(ClientResponse(previous))
     }
 
     #[tracing::instrument(level = "trace", skip(self, entries))]
     async fn replicate_to_state_machine(&self, entries: &[(&u64, &ClientRequest)]) -> Result<()> {
-        todo!()
+        let mut sm = self.sm.write().await;
+        for (index, data) in entries {
+            sm.last_applied_log = **index;
+            if let Some((serial, _)) = sm.client_serial_responses.get_mut(&data.client) {
+                if serial == &data.serial {
+                    continue;
+                }
+            }
+            let previous = sm.client_status.insert(data.client.clone(), data.status.clone());
+            sm.client_serial_responses
+                .insert(data.client.clone(), (data.serial, previous));
+        }
+        Ok(())
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
