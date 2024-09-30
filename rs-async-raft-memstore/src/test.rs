@@ -52,7 +52,10 @@ async fn test_get_membership_config_with_previous_state() -> Result<()> {
     let initial = store.get_membership_config().await?;
 
     assert_eq!(&initial.members, &members, "unexpected len for members");
-    assert!(initial.members_after_consensus.is_none(), "unexpected value for members_after_consensus");
+    assert!(
+        initial.members_after_consensus.is_none(),
+        "unexpected value for members_after_consensus"
+    );
     Ok(())
 }
 
@@ -71,8 +74,14 @@ async fn test_get_initial_state_default() -> Result<()> {
     assert_eq!(initial.last_log_index, 0, "unexpected default value for last log index");
     assert_eq!(initial.last_log_term, 0, "unexpected default value for last log term");
     assert_eq!(initial.last_applied_log, 0, "unexpected value for last applied log");
-    assert_eq!(initial.hard_state, expected_hs, "unexpected value for default hard state");
-    assert_eq!(initial.membership, expected_membership, "unexpected value for default membership config");
+    assert_eq!(
+        initial.hard_state, expected_hs,
+        "unexpected value for default hard state"
+    );
+    assert_eq!(
+        initial.membership, expected_membership,
+        "unexpected value for default membership config"
+    );
     Ok(())
 }
 
@@ -242,15 +251,26 @@ async fn test_apply_entry_to_state_machine() -> Result<()> {
         )
         .await?;
     let sm = store.get_state_machine().await;
-    assert_eq!(sm.last_applied_log, 1, "expected last_applied_log to be 1, got {}", sm.last_applied_log);
+    assert_eq!(
+        sm.last_applied_log, 1,
+        "expected last_applied_log to be 1, got {}",
+        sm.last_applied_log
+    );
     let client_serial = sm
         .client_serial_responses
         .get("0")
         .expect("expected entry to exist in client_serial_responses");
     assert_eq!(client_serial.0, 0, "unexpected client serial response");
     assert_eq!(client_serial.1, None, "unexpected client serial response");
-    let client_status = sm.client_status.get("0").expect("expected entry to exist in client_status");
-    assert_eq!(client_status, "lit", "expected client_status to be 'lit', got '{}'", client_status);
+    let client_status = sm
+        .client_status
+        .get("0")
+        .expect("expected entry to exist in client_status");
+    assert_eq!(
+        client_status, "lit",
+        "expected client_status to be 'lit', got '{}'",
+        client_status
+    );
     Ok(())
 }
 
@@ -279,23 +299,45 @@ async fn test_replicate_to_state_machine() -> Result<()> {
     store.replicate_to_state_machine(&entries).await?;
     let sm = store.get_state_machine().await;
 
-    assert_eq!(sm.last_applied_log, 3, "expected last_applied_log to be 3, got {}", sm.last_applied_log);
+    assert_eq!(
+        sm.last_applied_log, 3,
+        "expected last_applied_log to be 3, got {}",
+        sm.last_applied_log
+    );
     let client_serial1 = sm
         .client_serial_responses
         .get("1")
         .expect("expected entry to exist in client_serial_responses for client 1");
     assert_eq!(client_serial1.0, 1, "unexpected client serial response");
-    assert_eq!(client_serial1.1, Some(String::from("old")), "unexpected client serial response");
+    assert_eq!(
+        client_serial1.1,
+        Some(String::from("old")),
+        "unexpected client serial response"
+    );
     let client_serial2 = sm
         .client_serial_responses
         .get("2")
         .expect("expected entry to exist in client_serial_responses for client 2");
     assert_eq!(client_serial2.0, 0, "unexpected client serial response");
     assert_eq!(client_serial2.1, None, "unexpected client serial response");
-    let client_status1 = sm.client_status.get("1").expect("expected entry to exist in client_status for client 1");
-    let client_status2 = sm.client_status.get("2").expect("expected entry to exist in client_status for client 2");
-    assert_eq!(client_status1, "new", "expected client_status to be 'new', got '{}'", client_status1);
-    assert_eq!(client_status2, "other", "expected client_status to be 'other', got '{}'", client_status2);
+    let client_status1 = sm
+        .client_status
+        .get("1")
+        .expect("expected entry to exist in client_status for client 1");
+    let client_status2 = sm
+        .client_status
+        .get("2")
+        .expect("expected entry to exist in client_status for client 2");
+    assert_eq!(
+        client_status1, "new",
+        "expected client_status to be 'new', got '{}'",
+        client_status1
+    );
+    assert_eq!(
+        client_status2, "other",
+        "expected client_status to be 'other', got '{}'",
+        client_status2
+    );
     Ok(())
 }
 

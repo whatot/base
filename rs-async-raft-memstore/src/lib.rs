@@ -1,12 +1,13 @@
 use std::{
+    clone,
     collections::{BTreeMap, HashMap},
     io::Cursor,
 };
 
-use anyhow::Result;
+use anyhow::{Ok, Result};
 use async_raft::{
     async_trait::async_trait,
-    raft::{Entry, MembershipConfig},
+    raft::{Entry, EntryPayload, MembershipConfig},
     storage::{CurrentSnapshotData, HardState, InitialState},
     AppData, AppDataResponse, NodeId, RaftStorage,
 };
@@ -17,7 +18,8 @@ use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 #[cfg(test)]
 mod test;
 
-const ERR_INCONSISTENT_LOG: &str = "a query was received which was expecting data to be in place which does not exist in the log";
+const ERR_INCONSISTENT_LOG: &str =
+    "a query was received which was expecting data to be in place which does not exist in the log";
 
 /// The application data request type which the `MemStore` works with.
 ///
@@ -139,22 +141,65 @@ impl RaftStorage<ClientRequest, ClientResponse> for MemStore {
 
     #[tracing::instrument(level = "trace", skip(self))]
     async fn get_membership_config(&self) -> Result<MembershipConfig> {
-        todo!()
+        let log = self.log.read().await;
+
+        let cfg_opt = log.values().rev().find_map(|entry| match &entry.payload {
+            EntryPayload::ConfigChange(cfg) => Some(cfg.membership.clone()),
+            EntryPayload::SnapshotPointer(snap) => Some(snap.membership.clone()),
+            _ => None,
+        });
+
+        Ok(match cfg_opt {
+            Some(cfg) => cfg,
+            None => MembershipConfig::new_initial(self.id),
+        })
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
     async fn get_initial_state(&self) -> Result<InitialState> {
-        todo!()
+        let membership = self.get_membership_config().await?;
+        let mut hs = self.hs.write().await;
+        let log = self.log.read().await;
+        let sm = self.sm.read().await;
+
+        match &mut *hs {
+            Some(inner) => {
+                let (last_log_index, last_log_term) = match log.values().rev().next() {
+                    Some(log) => (log.index, log.term),
+                    None => (0, 0),
+                };
+                Ok(InitialState {
+                    last_log_index,
+                    last_log_term,
+                    last_applied_log: sm.last_applied_log,
+                    hard_state: inner.clone(),
+                    membership,
+                })
+            }
+            None => {
+                let new = InitialState::new_initial(self.id);
+                *hs = Some(new.hard_state.clone());
+                Ok(new)
+            }
+        }
     }
 
     #[tracing::instrument(level = "trace", skip(self, hs))]
     async fn save_hard_state(&self, hs: &HardState) -> Result<()> {
-        todo!()
+        *self.hs.write().await = Some(hs.clone());
+        // self.hs.write().await.replace(hs.clone());
+        Ok(())
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
     async fn get_log_entries(&self, start: u64, stop: u64) -> Result<Vec<Entry<ClientRequest>>> {
-        todo!()
+        // Invalid request, return empty vec.
+        if start > stop {
+            tracing::error!("invalid request: start={} > stop={}", start, stop);
+            return Ok(vec![]);
+        }
+        let log = self.log.read().await;
+        Ok(log.range(start..stop).map(|(_, val)| val.clone()).collect())
     }
 
     #[tracing::instrument(level = "trace", skip(self))]
