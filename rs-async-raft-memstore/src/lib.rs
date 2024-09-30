@@ -195,7 +195,7 @@ impl RaftStorage<ClientRequest, ClientResponse> for MemStore {
     async fn get_log_entries(&self, start: u64, stop: u64) -> Result<Vec<Entry<ClientRequest>>> {
         // Invalid request, return empty vec.
         if start > stop {
-            tracing::error!("invalid request: start={} > stop={}", start, stop);
+            tracing::error!("invalid request: start={start} > stop={stop}");
             return Ok(vec![]);
         }
         let log = self.log.read().await;
@@ -204,7 +204,24 @@ impl RaftStorage<ClientRequest, ClientResponse> for MemStore {
 
     #[tracing::instrument(level = "trace", skip(self))]
     async fn delete_logs_from(&self, start: u64, stop: Option<u64>) -> Result<()> {
-        todo!()
+        if stop.map(|stop| start > stop).unwrap_or(false) {
+            tracing::error!("invalid request: start > stop");
+            return Ok(());
+        }
+
+        let mut log = self.log.write().await;
+
+        if let Some(stop) = stop {
+            // If a stop point was specified, delete from start until the given stop point.
+            for key in start..stop {
+                log.remove(&key);
+            }
+        } else {
+            // Else, just split off the remainder.
+            log.split_off(&start);
+        }
+
+        return Ok(());
     }
 
     #[tracing::instrument(level = "trace", skip(self, entry))]
