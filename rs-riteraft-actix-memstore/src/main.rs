@@ -147,6 +147,9 @@ async fn main() -> std::result::Result<(), Box<dyn std::error::Error>> {
             })
             .bind(addr)
             .unwrap()
+            .disable_signals()
+            .shutdown_timeout(2)
+            .workers(2)
             .run(),
         );
     }

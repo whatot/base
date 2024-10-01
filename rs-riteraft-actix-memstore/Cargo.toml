@@ -1,5 +1,5 @@
 [package]
-name = "rs-riteraft-warp-memstore"
+name = "rs-riteraft-actix-memstore"
 version = "0.1.0"
 edition = "2021"
 
@@ -18,4 +18,3 @@ slog-stdlog = "4.1.1"
 slog-term = "2.9.1"
 slog-scope = "4.4"
 tokio = { version = "1.40.0", features = ["full"] }
-warp = "0.3.7"
