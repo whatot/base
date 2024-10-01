@@ -1,0 +1,27 @@
+set positional-arguments
+
+default: check
+
+alias s := search
+search crate:
+    cargo search --registry crates-io {{crate}}
+
+alias c := check
+check:
+    cargo check
+    cargo fmt
+    cargo clippy --all -- -D warnings
+
+alias t := test
+test:
+    cargo test
+
+alias r := run
+run *args='':
+    cargo run -- $@
+
+build:
+    cargo build
+
+clean:
+    cargo clean
