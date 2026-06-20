@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+axum = "0.8"
 percent-encoding = "2.3.2"
-rocket = "0.5.1"
+tokio = { version = "1.52", features = ["macros", "net", "rt-multi-thread"] }
