@@ -3,7 +3,7 @@
 import poplib
 
 username = 'someuser'
-password = 'dwuoj83de'
+password = 'CHANGE_ME'
 
 mail_server = 'mail.somedomain.com'
 

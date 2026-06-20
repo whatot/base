@@ -3,7 +3,7 @@
 import imaplib
 
 username = 'someuser'
-password = 'ciujicuw9e98'
+password = 'CHANGE_ME'
 
 mail_server = 'mail_server'
 

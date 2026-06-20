@@ -8,6 +8,11 @@
 *.jpg
 *.db
 *.beam
+.env
+*.local
+*-data/
+pgdata/
+webdav-log/
 
 # python
 *.pyc

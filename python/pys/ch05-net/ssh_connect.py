@@ -6,7 +6,7 @@ import paramiko
 hostname = '192.168.1.15'
 port = 22
 username = 'jjiuuh'
-password = 'xxxYYYzzz'
+password = 'CHANGE_ME'
 
 if __name__ == "__main__":
     paramiko.util.log_to_file('paramiko.log')
