@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::{Arg, Command, crate_authors, crate_description, crate_name, crate_version};
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use shelter_main::{commands, settings};
 use tracing::{Level, level_filters::LevelFilter};
 use tracing_subscriber::{Registry, layer::SubscriberExt};

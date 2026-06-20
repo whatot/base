@@ -9,7 +9,7 @@ migration = { path = "../migration" }
 entity = { path = "../entity" }
 anyhow = "1"
 clap = { version = "4", default-features = true, features = ["cargo"] }
-dotenv = "0.15"
+dotenvy = "0.15"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1"
 config = "0.15"
@@ -21,10 +21,11 @@ tracing-subscriber = { version = "0.3", features = ["registry", "env-filter"] }
 tower = "0.5.3"
 tower-http = { version = "0.7", features = ["trace"] }
 arc-swap = "1.9.1"
-sea-orm = { version = "1.1", features = [
+sea-orm = { version = "1.1", default-features = false, features = [
     "sqlx-postgres",
     "runtime-tokio-rustls",
     "macros",
+    "with-chrono",
 ] }
 argon2 = "0.5"
 jsonwebtoken = "10.4"
