@@ -6,4 +6,4 @@ description = "A lightweight redis cluster proxy"
 edition = "2024"
 
 [dependencies]
-structopt = "0.3"
+clap = { version = "4", features = ["derive"] }

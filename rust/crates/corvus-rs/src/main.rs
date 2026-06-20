@@ -1,9 +1,9 @@
-use structopt::StructOpt;
+use clap::Parser;
 
 mod config;
 use crate::config::CorvusOpt;
 
 fn main() {
-    let opt = CorvusOpt::from_args();
+    let opt = CorvusOpt::parse();
     println!("opt: {:?}", opt);
 }

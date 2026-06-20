@@ -1,49 +1,45 @@
+use clap::Parser;
 use std::path::PathBuf;
-use structopt::StructOpt;
 
-#[derive(StructOpt, Clone, PartialEq, Debug)]
-#[structopt(name = "corvus-rs")]
+#[derive(Parser, Clone, PartialEq, Debug)]
+#[command(name = "corvus-rs")]
 pub struct CorvusOpt {
-    #[structopt(
-        name = "corvus.config",
-        parse(from_os_str),
-        help = "Sets a custom config file"
-    )]
+    #[arg(value_name = "corvus.config", help = "Sets a custom config file")]
     pub config_file_path: PathBuf,
-    #[structopt(short = "c", long = "cluster", default_value = "default")]
+    #[arg(short = 'c', long = "cluster", default_value = "default")]
     pub cluster_name: String,
-    #[structopt(short = "b", long = "bind", default_value = "12345")]
+    #[arg(short = 'b', long = "bind", default_value = "12345")]
     pub bind_port: u16,
-    #[structopt(short = "n", long = "node", default_value = "")]
+    #[arg(short = 'n', long = "node", default_value = "")]
     pub node_address: String,
-    #[structopt(short = "t", long, default_value = "4")]
+    #[arg(short = 't', long, default_value = "4")]
     pub thread: u32,
-    #[structopt(short = "L", long, default_value = "2")]
+    #[arg(short = 'L', long, default_value = "2")]
     pub loglevel: u32,
-    #[structopt(short = "l", long)]
+    #[arg(short = 'l', long)]
     pub syslog: bool,
-    #[structopt(long, default_value = "localhost:8125")]
+    #[arg(long, default_value = "localhost:8125")]
     pub statsd_addr: String,
-    #[structopt(long, default_value = "10")]
+    #[arg(long, default_value = "10")]
     pub metric_interval: u32,
-    #[structopt(long)]
+    #[arg(long)]
     pub stats: bool,
-    #[structopt(long)]
+    #[arg(long)]
     pub readslave: bool,
-    #[structopt(long)]
+    #[arg(long)]
     pub readmaster: bool,
-    #[structopt(short = "P", long, default_value = "")]
+    #[arg(short = 'P', long, default_value = "")]
     pub requirepass: String,
-    #[structopt(short = "C", long, default_value = "0")]
+    #[arg(short = 'C', long, default_value = "0")]
     pub client_timeout: u32,
-    #[structopt(short = "S", long, default_value = "0")]
+    #[arg(short = 'S', long, default_value = "0")]
     pub server_timeout: u32,
-    #[structopt(short = "B", long, default_value = "16384")]
+    #[arg(short = 'B', long, default_value = "16384")]
     pub bufsize: u32,
-    #[structopt(short = "g", long, default_value = "-1")]
+    #[arg(short = 'g', long, default_value = "-1")]
     pub slowlog_log_slower_than: i32,
-    #[structopt(short = "G", long, default_value = "1024")]
+    #[arg(short = 'G', long, default_value = "1024")]
     pub slowlog_max_len: u32,
-    #[structopt(short = "E", long)]
+    #[arg(short = 'E', long)]
     pub slowlog_statsd_enabled: bool,
 }
