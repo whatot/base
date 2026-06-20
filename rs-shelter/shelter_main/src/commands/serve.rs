@@ -4,7 +4,7 @@ use std::{
 };
 
 use anyhow::Ok;
-use clap::{value_parser, Arg, ArgMatches, Command};
+use clap::{Arg, ArgMatches, Command, value_parser};
 use sea_orm::Database;
 use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;

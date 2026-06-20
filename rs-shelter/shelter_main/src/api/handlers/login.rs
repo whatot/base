@@ -1,17 +1,16 @@
 use anyhow::anyhow;
-use argon2::Argon2;
+use argon2::{Argon2, PasswordVerifier, password_hash::PasswordHash};
 use axum::{extract::State, http::StatusCode};
-use jsonwebtoken::{encode, EncodingKey, Header};
-use password_hash::{PasswordHash, PasswordVerifier};
+use jsonwebtoken::{EncodingKey, Header, encode};
 use sea_orm::{ColumnTrait, EntityTrait, QueryFilter};
 
 use crate::{
     api::{
         dto::{
+            TokenClaims,
             errors::{AppError, Status},
             login::LoginRequest,
             login::LoginResponse,
-            TokenClaims,
         },
         middleware::json::CustomJson,
     },

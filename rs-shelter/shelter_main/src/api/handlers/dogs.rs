@@ -1,15 +1,15 @@
+use crate::api::dto::TokenClaims;
 use crate::api::dto::dogs::DogCreateResponse;
 use crate::api::dto::dogs::DogGetResponse;
 use crate::api::dto::dogs::DogListResponse;
 use crate::api::dto::errors::AppError;
 use crate::api::dto::errors::Status;
-use crate::api::dto::TokenClaims;
 use crate::api::middleware::json::CustomJson;
 use crate::state::ApplicationState;
-use axum::extract::Path;
-use axum::extract::State;
 use axum::Extension;
 use axum::Json;
+use axum::extract::Path;
+use axum::extract::State;
 use entity::dog::DogCreateRequest;
 use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, IntoActiveModel, TryIntoModel};

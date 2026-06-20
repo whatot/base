@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::editor::{Annotation, AnnotationType, Line};
 
-use super::{syntax_highlighter::SyntaxHighlighter, LineIdx, Location};
+use super::{LineIdx, Location, syntax_highlighter::SyntaxHighlighter};
 
 #[derive(Default)]
 pub struct SearchResultHighlighter<'a> {

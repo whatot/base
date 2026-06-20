@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
 use axum::{
-    middleware,
+    Router, middleware,
     routing::{get, post},
-    Router,
 };
 
 use crate::state::ApplicationState;

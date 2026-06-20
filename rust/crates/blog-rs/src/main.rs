@@ -1,10 +1,8 @@
-use axum::extract::TypedHeader;
-use axum::headers::UserAgent;
-
-use axum::routing::get;
 use axum::Router;
+use axum::http::HeaderMap;
+use axum::routing::get;
 
-use sqlx::{migrate::MigrateDatabase, Sqlite, SqlitePool};
+use sqlx::{Sqlite, SqlitePool, migrate::MigrateDatabase};
 
 const DB_URL: &str = "sqlite:///tmp/sqlite.db";
 
@@ -12,8 +10,12 @@ async fn homepage() -> String {
     String::from("homepage")
 }
 
-async fn visit_info(TypedHeader(user_agent): TypedHeader<UserAgent>) -> String {
-    String::from(user_agent.as_str())
+async fn visit_info(headers: HeaderMap) -> String {
+    headers
+        .get(axum::http::header::USER_AGENT)
+        .and_then(|value| value.to_str().ok())
+        .unwrap_or("")
+        .to_string()
 }
 
 async fn init_db() {
@@ -43,8 +45,6 @@ async fn main() {
         .route("/", get(homepage))
         .route("/visit", get(visit_info));
 
-    axum::Server::bind(&"0.0.0.0:4000".parse().unwrap())
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:4000").await.unwrap();
+    axum::serve(listener, app).await.unwrap();
 }

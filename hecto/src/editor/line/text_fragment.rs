@@ -1,5 +1,5 @@
-use super::grapheme_width::GraphemeWidth;
 use super::ByteIdx;
+use super::grapheme_width::GraphemeWidth;
 
 #[derive(Clone, Debug)]
 pub struct TextFragment {

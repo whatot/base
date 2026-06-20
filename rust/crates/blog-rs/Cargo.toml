@@ -1,11 +1,11 @@
 [package]
 name = "blog-rs"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-tokio = {version="1.43", features = ["macros", "rt-multi-thread"]}
-axum = {version="0.6", features=["headers"]}
-askama = {version="0.12", features=["markdown"]}
-sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "sqlite", "macros", "time"] }
-tower-http = {version = "0.4", features=["full"]}
+tokio = {version="1.52", features = ["macros", "net", "rt-multi-thread"]}
+axum = "0.8"
+askama = "0.16"
+sqlx = { version = "0.9", features = ["runtime-tokio", "tls-rustls", "sqlite", "macros", "time"] }
+tower-http = {version = "0.7", features=["full"]}

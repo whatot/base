@@ -1,8 +1,9 @@
 use ggez::{
+    Context, GameError, GameResult,
     conf::{WindowMode, WindowSetup},
     event::{self},
     input::keyboard::KeyInput,
-    Context, GameError, GameResult,
+    winit::keyboard::PhysicalKey,
 };
 use resources::Time;
 use specs::{RunNow, World, WorldExt};
@@ -27,7 +28,7 @@ struct Game {
 // two things:
 // - updating
 // - rendering
-impl event::EventHandler<ggez::GameError> for Game {
+impl event::EventHandler for Game {
     fn update(&mut self, context: &mut Context) -> GameResult {
         {
             // Run input system
@@ -75,7 +76,7 @@ impl event::EventHandler<ggez::GameError> for Game {
         println!("Key pressed: {:?}", key_input);
 
         let mut input_queue = self.world.write_resource::<resources::InputQueue>();
-        if let Some(key) = key_input.keycode {
+        if let PhysicalKey::Code(key) = key_input.event.physical_key {
             input_queue.keys_pressed.push(key);
         }
         Ok(())

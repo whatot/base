@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use ggez::{
-    audio::{self, SoundSource},
     Context,
+    audio::{self, SoundSource},
 };
 use specs::{World, WorldExt};
 
@@ -24,11 +24,7 @@ pub fn initialize_sounds(world: &mut World, context: &mut Context) {
     }
 }
 impl AudioStore {
-    pub fn play_sound(&mut self, context: &mut Context, sound: &String) {
-        let _ = self
-            .sounds
-            .get_mut(sound)
-            .expect("expected sound")
-            .play_detached(context);
+    pub fn play_sound(&mut self, _context: &mut Context, sound: &String) {
+        let _ = self.sounds.get_mut(sound).expect("expected sound").play();
     }
 }

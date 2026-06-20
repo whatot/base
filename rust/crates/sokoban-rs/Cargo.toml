@@ -1,10 +1,10 @@
 [package]
 name = "sokoban-rs"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-ggez = "0.9"
+ggez = "0.10"
 specs ={ version = "0.20", features = ["specs-derive"]}
-glam = { version = "0.29", features = ["mint"] }
-itertools = "0.13"
+glam = { version = "0.33", features = ["mint"] }
+itertools = "0.15"

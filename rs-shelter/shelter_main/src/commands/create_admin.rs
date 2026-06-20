@@ -1,7 +1,9 @@
 use anyhow::anyhow;
-use argon2::Argon2;
+use argon2::{
+    Argon2, PasswordHasher,
+    password_hash::{SaltString, rand_core::OsRng},
+};
 use clap::{Arg, ArgMatches, Command};
-use password_hash::{rand_core::OsRng, PasswordHasher, SaltString};
 use sea_orm::{
     ActiveModelTrait, ActiveValue::NotSet, ColumnTrait, Database, EntityTrait, QueryFilter, Set,
 };

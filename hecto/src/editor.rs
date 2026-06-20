@@ -2,7 +2,7 @@ use std::io::Error;
 
 use crossterm::event::Event::{self};
 use crossterm::event::KeyEvent;
-use crossterm::event::{read, KeyEventKind};
+use crossterm::event::{KeyEventKind, read};
 
 mod annotate;
 mod annotation;

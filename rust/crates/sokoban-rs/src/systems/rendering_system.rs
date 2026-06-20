@@ -2,8 +2,8 @@ use std::{collections::HashMap, time::Duration};
 
 use ggez::graphics::{Canvas, DrawParam, Drawable, InstanceArray, Rect};
 use ggez::{
-    graphics::{self, Color, Image},
     Context,
+    graphics::{self, Color, Image},
 };
 use glam::vec2;
 use specs::{Join, Read, ReadStorage, System};

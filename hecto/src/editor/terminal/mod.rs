@@ -1,7 +1,8 @@
-use std::io::{stdout, Error, Write};
+use std::io::{Error, Write, stdout};
 
 use attribute::Attribute;
 use crossterm::{
+    Command,
     cursor::{self, MoveTo},
     queue,
     style::{
@@ -10,10 +11,9 @@ use crossterm::{
         ResetColor, SetBackgroundColor, SetForegroundColor,
     },
     terminal::{
-        self, disable_raw_mode, enable_raw_mode, size, Clear, ClearType, DisableLineWrap,
-        EnableLineWrap,
+        self, Clear, ClearType, DisableLineWrap, EnableLineWrap, disable_raw_mode, enable_raw_mode,
+        size,
     },
-    Command,
 };
 
 use super::annotate::AnnotatedString;

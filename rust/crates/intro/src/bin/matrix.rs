@@ -1,6 +1,3 @@
-#![feature(test)]
-
-extern crate test;
 use std::fmt::Debug;
 use std::ops::Add;
 use std::ops::Mul;
@@ -104,7 +101,6 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
 
     fn get_left() -> Matrix<i32> {
         Matrix::new(2, 3, vec![1, 2, 1, 2, 6, 9])
@@ -116,20 +112,6 @@ mod tests {
 
     fn get_result() -> Matrix<i32> {
         Matrix::new(2, 4, vec![16, 26, 15, 12, 96, 77, 48, 41])
-    }
-
-    #[bench]
-    fn bench_multiply_v1(b: &mut Bencher) {
-        let left = get_left();
-        let right = get_right();
-        b.iter(|| left.multiply_v1(&right))
-    }
-
-    #[bench]
-    fn bench_multiply_v2(b: &mut Bencher) {
-        let left = get_left();
-        let right = get_right();
-        b.iter(|| left.multiply_v2(&right))
     }
 
     #[test]

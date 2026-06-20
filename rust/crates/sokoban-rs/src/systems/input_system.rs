@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use specs::{world::Index, Entities, Join, ReadStorage, System, Write, WriteStorage};
+use specs::{Entities, Join, ReadStorage, System, Write, WriteStorage, world::Index};
 
 use ggez::input::keyboard::KeyCode;
 
@@ -55,10 +55,10 @@ impl<'a> System<'a> for InputSystem {
                 // Now iterate through current position to the end of the map
                 // on the correct axis and check what needs to move.
                 let (start, end, is_x) = match key {
-                    KeyCode::Up => (position.y, 0, false),
-                    KeyCode::Down => (position.y, constants::MAP_HEIGHT, false),
-                    KeyCode::Left => (position.x, 0, true),
-                    KeyCode::Right => (position.x, constants::MAP_WIDTH, true),
+                    KeyCode::ArrowUp => (position.y, 0, false),
+                    KeyCode::ArrowDown => (position.y, constants::MAP_HEIGHT, false),
+                    KeyCode::ArrowLeft => (position.x, 0, true),
+                    KeyCode::ArrowRight => (position.x, constants::MAP_WIDTH, true),
                     _ => continue,
                 };
 
@@ -107,10 +107,10 @@ impl<'a> System<'a> for InputSystem {
             let position = positions.get_mut(entities.entity(id));
             if let Some(positiom) = position {
                 match key {
-                    KeyCode::Up => positiom.y -= 1,
-                    KeyCode::Down => positiom.y += 1,
-                    KeyCode::Left => positiom.x -= 1,
-                    KeyCode::Right => positiom.x += 1,
+                    KeyCode::ArrowUp => positiom.y -= 1,
+                    KeyCode::ArrowDown => positiom.y += 1,
+                    KeyCode::ArrowLeft => positiom.x -= 1,
+                    KeyCode::ArrowRight => positiom.x += 1,
                     _ => (),
                 }
             }

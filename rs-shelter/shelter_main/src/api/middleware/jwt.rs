@@ -1,17 +1,17 @@
 use axum::{
+    Json,
     body::Body,
     extract::State,
-    http::{header, Request, StatusCode},
+    http::{Request, StatusCode, header},
     middleware::Next,
     response::IntoResponse,
-    Json,
 };
-use jsonwebtoken::{decode, DecodingKey, Validation};
+use jsonwebtoken::{DecodingKey, Validation, decode};
 
 use crate::{
     api::dto::{
-        errors::{ErrorResponse, Status},
         TokenClaims,
+        errors::{ErrorResponse, Status},
     },
     state::ApplicationState,
 };

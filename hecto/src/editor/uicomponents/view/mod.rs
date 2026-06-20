@@ -12,10 +12,10 @@ use search_direction::SearchDirection;
 use searchinfo::SearchInfo;
 
 use crate::editor::{
+    NAME, VERSION,
     command::{Edit, Move},
     documentstatus::DocumentStatus,
     uicomponents::UIComponent,
-    NAME, VERSION,
 };
 
 use crate::prelude::*;

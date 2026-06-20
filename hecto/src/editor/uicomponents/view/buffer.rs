@@ -7,8 +7,8 @@ use std::io::Write;
 use crate::editor::annotate::AnnotatedString;
 use crate::editor::line::Line;
 
-use super::fileinfo::FileInfo;
 use super::Highlighter;
+use super::fileinfo::FileInfo;
 use super::{GraphemeIdx, LineIdx, Location};
 
 #[derive(Default)]
